@@ -120,15 +120,45 @@ async function handleText(ctx: Context, pend: Map<number, Pending>, h: TextHelpe
   await handleTopicText(ctx, p, locale, h);
 }
 
-// Extended in Tasks 5-6.
-async function handleTopicText(_ctx: Context, _p: Pending, _locale: string, _h: TextHelpers): Promise<void> {}
+async function handleTopicText(ctx: Context, p: Pending, locale: string, h: TextHelpers): Promise<void> {
+  const userId = h.uid(ctx);
+  const text = (ctx.message as { text: string }).text.trim();
+  if (p.kind === 'add_shared') {
+    const res = rooms.addSharedTopic(userId, p.roomId, text);
+    await ctx.reply(res.ok ? t(locale, 'topic_added') : errorText(res.error, locale));
+    return void (await h.openRoom(ctx, p.roomId));
+  }
+  if (p.kind === 'add_personal') {
+    const res = rooms.addPersonalTopic(userId, p.roomId, text);
+    await ctx.reply(res.ok ? t(locale, 'topic_added') : errorText(res.error, locale));
+    return void (await h.openRoom(ctx, p.roomId));
+  }
+  await handleTopicText2(ctx, p, locale, h); // update_text/answer_note — Task 6
+}
+async function handleTopicText2(_ctx: Context, _p: Pending, _locale: string, _h: TextHelpers): Promise<void> {}
 
 async function handleRoomCallback(ctx: Context, a: RoomCbArgs): Promise<void> {
   if (a.ns === 'room' && a.action === 'open') return void (await a.openRoom(ctx, a.id));
   // addshared/addpersonal/update/answer/close/leave + topic:* added in Tasks 5-6.
   await handleRoomCallback2(ctx, a, a.uid(ctx), a.loc(ctx));
 }
-async function handleRoomCallback2(_ctx: Context, _a: RoomCbArgs, _userId: number, _locale: string): Promise<void> {}
+
+async function handleRoomCallback2(ctx: Context, a: RoomCbArgs, userId: number, locale: string): Promise<void> {
+  if (a.ns !== 'room') return void (await handleTopicCallback(ctx, a, userId, locale));
+  if (a.action === 'addshared') {
+    if (!rooms.isRoomAdmin(userId, a.id)) return void (await ctx.reply(errorText('not_admin', locale)));
+    a.pending.set(userId, { kind: 'add_shared', roomId: a.id });
+    return void (await ctx.reply(t(locale, 'shared_prompt')));
+  }
+  if (a.action === 'addpersonal') {
+    if (!rooms.isRoomMember(userId, a.id)) return void (await ctx.reply(t(locale, 'stale_button')));
+    a.pending.set(userId, { kind: 'add_personal', roomId: a.id });
+    return void (await ctx.reply(t(locale, 'personal_prompt')));
+  }
+  await handleRoomCallback3(ctx, a, userId, locale); // update/answer/close/leave — Task 6
+}
+async function handleRoomCallback3(_ctx: Context, _a: RoomCbArgs, _userId: number, _locale: string): Promise<void> {}
+async function handleTopicCallback(_ctx: Context, _a: RoomCbArgs, _userId: number, _locale: string): Promise<void> {}
 
 export async function safeEditMessageText(
   ctx: Context,
