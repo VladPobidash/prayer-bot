@@ -96,10 +96,31 @@ export function listRoomsForUser(telegramId: number): RoomWithRole[] {
   return rows.map((r) => ({ ...toRoom(r), role: r.role as MemberRole }));
 }
 
-// ---- membership (addMember needed by room tests; full membership block in next section) ----
+// ---- membership ----
+export interface Member { roomId: number; telegramId: number; role: MemberRole; joinedAt: string; }
+interface MemberRow { room_id: number; telegram_id: number; role: string; joined_at: string; }
+function toMember(r: MemberRow): Member {
+  return { roomId: r.room_id, telegramId: r.telegram_id, role: r.role as MemberRole, joinedAt: r.joined_at };
+}
+
 export function addMember(roomId: number, telegramId: number, role: MemberRole): void {
   getDb().prepare(
     `INSERT INTO room_members (room_id, telegram_id, role) VALUES (?, ?, ?)
      ON CONFLICT(room_id, telegram_id) DO UPDATE SET role = excluded.role`,
   ).run(roomId, telegramId, role);
+}
+export function removeMember(roomId: number, telegramId: number): void {
+  getDb().prepare(`DELETE FROM room_members WHERE room_id = ? AND telegram_id = ?`).run(roomId, telegramId);
+}
+export function getMember(roomId: number, telegramId: number): Member | null {
+  const row = getDb().prepare(
+    `SELECT * FROM room_members WHERE room_id = ? AND telegram_id = ?`,
+  ).get(roomId, telegramId) as MemberRow | undefined;
+  return row ? toMember(row) : null;
+}
+export function listMembers(roomId: number): Member[] {
+  return (getDb().prepare(`SELECT * FROM room_members WHERE room_id = ? ORDER BY joined_at`).all(roomId) as MemberRow[]).map(toMember);
+}
+export function countMembers(roomId: number): number {
+  return (getDb().prepare(`SELECT COUNT(*) AS c FROM room_members WHERE room_id = ?`).get(roomId) as { c: number }).c;
 }

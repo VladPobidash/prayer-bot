@@ -4,6 +4,7 @@ import { initDb, closeDb } from '../src/db/connection.ts';
 import {
   upsertUser, insertRoom, getRoom, getRoomByInvite, setRoomStatus,
   addMember, countRoomsForUser, listRoomsForUser,
+  removeMember, getMember, listMembers, countMembers,
 } from '../src/db/repo.ts';
 
 test('initDb creates the prayer-room tables', () => {
@@ -36,5 +37,21 @@ test('rooms: insert/get/getByInvite and membership-based room counts', () => {
 
   setRoomStatus(roomId, 'closed');
   assert.equal(getRoom(roomId)?.status, 'closed');
+  closeDb();
+});
+
+test('members: add/get/list/count/remove', () => {
+  initDb(':memory:');
+  const roomId = insertRoom('Room', 1, 'codeaaaa');
+  addMember(roomId, 1, 'admin');
+  addMember(roomId, 2, 'member');
+
+  assert.equal(countMembers(roomId), 2);
+  assert.equal(getMember(roomId, 2)?.role, 'member');
+  assert.deepEqual(listMembers(roomId).map((m) => m.telegramId).sort(), [1, 2]);
+
+  removeMember(roomId, 2);
+  assert.equal(getMember(roomId, 2), null);
+  assert.equal(countMembers(roomId), 1);
   closeDb();
 });
