@@ -14,8 +14,9 @@ This spec covers **only the blank framework/template** — the reusable architec
 wiring, and code patterns — with **no prayer business logic**. The template must compile,
 start, pass `GET /health`, and deploy to Railway, ready to receive the domain later.
 
-The architecture is a deliberately framework-light, layered Node.js ESM stack (Telegraf +
-better-sqlite3 WAL + node-cron + a built-in `http` server + minimal dependencies), designed
+The architecture is a deliberately framework-light, layered **TypeScript** (Node.js ESM)
+stack (Telegraf + better-sqlite3 WAL + node-cron + a built-in `http` server + minimal
+dependencies), run build-free via Node's native type-stripping and designed
 for **Railway's ephemeral-container, redeploy-on-push model** — durable state lives on a
 mounted Volume, process death is treated as normal, and missed work is reconciled on boot.
 
@@ -48,14 +49,15 @@ mounted Volume, process death is treated as normal, and missed work is reconcile
 | # | Decision | Choice | Rationale |
 |---|----------|--------|-----------|
 | D1 | Template depth | **Thin layer skeleton** | Framework + patterns only; domain added when business logic lands. |
-| D2 | Persistence | **SQLite on Railway Volume, abstracted** | Reuse better-sqlite3/WAL/repo patterns; all SQL behind `db/repo.js` so a Postgres swap touches one boundary. Single-replica. |
+| D2 | Persistence | **SQLite on Railway Volume, abstracted** | Reuse better-sqlite3/WAL/repo patterns; all SQL behind `db/repo.ts` so a Postgres swap touches one boundary. Single-replica. |
 | D3 | Transport | **Long-polling** | Zero public networking, simplest on Railway. `GET /health` keeps healthchecks green. Webhooks deferred. |
 | D4 | Localization | **i18n: uk / en / ru** | `t(locale,key,vars)` + dictionaries; default locale configurable (`uk`). |
-| D5 | Package mgr / deps | **npm, minimal deps** | `telegraf`, `better-sqlite3`, `node-cron`, `dotenv`. No build step. Pin `engines.node`. |
+| D5 | Package mgr / deps | **npm; minimal runtime deps** | Runtime: `telegraf`, `better-sqlite3`, `node-cron`, `dotenv`. Dev only: `typescript`, `@types/*`. No build step; pin `engines.node`. |
 | D6 | Process supervision | **Railway restart policy + graceful SIGTERM** | No external supervisor; rely on Railway's restart. A graceful SIGTERM handler runs `db.close()` so WAL flushes before SIGKILL. |
 | D7 | License | **MIT** | Maximize free reuse/forking by churches and groups; lowest-friction permissive license. |
 | D8 | Host / distribution | **GitHub** | Best forking UX + discoverability; native Railway "Deploy from GitHub" + one-click button. |
 | D9 | Docs audience | **Non-developer admin first** | README/SETUP must let a non-coder fork and deploy; dev docs (CLAUDE.md/ADRs) are secondary. |
+| D10 | Language | **TypeScript, run build-free** | Types as guardrails for agentic development. Run `.ts` directly via Node ≥24 native type-stripping — no `tsc`/bundler in the deploy path. `erasableSyntaxOnly` enforces strip-safe syntax; `tsc --noEmit` type-checks in CI/test. |
 
 ## 5. Architecture & Layering
 
@@ -81,19 +83,19 @@ Persistence is initialized before the client; the client before anything that se
 ```
 prayer-bot/
 ├─ src/
-│  ├─ index.js        Composition root: wiring order, reconcileOnBoot(), graceful shutdown
-│  ├─ config.js       Frozen env-derived config; fail-fast on required vars
-│  ├─ preferences.js  Committed non-string tunables (TELEGRAM_MAX_LENGTH, PAGE_SIZE, log prefixes)
-│  ├─ i18n.js         t(locale,key,vars), resolveLocale(ctx), uk/en/ru dictionaries
+│  ├─ index.ts        Composition root: wiring order, reconcileOnBoot(), graceful shutdown
+│  ├─ config.ts       Frozen env-derived config (typed Config); fail-fast on required vars
+│  ├─ preferences.ts  Committed non-string tunables (TELEGRAM_MAX_LENGTH, PAGE_SIZE, log prefixes)
+│  ├─ i18n.ts         t(locale,key,vars), resolveLocale(ctx), uk/en/ru dicts; Locale/LocaleKey types
 │  ├─ db/
-│  │   ├─ connection.js  better-sqlite3 singleton: DB_PATH, WAL, initDb(), getDb(), close()
-│  │   └─ repo.js        The ONLY module with SQL; named functions = the swap seam
-│  ├─ bot.js          createBot() factory (no launch): middleware, /start /help /ping, router, bot.catch
-│  ├─ scheduler.js    register({notify}) — node-cron wiring + one no-op heartbeat job
-│  ├─ notify.js       Pure formatters: truncate(4096), lines(), one keyboard-builder example
-│  ├─ utils.js        Cyrillic-safe normalize() (\p{L}\p{N}/u), withRetry(), withTimeout()
-│  └─ server.js       node:http server bound to PORT on 0.0.0.0: GET /health → 200
-├─ tests/             node --test: normalize(), truncate(), config parsing, i18n t()
+│  │   ├─ connection.ts  better-sqlite3 singleton: DB_PATH, WAL, initDb(), getDb(), close()
+│  │   └─ repo.ts        The ONLY module with SQL; typed named functions = the swap seam
+│  ├─ bot.ts          createBot() factory (no launch): middleware, /start /help /ping, router, bot.catch
+│  ├─ scheduler.ts    register({notify}) — node-cron wiring + one no-op heartbeat job
+│  ├─ notify.ts       Pure formatters: truncate(4096), lines(), one keyboard-builder example
+│  ├─ utils.ts        Cyrillic-safe normalize() (\p{L}\p{N}/u), withRetry(), withTimeout()
+│  └─ server.ts       node:http server bound to PORT on 0.0.0.0: GET /health → 200
+├─ tests/             node --test over tests/**/*.test.ts (Node strips types directly)
 ├─ docs/
 │  ├─ architecture-decisions.md   ADR log (developer-facing)
 │  ├─ SETUP.md                    Beginner step-by-step: BotFather → Railway deploy → verify
@@ -101,7 +103,8 @@ prayer-bot/
 ├─ .github/
 │  └─ ISSUE_TEMPLATE.md           Simple bug/question template (optional, low-effort)
 ├─ .env.example
-├─ package.json       "type":"module", engines.node pinned, start+test scripts, minimal deps
+├─ tsconfig.json      noEmit, nodenext, strict, erasableSyntaxOnly, verbatimModuleSyntax
+├─ package.json       "type":"module", engines.node ">=24", start=node src/index.ts, test=typecheck + node --test
 ├─ .gitignore         node_modules, .env, *.db, *.db-wal, *.db-shm, /data
 ├─ railway.json       start command for the Railway service
 ├─ LICENSE            MIT
@@ -111,15 +114,33 @@ prayer-bot/
 └─ README.md          Friendly landing: what/who-for, 1-click deploy, links to docs/SETUP & docs/USAGE
 ```
 
-**Why `db/` is two files:** `connection.js` owns the driver and lifecycle; `repo.js` is the
+**Why `db/` is two files:** `connection.ts` owns the driver and lifecycle; `repo.ts` is the
 single seam every caller goes through (callers never see SQL). A future Postgres migration
 rewrites these two files only. (Note: better-sqlite3 is synchronous; if Postgres is adopted
 later, repo functions become async and callers must `await` — but the change stays contained
 to the repo boundary + its direct callers.)
 
+### TypeScript & build-free execution
+
+Source is TypeScript, run **directly** by Node ≥24 via native type-stripping — `node
+src/index.ts`, with no `tsc`/bundler/`dist/` in the run or deploy path. Setup:
+
+- **Erasable-only syntax:** no `enum`, `namespace`, or constructor parameter properties
+  (they need codegen, not just stripping). `tsconfig.json` sets `erasableSyntaxOnly: true`
+  so the compiler rejects non-strip-safe syntax — use `const` objects + union types instead
+  of enums. Plus `verbatimModuleSyntax: true` (explicit `import type`), `module: nodenext`,
+  `rewriteRelativeImportExtensions: true`, `noEmit: true`, `strict: true`.
+- **Type-checking is separate:** stripping does not check types. `npm test` runs `tsc
+  --noEmit` before `node --test`; CI runs the same.
+- **Deps:** `typescript`, `@types/node`, `@types/better-sqlite3`, `@types/node-cron` are
+  **devDependencies**; runtime deps stay the four (Telegraf and dotenv ship their own types).
+- **Typed seams for agentic work:** a `Config` interface, a `BotState` row type, and
+  `Locale`/`LocaleKey` unions give compile-time contracts that catch wrong-shape calls
+  before runtime.
+
 ## 6. Module Specifications
 
-### `src/config.js`
+### `src/config.ts`
 - `import 'dotenv/config'` on line 1 (no-ops on Railway where no `.env` exists).
 - Fail-fast: `required = ['TELEGRAM_BOT_TOKEN']`; throw `Missing required env var: <KEY>` →
   surfaces as a one-line Railway crash-loop log.
@@ -134,12 +155,12 @@ to the repo boundary + its direct callers.)
   - `heartbeatCron` = `process.env.HEARTBEAT_CRON || '0 * * * *'`
 - Deliberate numeric parsing that does not treat a legitimate `0` as falsy where it matters.
 
-### `src/preferences.js`
+### `src/preferences.ts`
 - Dependency-free committed constants: `TELEGRAM_MAX_LENGTH = 4096`, `PAGE_SIZE = 10`,
   `LOG_PREFIX = { bot:'[bot]', db:'[db]', scheduler:'[scheduler]', server:'[server]' }`.
-- (User-facing strings live in `i18n.js`, not here.)
+- (User-facing strings live in `i18n.ts`, not here.)
 
-### `src/i18n.js`
+### `src/i18n.ts`
 - `LOCALES = { uk: {...}, en: {...}, ru: {...} }` — dictionaries for the stub strings
   (`start`, `help`, `ping`, plus a generic `unknownCommand`). Each key may contain
   `{placeholder}` tokens.
@@ -149,21 +170,21 @@ to the repo boundary + its direct callers.)
 - `resolveLocale(ctx)`: returns `config.defaultLocale` for now. **TODO** marker: read a
   per-group/user locale from the DB once the domain models it.
 
-### `src/db/connection.js`
+### `src/db/connection.ts`
 - `initDb()`: open `better-sqlite3(config.dbPath)`, `pragma('journal_mode = WAL')`, run
   idempotent `CREATE TABLE IF NOT EXISTS` for the framework schema, run a PRAGMA-guarded
   additive-`ALTER` migration helper (worked example, currently a no-op), then **reconcile**
   (currently a no-op placeholder; the hook exists). Returns the handle.
-- `getDb()`: accessor for `repo.js`. `closeDb()`: `db.close()` for graceful shutdown.
+- `getDb()`: accessor for `repo.ts`. `closeDb()`: `db.close()` for graceful shutdown.
 - Single owner of the connection.
 
-### `src/db/repo.js`
+### `src/db/repo.ts`
 - The only module importing `getDb()`. All SQL via prepared statements; all values bound.
 - Worked example over `bot_state`: `getState(key)`, `setState(key, value)` (UPSERT via
   `ON CONFLICT DO UPDATE`).
 - A large comment block marks where prayer-domain repo functions will go.
 
-### `src/bot.js`
+### `src/bot.ts`
 - `createBot()` constructs `new Telegraf(config.telegramBotToken)` and returns it **without
   launching** (caller owns lifecycle/transport).
 - **Admin-gating middleware scaffold:** one `bot.use` that gates *write/admin* commands
@@ -179,30 +200,30 @@ to the repo boundary + its direct callers.)
   modified", rethrows others.
 - `bot.catch` global error boundary (logs; keeps process alive).
 
-### `src/scheduler.js`
+### `src/scheduler.ts`
 - `register({ notify })`: registers node-cron jobs, each behind a feature flag and wrapped
   in per-iteration `try/catch`. Ships **one no-op heartbeat job** (`config.heartbeatCron`)
   that logs `[scheduler] heartbeat` — demonstrates the registration pattern.
-- Takes an injected `notify(chatId, text, extra)` closure (never imports `bot.js`).
+- Takes an injected `notify(chatId, text, extra)` closure (never imports `bot.ts`).
 
-### `src/notify.js`
+### `src/notify.ts`
 - Pure, stateless: `truncate(text)` (single shared helper at `TELEGRAM_MAX_LENGTH`),
   `lines(arr)` join helper, one example inline-keyboard builder. No Telegram API calls.
 - One keyboard convention only (Telegraf `Markup`).
 
-### `src/utils.js`
+### `src/utils.ts`
 - `normalize(str)`: Unicode-aware, `\p{L}\p{N}` with the `/u` flag (**Cyrillic-safe** — does
   not strip uk/ru text). Used later for title matching.
 - `withRetry(fn, opts)` and `withTimeout(promise, ms)`: small manual wrappers (no deps) for
   any future outbound HTTP.
 
-### `src/server.js`
+### `src/server.ts`
 - `startHealthServer(port)`: framework-free `node:http` server bound to `0.0.0.0:port`,
   method+url if-chain, `GET /health → 200 {status:'ok'}`, 404 fallthrough. Returns the
-  server so `index.js` can `close()` it on shutdown. (Placeholder comment for a future
+  server so `index.ts` can `close()` it on shutdown. (Placeholder comment for a future
   `POST /telegram/<secret>` webhook route.)
 
-### `src/index.js`
+### `src/index.ts`
 - The composition root described in §5. `shutdown()` is a single idempotent function bound
   via `process.once` to SIGINT and SIGTERM: `bot.stop('SIGTERM') → server.close() →
   closeDb() → process.exit(0)`. Process-level error guards installed first.
@@ -270,8 +291,9 @@ A commented block documents the planned prayer-domain tables (added later, addit
 - **Persistence:** create a Railway **Volume** mounted at `/data`; set
   `DB_PATH=/data/prayer-bot.db`. The `.db`/`.db-wal`/`.db-shm` all persist there. **Single
   replica only** (WAL across replicas is unsafe).
-- **Build:** Nixpacks runs `npm install` + `npm start`; better-sqlite3 compiles fine.
-  `railway.json` declares the start command. No build step.
+- **Build:** Nixpacks runs `npm install` + `npm start` (= `node src/index.ts`); Node ≥24
+  strips TypeScript types at load, so there is **no build step** and no `dist/`. better-sqlite3
+  compiles fine. `railway.json` declares the start command; pin Node via `engines.node`.
 - **Config:** all via the Railway Variables tab (no committed `.env`).
 - **Shutdown:** rely on Railway's SIGTERM-then-SIGKILL; the graceful handler closes the DB.
 - **One-click deploy:** publish a Railway template from the GitHub repo and embed a
@@ -285,12 +307,15 @@ A commented block documents the planned prayer-domain tables (added later, addit
 
 ## 12. Testing
 
-`node --test` over `tests/**/*.test.js`, required env injected inline in the `test` script.
+`node --test` over `tests/**/*.test.ts`, required env injected inline in the `test` script.
 Cover the pure logic that exists in the skeleton:
 - `utils.normalize()` — Cyrillic preserved, punctuation stripped.
 - `notify.truncate()` — boundary at 4096.
 - `config` parsing — required-var throw, numeric `0` handling, comma-list → Set.
 - `i18n.t()` — fallback chain + `{var}` interpolation.
+
+`npm test` runs `tsc --noEmit` (type-check) **then** `node --test`. Tests are `.ts` and run
+directly via type-stripping — no separate compile.
 
 ## 13. Conventions
 
@@ -299,6 +324,9 @@ Cover the pure logic that exists in the skeleton:
   in-memory Maps (none needed yet in the skeleton).
 - One shared `truncate()`; one keyboard convention; `\p{L}\p{N}` normalizer (never `[a-z0-9]`).
 - Three-tier docs kept in sync; one accurate dependency-count source of truth.
+- TypeScript, erasable-only: no `enum`/`namespace`/parameter-properties (`erasableSyntaxOnly`
+  enforces it); prefer `const` + union over `enum`; `import type` for type-only imports.
+  Types are guardrails, not ceremony.
 
 ## 14. ADRs to Record (`docs/architecture-decisions.md`)
 
@@ -307,18 +335,20 @@ Cover the pure logic that exists in the skeleton:
 3. In-process node-cron + reconcile-on-boot vs Railway Cron (→ in-process).
 4. Group-safe auth: admin-gating + silent-on-chatter vs closed allow-list.
 5. Railway restart policy + graceful SIGTERM, with no external process supervisor.
+6. TypeScript run via Node native type-stripping vs a `tsc` build vs plain JS (→ type-stripping, no build step).
 
 ## 15. Definition of Done (template)
 
 - `npm install && npm start` boots locally: DB opens (WAL), bot connects (long-polling),
   `GET /health` returns 200, heartbeat cron logs on schedule, `/start` `/help` `/ping`
   respond in the default locale, SIGINT shuts down cleanly (DB closed).
-- `npm test` passes.
+- `npm test` passes (`tsc --noEmit` type-check + `node --test`).
+- `npm start` runs `src/index.ts` directly via Node type-stripping — no build step, no `dist/`.
 - Deploys to Railway with a Volume; data survives a redeploy.
 - **A non-developer can deploy from the README**: the "Deploy on Railway" button + a
   `docs/SETUP.md` walkthrough get a fork running without editing code.
 - `LICENSE` (MIT), `README.md`, `docs/SETUP.md`, `docs/USAGE.md`, `CONTRIBUTING.md`,
-  `CLAUDE.md`, and the 5 ADRs are present, accurate, and cross-linked.
+  `CLAUDE.md`, `tsconfig.json`, and the 6 ADRs are present, accurate, and cross-linked.
 - No prayer business logic present; extension points are clearly commented.
 
 ## 16. Documentation Set (open-source, beginner-friendly)
