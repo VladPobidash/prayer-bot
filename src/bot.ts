@@ -135,11 +135,29 @@ async function handleTopicText(ctx: Context, p: Pending, locale: string, h: Text
   }
   await handleTopicText2(ctx, p, locale, h); // update_text/answer_note — Task 6
 }
-async function handleTopicText2(_ctx: Context, _p: Pending, _locale: string, _h: TextHelpers): Promise<void> {}
+async function handleTopicText2(ctx: Context, p: Pending, locale: string, h: TextHelpers): Promise<void> {
+  const userId = h.uid(ctx);
+  const text = (ctx.message as { text: string }).text.trim();
+  if (p.kind === 'update_text') {
+    const res = rooms.postUpdate(userId, p.topicId, text);
+    await ctx.reply(res.ok ? t(locale, 'update_posted') : errorText(res.error, locale));
+    const topic = repo.getTopic(p.topicId);
+    if (topic) await h.openRoom(ctx, topic.roomId);
+    return;
+  }
+  if (p.kind === 'answer_note') {
+    const res = rooms.markAnswered(userId, p.topicId, text);
+    await ctx.reply(res.ok ? t(locale, 'answered_ok') : errorText(res.error, locale));
+    const topic = repo.getTopic(p.topicId);
+    if (topic) await h.openRoom(ctx, topic.roomId);
+    return;
+  }
+}
 
 async function handleRoomCallback(ctx: Context, a: RoomCbArgs): Promise<void> {
   if (a.ns === 'room' && a.action === 'open') return void (await a.openRoom(ctx, a.id));
-  // addshared/addpersonal/update/answer/close/leave + topic:* added in Tasks 5-6.
+  if (a.ns === 'topic') return void (await handleTopicCallback(ctx, a, a.uid(ctx), a.loc(ctx)));
+  if (a.ns === 'do') return void (await handleRoomCallback3(ctx, a, a.uid(ctx), a.loc(ctx)));
   await handleRoomCallback2(ctx, a, a.uid(ctx), a.loc(ctx));
 }
 
@@ -157,8 +175,50 @@ async function handleRoomCallback2(ctx: Context, a: RoomCbArgs, userId: number, 
   }
   await handleRoomCallback3(ctx, a, userId, locale); // update/answer/close/leave — Task 6
 }
-async function handleRoomCallback3(_ctx: Context, _a: RoomCbArgs, _userId: number, _locale: string): Promise<void> {}
-async function handleTopicCallback(_ctx: Context, _a: RoomCbArgs, _userId: number, _locale: string): Promise<void> {}
+async function handleRoomCallback3(ctx: Context, a: RoomCbArgs, userId: number, locale: string): Promise<void> {
+  if (a.action === 'update' || a.action === 'answer') {
+    const room = repo.getRoom(a.id);
+    if (!room || !rooms.isRoomMember(userId, a.id)) return void (await ctx.reply(t(locale, 'stale_button')));
+    const prompt = a.action === 'update' ? 'pick_topic_update' : 'pick_topic_answer';
+    await ctx.reply(t(locale, prompt), ownTopicsKb(repo.listTopics(a.id), userId, a.action, locale));
+    return;
+  }
+  if (a.action === 'close') {
+    const room = repo.getRoom(a.id);
+    if (!room) return void (await ctx.reply(t(locale, 'stale_button')));
+    await ctx.reply(t(locale, 'close_confirm', { name: room.name }), confirmKb(`do:close:${a.id}`, 'menu:rooms', locale));
+    return;
+  }
+  if (a.action === 'leave') {
+    const room = repo.getRoom(a.id);
+    if (!room) return void (await ctx.reply(t(locale, 'stale_button')));
+    await ctx.reply(t(locale, 'leave_confirm', { name: room.name }), confirmKb(`do:leave:${a.id}`, 'menu:rooms', locale));
+    return;
+  }
+  if (a.ns === 'do' && a.action === 'close') {
+    const res = rooms.closeRoom(userId, a.id);
+    if (!res.ok) return void (await ctx.reply(errorText(res.error, locale)));
+    // notify other members
+    for (const m of repo.listMembers(a.id)) {
+      if (m.telegramId !== userId) {
+        try { await ctx.telegram.sendMessage(m.telegramId, t(locale, 'close_notify', { name: res.value.name })); } catch { /* member blocked the bot */ }
+      }
+    }
+    return void (await ctx.reply(t(locale, 'closed_ok')));
+  }
+  if (a.ns === 'do' && a.action === 'leave') {
+    const res = rooms.leaveRoom(userId, a.id);
+    await ctx.reply(res.ok ? t(locale, 'left_ok') : errorText(res.error, locale));
+    return void (await a.showRooms(ctx));
+  }
+}
+
+async function handleTopicCallback(ctx: Context, a: RoomCbArgs, userId: number, locale: string): Promise<void> {
+  const topic = repo.getTopic(a.id);
+  if (!topic || topic.ownerId !== userId) return void (await ctx.reply(errorText('not_owner', locale)));
+  if (a.action === 'update') { a.pending.set(userId, { kind: 'update_text', topicId: a.id }); return void (await ctx.reply(t(locale, 'update_prompt'))); }
+  if (a.action === 'answer') { a.pending.set(userId, { kind: 'answer_note', topicId: a.id }); return void (await ctx.reply(t(locale, 'answer_prompt'))); }
+}
 
 export async function safeEditMessageText(
   ctx: Context,
