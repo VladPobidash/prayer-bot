@@ -14,14 +14,14 @@ This spec covers **only the blank framework/template** — the reusable architec
 wiring, and code patterns — with **no prayer business logic**. The template must compile,
 start, pass `GET /health`, and deploy to Railway, ready to receive the domain later.
 
-The patterns are deliberately ported from a well-architected reference app, `music-bot`
-(Node.js ESM Telegram bot: Telegraf + better-sqlite3 WAL + node-cron + a built-in `http`
-server + minimal dependencies), adapting its **single-always-on-host (pm2 on a Mac Mini)**
-assumptions to **Railway's ephemeral-container, redeploy-on-push model**.
+The architecture is a deliberately framework-light, layered Node.js ESM stack (Telegraf +
+better-sqlite3 WAL + node-cron + a built-in `http` server + minimal dependencies), designed
+for **Railway's ephemeral-container, redeploy-on-push model** — durable state lives on a
+mounted Volume, process death is treated as normal, and missed work is reconciled on boot.
 
 ## 2. Goals
 
-- Mirror `music-bot`'s proven layering so its patterns transfer 1:1.
+- Use a clean, proven layering (composition root → config → data → bot → background → presentation).
 - Be the **thinnest** useful framework: wiring + patterns, no domain tables/logic.
 - Deploy cleanly on Railway (personal account) with durable persistence.
 - Support three UI locales from day one: **Ukrainian (uk), English (en), Russian (ru)**.
@@ -52,7 +52,7 @@ assumptions to **Railway's ephemeral-container, redeploy-on-push model**.
 | D3 | Transport | **Long-polling** | Zero public networking, simplest on Railway. `GET /health` keeps healthchecks green. Webhooks deferred. |
 | D4 | Localization | **i18n: uk / en / ru** | `t(locale,key,vars)` + dictionaries; default locale configurable (`uk`). |
 | D5 | Package mgr / deps | **npm, minimal deps** | `telegraf`, `better-sqlite3`, `node-cron`, `dotenv`. No build step. Pin `engines.node`. |
-| D6 | Process supervision | **Railway restart policy + graceful SIGTERM** | Drop pm2. Add `db.close()` to shutdown (music-bot omits it) so WAL flushes before SIGKILL. |
+| D6 | Process supervision | **Railway restart policy + graceful SIGTERM** | No external supervisor; rely on Railway's restart. A graceful SIGTERM handler runs `db.close()` so WAL flushes before SIGKILL. |
 | D7 | License | **MIT** | Maximize free reuse/forking by churches and groups; lowest-friction permissive license. |
 | D8 | Host / distribution | **GitHub** | Best forking UX + discoverability; native Railway "Deploy from GitHub" + one-click button. |
 | D9 | Docs audience | **Non-developer admin first** | README/SETUP must let a non-coder fork and deploy; dev docs (CLAUDE.md/ADRs) are secondary. |
@@ -306,7 +306,7 @@ Cover the pure logic that exists in the skeleton:
 2. SQLite-on-Volume (abstracted via repo) vs managed Postgres (→ SQLite now).
 3. In-process node-cron + reconcile-on-boot vs Railway Cron (→ in-process).
 4. Group-safe auth: admin-gating + silent-on-chatter vs closed allow-list.
-5. Railway restart policy + graceful SIGTERM vs pm2 supervision.
+5. Railway restart policy + graceful SIGTERM, with no external process supervisor.
 
 ## 15. Definition of Done (template)
 
@@ -347,7 +347,7 @@ Audience-split, **non-developer admin first**:
 - **.env.example** — every variable with a friendly one-line comment; required ones marked.
 
 Cross-linking is mandatory (README → SETUP/USAGE; SETUP ↔ USAGE; guides → repo issues for
-help). Keep one accurate dependency/feature source of truth (avoid music-bot's doc drift).
+help). Keep one accurate dependency/feature source of truth; don't let docs drift out of sync.
 
 ## 17. Future Work (out of scope here)
 
