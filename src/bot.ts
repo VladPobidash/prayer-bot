@@ -95,12 +95,40 @@ export function createBot(token: string = config.telegramBotToken): Telegraf {
   return bot;
 }
 
-async function handleText(_ctx: Context, _pending: Map<number, Pending>, _helpers: TextHelpers): Promise<void> {
-  // Filled in Task 4+ (create_name/join_code/add_shared/add_personal/update_text/answer_note).
+async function handleText(ctx: Context, pend: Map<number, Pending>, h: TextHelpers): Promise<void> {
+  const userId = h.uid(ctx);
+  const p = pend.get(userId);
+  if (!p) return; // no active wizard — ignore stray text
+  pend.delete(userId);
+  const text = (ctx.message as { text: string }).text.trim();
+  const locale = h.loc(ctx);
+
+  if (p.kind === 'create_name') {
+    const res = rooms.createRoom(userId, text);
+    if (!res.ok) return void (await ctx.reply(errorText(res.error, locale)));
+    const link = `https://t.me/${(ctx.botInfo as { username?: string } | undefined)?.username ?? 'bot'}?start=join_${res.value.inviteCode}`;
+    await ctx.reply(t(locale, 'room_created', { name: res.value.name, code: res.value.inviteCode, link }));
+    return void (await h.openRoom(ctx, res.value.id));
+  }
+  if (p.kind === 'join_code') {
+    const res = rooms.joinRoom(userId, text);
+    if (!res.ok) return void (await ctx.reply(errorText(res.error, locale)));
+    await ctx.reply(t(locale, 'joined', { name: res.value.name }));
+    return void (await h.openRoom(ctx, res.value.id));
+  }
+  // add_shared / add_personal / update_text / answer_note handled in Tasks 5-6:
+  await handleTopicText(ctx, p, locale, h);
 }
-async function handleRoomCallback(_ctx: Context, _args: RoomCbArgs): Promise<void> {
-  // Filled in Task 4+ (room:open/addshared/addpersonal/update/answer/close/leave, topic:update/answer).
+
+// Extended in Tasks 5-6.
+async function handleTopicText(_ctx: Context, _p: Pending, _locale: string, _h: TextHelpers): Promise<void> {}
+
+async function handleRoomCallback(ctx: Context, a: RoomCbArgs): Promise<void> {
+  if (a.ns === 'room' && a.action === 'open') return void (await a.openRoom(ctx, a.id));
+  // addshared/addpersonal/update/answer/close/leave + topic:* added in Tasks 5-6.
+  await handleRoomCallback2(ctx, a, a.uid(ctx), a.loc(ctx));
 }
+async function handleRoomCallback2(_ctx: Context, _a: RoomCbArgs, _userId: number, _locale: string): Promise<void> {}
 
 export async function safeEditMessageText(
   ctx: Context,
