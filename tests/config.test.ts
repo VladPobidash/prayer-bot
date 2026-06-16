@@ -31,3 +31,16 @@ test('invalid DEFAULT_LOCALE falls back to uk', () => {
   const c = loadConfig({ ...base, DEFAULT_LOCALE: 'xx' });
   assert.equal(c.defaultLocale, 'uk');
 });
+
+test('treats empty-string env vars as unset and uses defaults', () => {
+  const c = loadConfig({
+    TELEGRAM_BOT_TOKEN: 'x',
+    DB_PATH: '', PORT: '', TZ: '', DEFAULT_LOCALE: '', HEARTBEAT_CRON: '', ADMIN_CHAT_ID: '',
+  } as NodeJS.ProcessEnv);
+  assert.equal(c.dbPath, './data/prayer-bot.db');
+  assert.equal(c.port, 3000);
+  assert.equal(c.tz, 'UTC');
+  assert.equal(c.defaultLocale, 'uk');
+  assert.equal(c.heartbeatCron, '0 * * * *');
+  assert.equal(c.adminChatId, null);
+});

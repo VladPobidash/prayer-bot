@@ -17,18 +17,21 @@ export interface Config {
 const REQUIRED = ['TELEGRAM_BOT_TOKEN'] as const;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
+  const read = (v: string | undefined): string | undefined =>
+    v !== undefined && v !== '' ? v : undefined;
+
   for (const key of REQUIRED) {
     if (!env[key]) throw new Error(`Missing required env var: ${key}`);
   }
 
-  const localeRaw = env.DEFAULT_LOCALE ?? 'uk';
+  const localeRaw = read(env.DEFAULT_LOCALE) ?? 'uk';
   const defaultLocale: Locale =
     (SUPPORTED_LOCALES as readonly string[]).includes(localeRaw)
       ? (localeRaw as Locale)
       : 'uk';
 
   const adminUserIds = new Set(
-    (env.ADMIN_USER_IDS ?? '')
+    (read(env.ADMIN_USER_IDS) ?? '')
       .split(',')
       .map((s) => s.trim())
       .filter((s) => s.length > 0)
@@ -36,18 +39,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       .filter((n) => Number.isFinite(n)),
   );
 
+  const portStr = read(env.PORT);
+  const adminChatStr = read(env.ADMIN_CHAT_ID);
+
   return Object.freeze({
     telegramBotToken: env.TELEGRAM_BOT_TOKEN as string,
-    dbPath: env.DB_PATH ?? './data/prayer-bot.db',
-    port: env.PORT !== undefined && env.PORT !== '' ? Number(env.PORT) : 3000,
-    tz: env.TZ ?? 'UTC',
+    dbPath: read(env.DB_PATH) ?? './data/prayer-bot.db',
+    port: portStr !== undefined ? Number(portStr) : 3000,
+    tz: read(env.TZ) ?? 'UTC',
     defaultLocale,
     adminUserIds,
-    adminChatId:
-      env.ADMIN_CHAT_ID !== undefined && env.ADMIN_CHAT_ID !== ''
-        ? Number(env.ADMIN_CHAT_ID)
-        : null,
-    heartbeatCron: env.HEARTBEAT_CRON ?? '0 * * * *',
+    adminChatId: adminChatStr !== undefined ? Number(adminChatStr) : null,
+    heartbeatCron: read(env.HEARTBEAT_CRON) ?? '0 * * * *',
   });
 }
 
