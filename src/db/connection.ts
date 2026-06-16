@@ -21,6 +21,64 @@ export function initDb(path: string = config.dbPath): DB {
     )
   `);
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      telegram_id  INTEGER PRIMARY KEY,
+      display_name TEXT,
+      locale       TEXT,
+      created_at   TEXT DEFAULT (datetime('now'))
+    )
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS rooms (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      name        TEXT NOT NULL,
+      admin_id    INTEGER NOT NULL,
+      invite_code TEXT NOT NULL UNIQUE,
+      status      TEXT NOT NULL DEFAULT 'active',
+      created_at  TEXT DEFAULT (datetime('now')),
+      closed_at   TEXT
+    )
+  `);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_rooms_invite ON rooms(invite_code)`);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS room_members (
+      room_id     INTEGER NOT NULL,
+      telegram_id INTEGER NOT NULL,
+      role        TEXT NOT NULL DEFAULT 'member',
+      joined_at   TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (room_id, telegram_id)
+    )
+  `);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_members_user ON room_members(telegram_id)`);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS topics (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      room_id     INTEGER NOT NULL,
+      owner_id    INTEGER NOT NULL,
+      kind        TEXT NOT NULL,
+      text        TEXT NOT NULL,
+      status      TEXT NOT NULL DEFAULT 'active',
+      answer_note TEXT,
+      created_at  TEXT DEFAULT (datetime('now')),
+      answered_at TEXT
+    )
+  `);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_topics_room ON topics(room_id, status)`);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS topic_updates (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      topic_id   INTEGER NOT NULL,
+      author_id  INTEGER NOT NULL,
+      text       TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now'))
+    )
+  `);
+
   runMigrations(db);
   reconcile(db);
   console.log(`${LOG_PREFIX.db} initialized at ${path}`);
