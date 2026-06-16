@@ -42,3 +42,40 @@ export function joinRoom(telegramId: number, code: string): Result<Room> {
   repo.addMember(room.id, telegramId, 'member');
   return ok(room);
 }
+
+export function leaveRoom(telegramId: number, roomId: number): Result<void> {
+  const member = repo.getMember(roomId, telegramId);
+  if (!member || member.role === 'admin') return err('not_member'); // admins close, never leave
+  repo.deleteActivePersonalTopics(roomId, telegramId);
+  repo.removeMember(roomId, telegramId);
+  return ok(undefined);
+}
+
+export function closeRoom(adminId: number, roomId: number): Result<Room> {
+  const room = repo.getRoom(roomId);
+  if (!room) return err('room_not_found');
+  if (room.adminId !== adminId) return err('not_admin');
+  repo.setRoomStatus(roomId, 'closed');
+  const closed = repo.getRoom(roomId);
+  return closed ? ok(closed) : err('room_not_found');
+}
+
+export function addSharedTopic(adminId: number, roomId: number, text: string): Result<Topic> {
+  const room = repo.getRoom(roomId);
+  if (!room || room.status !== 'active') return err('room_not_found');
+  if (room.adminId !== adminId) return err('not_admin');
+  if (repo.countActiveTopics(roomId, 'shared') >= MAX_SHARED_TOPICS_PER_ROOM) return err('shared_cap');
+  const id = repo.insertTopic(roomId, adminId, 'shared', text.trim());
+  const t = repo.getTopic(id);
+  return t ? ok(t) : err('topic_not_found');
+}
+
+export function addPersonalTopic(telegramId: number, roomId: number, text: string): Result<Topic> {
+  const room = repo.getRoom(roomId);
+  if (!room || room.status !== 'active') return err('room_not_found');
+  if (!repo.getMember(roomId, telegramId)) return err('not_member');
+  if (repo.countActiveTopics(roomId, 'personal', telegramId) >= MAX_PERSONAL_TOPICS_PER_MEMBER) return err('personal_cap');
+  const id = repo.insertTopic(roomId, telegramId, 'personal', text.trim());
+  const t = repo.getTopic(id);
+  return t ? ok(t) : err('topic_not_found');
+}
