@@ -1,0 +1,24 @@
+{
+  "name": "prayer-bot",
+  "version": "0.1.0",
+  "description": "Open-source Telegram prayer bot for churches and small groups — prayer topics, reminders, and gamification.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && node --env-file=.env.test --test \"tests/**/*.test.ts\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "dotenv": "^16.4.7",
+    "node-cron": "^4.2.1",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.3"
+  }
+}
