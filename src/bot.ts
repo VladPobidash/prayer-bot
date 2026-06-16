@@ -183,13 +183,13 @@ async function handleRoomCallback3(ctx: Context, a: RoomCbArgs, userId: number, 
     await ctx.reply(t(locale, prompt), ownTopicsKb(repo.listTopics(a.id), userId, a.action, locale));
     return;
   }
-  if (a.action === 'close') {
+  if (a.ns === 'room' && a.action === 'close') {
     const room = repo.getRoom(a.id);
     if (!room) return void (await ctx.reply(t(locale, 'stale_button')));
     await ctx.reply(t(locale, 'close_confirm', { name: room.name }), confirmKb(`do:close:${a.id}`, 'menu:rooms', locale));
     return;
   }
-  if (a.action === 'leave') {
+  if (a.ns === 'room' && a.action === 'leave') {
     const room = repo.getRoom(a.id);
     if (!room) return void (await ctx.reply(t(locale, 'stale_button')));
     await ctx.reply(t(locale, 'leave_confirm', { name: room.name }), confirmKb(`do:leave:${a.id}`, 'menu:rooms', locale));
