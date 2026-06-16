@@ -70,8 +70,10 @@ See **[CLAUDE.md](CLAUDE.md)** for the full Patterns reference. The short list:
   (required by Node's runtime resolver and `allowImportingTsExtensions`).
 - **Bracketed log prefixes** — every `console.log` / `console.error` call
   starts with `[bot]`, `[db]`, `[scheduler]`, or `[server]` as appropriate.
-- **All SQL lives in `src/db/repo.ts`** — no SQL in any other module. This
-  keeps a future database swap cheap (touch only `connection.ts` + `repo.ts`).
+- **All SQL lives in `src/db/`** — query statements (DML) in `repo.ts`, schema
+  (DDL: `CREATE TABLE`, migrations) in `connection.ts`; no SQL in any other
+  module. This keeps a future database swap cheap (touch only `connection.ts` +
+  `repo.ts`).
 
 ---
 

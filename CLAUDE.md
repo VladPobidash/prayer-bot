@@ -48,9 +48,10 @@ to inject a stub in tests.
 ### SQLite singleton + repo seam
 
 `src/db/connection.ts` holds a module-level `db` variable initialised once by
-`initDb()`. `getDb()` throws if called before that. All SQL is in
-`src/db/repo.ts`; no other module may import `getDb()` directly. A future
-Postgres swap requires changes only to `connection.ts` and `repo.ts`.
+`initDb()`, which also creates the schema (DDL). `getDb()` throws if called
+before that. All query SQL (DML) is in `src/db/repo.ts`; no other module may
+import `getDb()` directly. A future Postgres swap requires changes only to
+`connection.ts` and `repo.ts`.
 
 ### `createBot()` factory (no launch)
 
