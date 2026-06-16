@@ -140,3 +140,39 @@ repository is simpler to understand and deploy. The constraint is that only
 erasable TypeScript syntax is allowed — decorators, `const enum`, and other
 transforming syntax are off-limits. This is acceptable because the codebase
 uses only simple type annotations, interfaces, and `as const` assertions.
+
+---
+
+## ADR 7 — Logical DM prayer rooms joined by invite code (no Telegram groups)
+
+**Status:** Accepted
+
+**Context:** Shared prayer tracking could be implemented as a Telegram group bot (the bot joins a group chat), or as logical "rooms" managed entirely in DMs. A group-based approach ties the feature to Telegram group permissions, group admin rights, and the noise of a shared chat history.
+
+**Decision:** Implement prayer rooms as logical entities in SQLite, joined by sharing an 8-character invite code or a `?start=join_<code>` deep-link. All bot interaction happens in each user's private DM with the bot; no Telegram group is created or required.
+
+**Consequences:** Users keep their prayer activity private; there is no shared chat to scroll through. The invite code fits naturally in a message or link. The trade-off is that users cannot see each other's personal topics (only a count is shown), which is intentional for privacy. Adding group-chat support in a future version would require a separate handler path but does not affect the DM flow.
+
+---
+
+## ADR 8 — Per-room authorization replaces the global allow-list
+
+**Status:** Accepted
+
+**Context:** The original `bot.ts` used a global `ADMIN_USER_IDS` middleware that silently dropped commands from users not on the list. With prayer rooms, every registered user can create and own rooms, so a global allow-list is too coarse — it would block legitimate members.
+
+**Decision:** Remove the global allow-list middleware. Authorization is now enforced per room inside each handler using `rooms.isRoomAdmin(userId, roomId)` and `rooms.isRoomMember(userId, roomId)`. Any Telegram user who messages the bot can create or join rooms; admin-level actions (add shared topic, close room) are gated on the user being the room creator.
+
+**Consequences:** The bot is open to anyone who can find or be given the invite code, which is the intended behaviour for a small-group prayer tool. There is no server-side user deny-list. If rate-limiting or abuse prevention is needed in the future, it can be added as a separate concern without changing the per-room auth model.
+
+---
+
+## ADR 9 — Self-documenting bot: /start instructions + /help reference
+
+**Status:** Accepted
+
+**Context:** A Telegram bot's feature surface is not easily discoverable without documentation baked into the bot itself. Users arriving via an invite link have no prior context.
+
+**Decision:** `/start` always shows a concise "how it works" explanation followed by the main action menu. `/help` shows the complete command and action reference. Both are available at any time and are driven by `i18n.ts` so they appear in the user's configured language. No external onboarding document is required to start using the bot.
+
+**Consequences:** New users landing on the bot via a deep-link join (`?start=join_<code>`) are onboarded immediately — the join succeeds and the welcome text explains the next steps. Keeping the strings in `i18n.ts` means the docs and the bot stay in sync automatically; there is no separate content layer to maintain.

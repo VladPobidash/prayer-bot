@@ -12,10 +12,12 @@ the build/run commands. Read this before making changes.
 | `src/index.ts` | Composition root: wires all modules in the correct order, calls `reconcileOnBoot()`, registers SIGINT/SIGTERM shutdown handlers. |
 | `src/config.ts` | `loadConfig(env)` reads environment variables into a frozen `Config` object; exports an eagerly-loaded default instance (fail-fast at boot). |
 | `src/preferences.ts` | Committed code-reviewed tunables (`TELEGRAM_MAX_LENGTH`, `PAGE_SIZE`) and the `LOG_PREFIX` constants used by every log call. |
-| `src/i18n.ts` | `LOCALES` dictionary (uk/en/ru), `t(locale, key, vars)` translator with `{var}` interpolation, `resolveLocale(ctx)` stub (returns `config.defaultLocale`). |
+| `src/i18n.ts` | `LOCALES` dictionary (uk/en/ru, ~60 keys), `t(locale, key, vars)` translator with `{var}` interpolation, `resolveLocale(ctx)` stub (returns `config.defaultLocale`), `errorKey(RoomError)` maps every `RoomError` to its `err_*` locale key. |
+| `src/rooms.ts` | Prayer-room domain logic: `createRoom` / `joinRoom` / `leaveRoom` / `closeRoom`, `addSharedTopic` / `addPersonalTopic`, `postUpdate` / `markAnswered`, `isRoomAdmin` / `isRoomMember`, `generateInviteCode`. All operations return `Result<T>` (`{ ok: true; value }` or `{ ok: false; error: RoomError }`). Enforces caps (3 rooms/user, 5 shared topics/room, 3 personal topics/member) and per-room role checks. |
+| `src/ui.ts` | Pure render + inline-keyboard builders — no Telegraf calls, no DB. Exports: `mainMenu`, `roomsList`, `renderRoomView` (viewer-aware: admin vs member buttons), `confirmKb`, `ownTopicsKb`, `errorText`. Depends only on `i18n.ts`, `notify.ts`, and types from `db/repo.ts` / `rooms.ts`. |
 | `src/db/connection.ts` | better-sqlite3 singleton: `initDb(path)` opens the database in WAL mode, creates `bot_state`, runs migrations, and calls the reconcile hook; `getDb()` / `closeDb()`. |
-| `src/db/repo.ts` | The only SQL module: `getState(key)` / `setState(key, value)` (UPSERT). All future prayer-domain SQL goes here. |
-| `src/bot.ts` | `createBot(token)` factory — registers admin middleware, `/start` / `/help` / `/ping` commands, and a single `callback_query` prefix-router; `safeEditMessageText` helper. Does NOT call `bot.launch()`. |
+| `src/db/repo.ts` | The only SQL module: `getState`/`setState` (UPSERT), plus all prayer-domain SQL — users, rooms, members, topics, topic updates. All future prayer-domain SQL goes here. |
+| `src/bot.ts` | `createBot(token)` factory — `/start` (welcome + how-it-works + menu, handles deep-link `?start=join_<code>`), `/help`, `/rooms`, `/join [code]`; single `callback_query` prefix-router dispatching `menu:*` / `room:*` / `topic:*` / `do:*` namespaces; per-user in-memory pending-input session `Map` for multi-step wizards (create_name, join_code, add_shared/personal, update_text, answer_note); **per-room authorization checked in handlers** (`isRoomAdmin`/`isRoomMember`); `safeEditMessageText` helper. Does NOT call `bot.launch()`. |
 | `src/scheduler.ts` | `register({ notify })` — schedules in-process node-cron jobs (heartbeat as the worked example); returns stoppable `ScheduledTask[]`. |
 | `src/notify.ts` | `truncate(text, max)`, `lines(items)`, and `confirmKeyboard(yesData, noData)` — message-formatting helpers used by senders. |
 | `src/utils.ts` | `normalize(input)` (Cyrillic-safe), `withTimeout(promise, ms)`, `withRetry(fn, opts)` — pure utility functions with no side-effects. |
@@ -60,12 +62,22 @@ import `getDb()` directly. A future Postgres swap requires changes only to
 long-polling and avoids a race condition where handlers are registered after
 the bot is already receiving updates.
 
+### Per-room authorization (not a global allow-list)
+
+Authorization is enforced per room inside each handler. `rooms.isRoomAdmin(userId, roomId)` and `rooms.isRoomMember(userId, roomId)` are called at the point of action — no global `bot.use` middleware gate exists. Admin rights mean the user is the room creator (`room.adminId === userId`); member rights mean any active entry in `room_members`. Handlers that require admin access reply with `err_not_admin` from `i18n.ts` if the check fails.
+
+### Pending-input session Map for multi-step wizards
+
+`src/bot.ts` holds a module-level `Map<number, Pending>` (keyed by Telegram user id) to track in-progress wizard steps such as entering a room name, an invite code, or a topic text. When the user sends free text, the `bot.on('text', …)` handler looks up the pending entry, consumes it, and dispatches to the appropriate action. The map is purely in-memory — it does not survive a process restart (acceptable for wizard prompts; durable state goes to SQLite).
+
 ### Single callback prefix-router
 
 All `callback_query` events are handled by one `bot.on('callback_query', …)`
 handler in `src/bot.ts`. Callback data follows the scheme
-`namespace:action:id`. The switch dispatches on `namespace:action`. Keep all
-callback routing here; do not scatter individual `bot.action()` calls across
+`namespace:action:id` (≤64 bytes — carry only ids). Namespaces in use:
+`menu` (home/rooms/help/create/join), `room` (open/addshared/addpersonal/update/answer/close/leave),
+`topic` (update/answer), `do` (close/leave confirmations).
+Keep all callback routing here; do not scatter individual `bot.action()` calls across
 the codebase.
 
 ### Persist-in-SQLite vs ephemeral boundary
