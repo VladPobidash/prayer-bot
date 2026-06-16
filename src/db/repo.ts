@@ -124,3 +124,59 @@ export function listMembers(roomId: number): Member[] {
 export function countMembers(roomId: number): number {
   return (getDb().prepare(`SELECT COUNT(*) AS c FROM room_members WHERE room_id = ?`).get(roomId) as { c: number }).c;
 }
+
+// ---- topics + updates ----
+export interface TopicUpdate { id: number; topicId: number; authorId: number; text: string; createdAt: string; }
+interface TopicRow {
+  id: number; room_id: number; owner_id: number; kind: string; text: string;
+  status: string; answer_note: string | null; created_at: string; answered_at: string | null;
+}
+function toTopic(r: TopicRow): Topic {
+  return {
+    id: r.id, roomId: r.room_id, ownerId: r.owner_id, kind: r.kind as TopicKind, text: r.text,
+    status: r.status as TopicStatus, answerNote: r.answer_note, createdAt: r.created_at, answeredAt: r.answered_at,
+  };
+}
+
+export function insertTopic(roomId: number, ownerId: number, kind: TopicKind, text: string): number {
+  const r = getDb().prepare(
+    `INSERT INTO topics (room_id, owner_id, kind, text) VALUES (?, ?, ?, ?)`,
+  ).run(roomId, ownerId, kind, text);
+  return Number(r.lastInsertRowid);
+}
+export function getTopic(id: number): Topic | null {
+  const row = getDb().prepare(`SELECT * FROM topics WHERE id = ?`).get(id) as TopicRow | undefined;
+  return row ? toTopic(row) : null;
+}
+export function listTopics(roomId: number): Topic[] {
+  return (getDb().prepare(`SELECT * FROM topics WHERE room_id = ? ORDER BY created_at`).all(roomId) as TopicRow[]).map(toTopic);
+}
+// Counts ACTIVE topics. For personal, pass ownerId to scope to one member.
+export function countActiveTopics(roomId: number, kind: TopicKind, ownerId?: number): number {
+  if (ownerId !== undefined) {
+    return (getDb().prepare(
+      `SELECT COUNT(*) AS c FROM topics WHERE room_id = ? AND kind = ? AND owner_id = ? AND status = 'active'`,
+    ).get(roomId, kind, ownerId) as { c: number }).c;
+  }
+  return (getDb().prepare(
+    `SELECT COUNT(*) AS c FROM topics WHERE room_id = ? AND kind = ? AND status = 'active'`,
+  ).get(roomId, kind) as { c: number }).c;
+}
+export function setTopicAnswered(id: number, answerNote: string): void {
+  getDb().prepare(
+    `UPDATE topics SET status = 'answered', answer_note = ?, answered_at = datetime('now') WHERE id = ?`,
+  ).run(answerNote, id);
+}
+export function deleteActivePersonalTopics(roomId: number, ownerId: number): void {
+  getDb().prepare(
+    `DELETE FROM topics WHERE room_id = ? AND owner_id = ? AND kind = 'personal' AND status = 'active'`,
+  ).run(roomId, ownerId);
+}
+export function insertTopicUpdate(topicId: number, authorId: number, text: string): void {
+  getDb().prepare(`INSERT INTO topic_updates (topic_id, author_id, text) VALUES (?, ?, ?)`).run(topicId, authorId, text);
+}
+export function listTopicUpdates(topicId: number): TopicUpdate[] {
+  return (getDb().prepare(`SELECT * FROM topic_updates WHERE topic_id = ? ORDER BY created_at`).all(topicId) as
+    { id: number; topic_id: number; author_id: number; text: string; created_at: string }[])
+    .map((r) => ({ id: r.id, topicId: r.topic_id, authorId: r.author_id, text: r.text, createdAt: r.created_at }));
+}

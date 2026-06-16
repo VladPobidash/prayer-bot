@@ -5,6 +5,8 @@ import {
   upsertUser, insertRoom, getRoom, getRoomByInvite, setRoomStatus,
   addMember, countRoomsForUser, listRoomsForUser,
   removeMember, getMember, listMembers, countMembers,
+  insertTopic, getTopic, listTopics, countActiveTopics,
+  setTopicAnswered, deleteActivePersonalTopics, insertTopicUpdate, listTopicUpdates,
 } from '../src/db/repo.ts';
 
 test('initDb creates the prayer-room tables', () => {
@@ -53,5 +55,28 @@ test('members: add/get/list/count/remove', () => {
   removeMember(roomId, 2);
   assert.equal(getMember(roomId, 2), null);
   assert.equal(countMembers(roomId), 1);
+  closeDb();
+});
+
+test('topics: insert/list/count(active)/answer/delete + updates', () => {
+  initDb(':memory:');
+  const roomId = insertRoom('Room', 1, 'codebbbb');
+  const t1 = insertTopic(roomId, 1, 'shared', 'For the church');
+  const t2 = insertTopic(roomId, 2, 'personal', 'My exam');
+
+  assert.equal(countActiveTopics(roomId, 'shared'), 1);
+  assert.equal(countActiveTopics(roomId, 'personal', 2), 1);
+  assert.equal(listTopics(roomId).length, 2);
+
+  insertTopicUpdate(t2, 2, 'still studying');
+  assert.equal(listTopicUpdates(t2).length, 1);
+
+  setTopicAnswered(t1, 'God provided');
+  assert.equal(getTopic(t1)?.status, 'answered');
+  assert.equal(getTopic(t1)?.answerNote, 'God provided');
+  assert.equal(countActiveTopics(roomId, 'shared'), 0); // answered frees the slot
+
+  deleteActivePersonalTopics(roomId, 2);
+  assert.equal(countActiveTopics(roomId, 'personal', 2), 0);
   closeDb();
 });
