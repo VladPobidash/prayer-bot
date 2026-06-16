@@ -118,3 +118,22 @@ test('auth helpers', () => {
   assert.equal(isRoomMember(999, roomId), false);
   closeDb();
 });
+
+test('joinRoom rejects when the joiner is already at the room cap', () => {
+  initDb(':memory:');
+  upsertUser(2, 'Bob');
+  // Use 4 separate admins so each can create one room (cap is per-user).
+  const codes: string[] = [];
+  for (let i = 10; i <= 13; i++) {
+    upsertUser(i, `Admin${i}`);
+    const r = createRoom(i, `Room ${i}`);
+    if (r.ok) codes.push(r.value.inviteCode);
+  }
+  // Bob joins 3 rooms — now at the cap of 3.
+  for (let i = 0; i < 3; i++) assert.equal(joinRoom(2, codes[i]).ok, true);
+  // The 4th join must be rejected by the room cap.
+  const over = joinRoom(2, codes[3]);
+  assert.equal(over.ok, false);
+  assert.equal(over.ok === false && over.error, 'room_cap');
+  closeDb();
+});
