@@ -1,0 +1,8 @@
+# Railway/Nixpacks build configuration.
+#
+# `better-sqlite3` is a native module. On some Linux + Node ABI combinations it
+# has no prebuilt binary, so npm compiles it from source with node-gyp during
+# `npm ci`. node-gyp needs Python and a C/C++ toolchain, which the default
+# Nixpacks Node image does not ship. Adding them here makes the install succeed.
+[phases.setup]
+aptPkgs = ["python3", "build-essential"]
