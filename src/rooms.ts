@@ -79,3 +79,27 @@ export function addPersonalTopic(telegramId: number, roomId: number, text: strin
   const t = repo.getTopic(id);
   return t ? ok(t) : err('topic_not_found');
 }
+
+export function postUpdate(userId: number, topicId: number, text: string): Result<void> {
+  const topic = repo.getTopic(topicId);
+  if (!topic) return err('topic_not_found');
+  if (topic.ownerId !== userId) return err('not_owner');
+  repo.insertTopicUpdate(topicId, userId, text.trim());
+  return ok(undefined);
+}
+
+export function markAnswered(userId: number, topicId: number, note: string): Result<void> {
+  const topic = repo.getTopic(topicId);
+  if (!topic) return err('topic_not_found');
+  if (topic.ownerId !== userId) return err('not_owner');
+  repo.setTopicAnswered(topicId, note.trim());
+  return ok(undefined);
+}
+
+export function isRoomAdmin(userId: number, roomId: number): boolean {
+  const m = repo.getMember(roomId, userId);
+  return m?.role === 'admin';
+}
+export function isRoomMember(userId: number, roomId: number): boolean {
+  return repo.getMember(roomId, userId) !== null;
+}

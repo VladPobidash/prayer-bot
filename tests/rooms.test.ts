@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initDb, closeDb } from '../src/db/connection.ts';
 import { upsertUser } from '../src/db/repo.ts';
-import { createRoom, joinRoom, generateInviteCode, leaveRoom, closeRoom, addSharedTopic, addPersonalTopic } from '../src/rooms.ts';
-import { listTopics, getMember, getRoom } from '../src/db/repo.ts';
+import { createRoom, joinRoom, generateInviteCode, leaveRoom, closeRoom, addSharedTopic, addPersonalTopic, postUpdate, markAnswered, isRoomAdmin, isRoomMember } from '../src/rooms.ts';
+import { listTopics, getMember, getRoom, getTopic, listTopicUpdates } from '../src/db/repo.ts';
 
 test('generateInviteCode returns an 8-char url-safe unique code', () => {
   initDb(':memory:');
@@ -86,5 +86,35 @@ test('closeRoom: admin only; sets status closed', () => {
   assert.equal(notAdminClose.ok === false && notAdminClose.error, 'not_admin');
   assert.equal(closeRoom(1, roomId).ok, true);
   assert.equal(getRoom(roomId)?.status, 'closed');
+  closeDb();
+});
+
+test('postUpdate + markAnswered: owner only', () => {
+  initDb(':memory:');
+  upsertUser(1, 'Admin'); upsertUser(2, 'Bob');
+  const room = createRoom(1, 'Room');
+  const roomId = room.ok === true ? room.value.id : 0;
+  joinRoom(2, room.ok === true ? room.value.inviteCode : '');
+  const topic = addPersonalTopic(2, roomId, 'mine');
+  const topicId = topic.ok === true ? topic.value.id : 0;
+
+  const notOwner = postUpdate(1, topicId, 'not owner');
+  assert.equal(notOwner.ok === false && notOwner.error, 'not_owner');
+  assert.equal(postUpdate(2, topicId, 'progress').ok, true);
+  assert.equal(listTopicUpdates(topicId).length, 1);
+
+  assert.equal(markAnswered(2, topicId, 'God answered!').ok, true);
+  assert.equal(getTopic(topicId)?.status, 'answered');
+});
+
+test('auth helpers', () => {
+  // continues on the same in-memory db from the previous test
+  const room = createRoom(1, 'Auth Room');
+  const roomId = room.ok === true ? room.value.id : 0;
+  joinRoom(2, room.ok === true ? room.value.inviteCode : '');
+  assert.equal(isRoomAdmin(1, roomId), true);
+  assert.equal(isRoomAdmin(2, roomId), false);
+  assert.equal(isRoomMember(2, roomId), true);
+  assert.equal(isRoomMember(999, roomId), false);
   closeDb();
 });
