@@ -180,3 +180,65 @@ export function listTopicUpdates(topicId: number): TopicUpdate[] {
     { id: number; topic_id: number; author_id: number; text: string; created_at: string }[])
     .map((r) => ({ id: r.id, topicId: r.topic_id, authorId: r.author_id, text: r.text, createdAt: r.created_at }));
 }
+
+// ─────────────────────────── Stage 2: prefs / assignments / prayer log ──────
+
+export interface UserPrefs { telegramId: number; timezone: string | null; reminderTime: string | null; reminderEnabled: boolean; }
+
+export function getUserPrefs(telegramId: number): UserPrefs | null {
+  const r = getDb().prepare(
+    `SELECT telegram_id, timezone, reminder_time, reminder_enabled FROM users WHERE telegram_id = ?`,
+  ).get(telegramId) as { telegram_id: number; timezone: string | null; reminder_time: string | null; reminder_enabled: number } | undefined;
+  return r ? { telegramId: r.telegram_id, timezone: r.timezone, reminderTime: r.reminder_time, reminderEnabled: !!r.reminder_enabled } : null;
+}
+export function setReminderTime(telegramId: number, time: string | null): void {
+  getDb().prepare(`UPDATE users SET reminder_time = ? WHERE telegram_id = ?`).run(time, telegramId);
+}
+export function setReminderEnabled(telegramId: number, enabled: boolean): void {
+  getDb().prepare(`UPDATE users SET reminder_enabled = ? WHERE telegram_id = ?`).run(enabled ? 1 : 0, telegramId);
+}
+// Users who should get a reminder today: a time set and reminders enabled.
+export function listReminderRecipients(): { telegramId: number; reminderTime: string }[] {
+  return (getDb().prepare(
+    `SELECT telegram_id, reminder_time FROM users WHERE reminder_time IS NOT NULL AND reminder_enabled = 1`,
+  ).all() as { telegram_id: number; reminder_time: string }[]).map((r) => ({ telegramId: r.telegram_id, reminderTime: r.reminder_time }));
+}
+
+export interface Assignment { date: string; roomId: number; telegramId: number; sharedTopicId: number | null; personalTopicId: number | null; }
+export function upsertAssignment(date: string, roomId: number, telegramId: number, sharedTopicId: number | null, personalTopicId: number | null): void {
+  getDb().prepare(
+    `INSERT INTO daily_assignment (date, room_id, telegram_id, shared_topic_id, personal_topic_id)
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(date, room_id, telegram_id) DO UPDATE SET shared_topic_id = excluded.shared_topic_id, personal_topic_id = excluded.personal_topic_id`,
+  ).run(date, roomId, telegramId, sharedTopicId, personalTopicId);
+}
+export function getAssignmentsForUser(telegramId: number, date: string): Assignment[] {
+  return (getDb().prepare(
+    `SELECT date, room_id, telegram_id, shared_topic_id, personal_topic_id FROM daily_assignment WHERE telegram_id = ? AND date = ?`,
+  ).all(telegramId, date) as { date: string; room_id: number; telegram_id: number; shared_topic_id: number | null; personal_topic_id: number | null }[])
+    .map((r) => ({ date: r.date, roomId: r.room_id, telegramId: r.telegram_id, sharedTopicId: r.shared_topic_id, personalTopicId: r.personal_topic_id }));
+}
+export function hasAssignmentsForRoomDate(roomId: number, date: string): boolean {
+  return !!getDb().prepare(`SELECT 1 FROM daily_assignment WHERE room_id = ? AND date = ? LIMIT 1`).get(roomId, date);
+}
+
+export function recordPrayer(telegramId: number, roomId: number, topicId: number, prayedDate: string): void {
+  getDb().prepare(
+    `INSERT OR IGNORE INTO prayer_log (telegram_id, room_id, topic_id, prayed_date) VALUES (?, ?, ?, ?)`,
+  ).run(telegramId, roomId, topicId, prayedDate);
+}
+export function hasPrayed(telegramId: number, topicId: number, prayedDate: string): boolean {
+  return !!getDb().prepare(
+    `SELECT 1 FROM prayer_log WHERE telegram_id = ? AND topic_id = ? AND prayed_date = ?`,
+  ).get(telegramId, topicId, prayedDate);
+}
+
+// Active topics of a kind in a room, ordered by id (stable rotation order).
+export function listActiveTopics(roomId: number, kind: TopicKind): Topic[] {
+  return (getDb().prepare(
+    `SELECT * FROM topics WHERE room_id = ? AND kind = ? AND status = 'active' ORDER BY id`,
+  ).all(roomId, kind) as TopicRow[]).map(toTopic);
+}
+export function listActiveRooms(): Room[] {
+  return (getDb().prepare(`SELECT * FROM rooms WHERE status = 'active' ORDER BY id`).all() as RoomRow[]).map(toRoom);
+}

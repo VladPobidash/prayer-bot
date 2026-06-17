@@ -7,6 +7,9 @@ import {
   removeMember, getMember, listMembers, countMembers,
   insertTopic, getTopic, listTopics, countActiveTopics,
   setTopicAnswered, deleteActivePersonalTopics, insertTopicUpdate, listTopicUpdates,
+  setReminderTime, getUserPrefs, listReminderRecipients,
+  upsertAssignment, getAssignmentsForUser, hasAssignmentsForRoomDate,
+  recordPrayer, hasPrayed, listActiveTopics, listActiveRooms,
 } from '../src/db/repo.ts';
 
 test('initDb creates the prayer-room tables', () => {
@@ -88,5 +91,33 @@ test('Stage 2 schema: user pref columns + daily_assignment + prayer_log exist', 
   const tables = (db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]).map((t) => t.name);
   assert.ok(tables.includes('daily_assignment'));
   assert.ok(tables.includes('prayer_log'));
+  closeDb();
+});
+
+test('Stage 2 repo: prefs, assignments, prayer log, helpers', () => {
+  initDb(':memory:');
+  upsertUser(1, 'A'); upsertUser(2, 'B');
+  const roomId = insertRoom('Room', 1, 'codecccc');
+  addMember(roomId, 1, 'admin'); addMember(roomId, 2, 'member');
+  const shared = insertTopic(roomId, 1, 'shared', 'church');
+  const personal = insertTopic(roomId, 2, 'personal', 'exam');
+
+  setReminderTime(1, '08:00');
+  assert.equal(getUserPrefs(1)?.reminderTime, '08:00');
+  assert.deepEqual(listReminderRecipients().map((r) => r.telegramId), [1]);
+
+  upsertAssignment('2026-06-17', roomId, 2, shared, personal);
+  assert.equal(getAssignmentsForUser(2, '2026-06-17').length, 1);
+  assert.equal(hasAssignmentsForRoomDate(roomId, '2026-06-17'), true);
+  assert.equal(hasAssignmentsForRoomDate(roomId, '2026-06-18'), false);
+
+  assert.equal(hasPrayed(2, personal, '2026-06-17'), false);
+  recordPrayer(2, roomId, personal, '2026-06-17');
+  recordPrayer(2, roomId, personal, '2026-06-17'); // idempotent
+  assert.equal(hasPrayed(2, personal, '2026-06-17'), true);
+
+  assert.equal(listActiveTopics(roomId, 'shared').length, 1);
+  assert.equal(listActiveTopics(roomId, 'personal').length, 1);
+  assert.deepEqual(listActiveRooms().map((r) => r.id), [roomId]);
   closeDb();
 });
