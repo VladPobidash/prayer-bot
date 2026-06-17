@@ -80,3 +80,13 @@ test('topics: insert/list/count(active)/answer/delete + updates', () => {
   assert.equal(countActiveTopics(roomId, 'personal', 2), 0);
   closeDb();
 });
+
+test('Stage 2 schema: user pref columns + daily_assignment + prayer_log exist', () => {
+  const db = initDb(':memory:');
+  const cols = (db.prepare(`PRAGMA table_info(users)`).all() as { name: string }[]).map((c) => c.name);
+  for (const c of ['timezone', 'reminder_time', 'reminder_enabled']) assert.ok(cols.includes(c), `users.${c} missing`);
+  const tables = (db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]).map((t) => t.name);
+  assert.ok(tables.includes('daily_assignment'));
+  assert.ok(tables.includes('prayer_log'));
+  closeDb();
+});

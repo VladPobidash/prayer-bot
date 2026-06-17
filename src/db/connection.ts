@@ -79,18 +79,44 @@ export function initDb(path: string = config.dbPath): DB {
     )
   `);
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS daily_assignment (
+      date              TEXT NOT NULL,
+      room_id           INTEGER NOT NULL,
+      telegram_id       INTEGER NOT NULL,
+      shared_topic_id   INTEGER,
+      personal_topic_id INTEGER,
+      created_at        TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (date, room_id, telegram_id)
+    )
+  `);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_assign_user_date ON daily_assignment(telegram_id, date)`);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS prayer_log (
+      telegram_id INTEGER NOT NULL,
+      room_id     INTEGER NOT NULL,
+      topic_id    INTEGER NOT NULL,
+      prayed_date TEXT NOT NULL,
+      prayed_at   TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (telegram_id, topic_id, prayed_date)
+    )
+  `);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_prayer_room_date ON prayer_log(room_id, prayed_date)`);
+
   runMigrations(db);
   reconcile(db);
   console.log(`${LOG_PREFIX.db} initialized at ${path}`);
   return db;
 }
 
-// Additive, PRAGMA-guarded migrations. None yet — worked-example pattern:
-//   const cols = db.prepare(`PRAGMA table_info(bot_state)`).all();
-//   if (!cols.some((c) => (c as { name: string }).name === 'updated_at')) {
-//     db.exec(`ALTER TABLE bot_state ADD COLUMN updated_at TEXT`);
-//   }
-function runMigrations(_db: DB): void {}
+// Additive, PRAGMA-guarded migrations.
+function runMigrations(db: DB): void {
+  const cols = (db.prepare(`PRAGMA table_info(users)`).all() as { name: string }[]).map((c) => c.name);
+  if (!cols.includes('timezone')) db.exec(`ALTER TABLE users ADD COLUMN timezone TEXT`);
+  if (!cols.includes('reminder_time')) db.exec(`ALTER TABLE users ADD COLUMN reminder_time TEXT`);
+  if (!cols.includes('reminder_enabled')) db.exec(`ALTER TABLE users ADD COLUMN reminder_enabled INTEGER DEFAULT 1`);
+}
 
 // Recover transient state after a restart. No-op until the domain adds rows
 // (e.g. UPDATE reminders SET status='pending' WHERE status='sending'); the hook
