@@ -11,10 +11,7 @@ test('normalize preserves Cyrillic (uk/ru) and digits', () => {
 });
 
 test('withTimeout rejects after the deadline', async () => {
-  await assert.rejects(
-    withTimeout(new Promise((r) => setTimeout(r, 50)), 10),
-    /timeout/,
-  );
+  await assert.rejects(withTimeout(new Promise<never>(() => {}), 10), /timeout/);
 });
 
 test('withRetry returns once fn eventually succeeds', async () => {

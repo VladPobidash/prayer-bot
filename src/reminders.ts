@@ -38,8 +38,12 @@ export async function dispatchDueReminders(now: Date, tz: string, send: SendFn):
     if (repo.hasSentToday(r.telegramId, date)) continue; // already sent (idempotent + catch-up)
     const msgs = buildMessagesForUser(r.telegramId, date, config.defaultLocale);
     for (const m of msgs) {
-      const messageId = await send(r.telegramId, m.text, m.topicId);
-      repo.recordSent(r.telegramId, messageId, m.topicId, m.roomId, date);
+      try {
+        const messageId = await send(r.telegramId, m.text, m.topicId);
+        repo.recordSent(r.telegramId, messageId, m.topicId, m.roomId, date);
+      } catch (err) {
+        console.error(`[scheduler] reminder send failed (topic ${m.topicId}):`, err);
+      }
     }
     // Note: if msgs is empty (all-null assignment), nothing is sent and hasSentToday stays
     // false, so we retry next tick until there's something — acceptable for a daily nudge.
