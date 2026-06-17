@@ -1,4 +1,5 @@
 import type { Topic } from './db/repo.ts';
+import * as repo from './db/repo.ts';
 
 // 'YYYY-MM-DD' for `now` in the given IANA timezone (en-CA gives ISO-like date).
 export function localDate(now: Date, tz: string): string {
@@ -49,4 +50,21 @@ export function assignPersonalTopics(
     result.set(member, null); // every topic belongs to this member
   });
   return result;
+}
+
+// Precompute one room's assignments for a date (idempotent via upsert).
+export function generateDailyAssignments(roomId: number, date: string): void {
+  const day = dayNumber(date);
+  const shared = sharedTopicOfDay(repo.listActiveTopics(roomId, 'shared'), day);
+  const members = repo.listMembers(roomId).map((m) => m.telegramId);
+  const personalTopics = repo.listActiveTopics(roomId, 'personal').map((t) => ({ id: t.id, ownerId: t.ownerId }));
+  const personalByMember = assignPersonalTopics(members, personalTopics, day);
+  for (const member of members) {
+    repo.upsertAssignment(date, roomId, member, shared ? shared.id : null, personalByMember.get(member) ?? null);
+  }
+}
+
+// Thin wrapper so the bot layer records prayers through the domain module.
+export function recordPrayer(telegramId: number, roomId: number, topicId: number, date: string): void {
+  repo.recordPrayer(telegramId, roomId, topicId, date);
 }

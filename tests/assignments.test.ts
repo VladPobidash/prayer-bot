@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { localDate, localTime, dayNumber, sharedTopicOfDay, isReminderDue, assignPersonalTopics } from '../src/assignments.ts';
+import { localDate, localTime, dayNumber, sharedTopicOfDay, isReminderDue, assignPersonalTopics, generateDailyAssignments, recordPrayer } from '../src/assignments.ts';
 import type { Topic } from '../src/db/repo.ts';
+import { initDb, closeDb } from '../src/db/connection.ts';
+import { upsertUser, insertRoom, addMember, insertTopic, getAssignmentsForUser, hasPrayed } from '../src/db/repo.ts';
 
 const topic = (id: number, ownerId = 1): Topic => ({
   id, roomId: 1, ownerId, kind: 'shared', text: `t${id}`, status: 'active',
@@ -57,4 +59,29 @@ test('assignPersonalTopics edge cases', () => {
   // member with no own topic still gets assigned someone else's
   assert.equal(assignPersonalTopics([1, 2], [p(11, 2)], 0).get(1), 11);
   assert.equal(assignPersonalTopics([1, 2], [p(11, 2)], 0).get(2), null);  // owner 2 can't get own
+});
+
+test('generateDailyAssignments writes one row per member with shared+personal', () => {
+  initDb(':memory:');
+  upsertUser(1, 'A'); upsertUser(2, 'B');
+  const roomId = insertRoom('Room', 1, 'codedddd');
+  addMember(roomId, 1, 'admin'); addMember(roomId, 2, 'member');
+  insertTopic(roomId, 1, 'shared', 'church');
+  insertTopic(roomId, 1, 'personal', 'admin-personal');
+  insertTopic(roomId, 2, 'personal', 'b-personal');
+
+  generateDailyAssignments(roomId, '2026-06-17');
+  const a1 = getAssignmentsForUser(1, '2026-06-17')[0];
+  const a2 = getAssignmentsForUser(2, '2026-06-17')[0];
+  assert.ok(a1.sharedTopicId && a2.sharedTopicId);
+  assert.equal(a1.sharedTopicId, a2.sharedTopicId);           // same shared topic for everyone
+  assert.notEqual(a1.personalTopicId, null);                  // each gets a personal (the other's)
+  assert.notEqual(a2.personalTopicId, null);
+
+  generateDailyAssignments(roomId, '2026-06-17');             // idempotent re-run, no duplicate rows
+  assert.equal(getAssignmentsForUser(1, '2026-06-17').length, 1);
+
+  recordPrayer(1, roomId, a1.sharedTopicId as number, '2026-06-17');
+  assert.equal(hasPrayed(1, a1.sharedTopicId as number, '2026-06-17'), true);
+  closeDb();
 });
