@@ -43,6 +43,16 @@ test('mainMenu has the four entries', () => {
   for (const d of ['menu:rooms', 'menu:create', 'menu:join', 'menu:help']) assert.ok(flat.includes(d));
 });
 
+test('i18n: Stage 2b reminder keys exist in all locales', () => {
+  for (const loc of ['uk', 'en', 'ru']) {
+    assert.ok(t(loc, 'reminder_shared', { room: 'R', text: 'X' }).includes('X'));
+    assert.ok(t(loc, 'btn_prayed').length > 0);
+    assert.ok(t(loc, 'prayed_ack').length > 0);
+    assert.ok(t(loc, 'confirm_to_owner', { name: 'N', text: 'X' }).includes('N'));
+    assert.ok(t(loc, 'reminder_prompt').length > 0);
+  }
+});
+
 test('renderRoomView shows admin buttons only for the admin', () => {
   const topics = [topic({ id: 9, ownerId: 2, kind: 'personal', text: 'Mine' })];
   const members: Member[] = [
