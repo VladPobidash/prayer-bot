@@ -30,3 +30,23 @@ export function sharedTopicOfDay(activeShared: Topic[], dayNum: number): Topic |
 export function isReminderDue(reminderTime: string, now: Date, tz: string): boolean {
   return localTime(now, tz) === reminderTime;
 }
+
+// Assign each member one OTHER member's personal topic, rotated by day.
+// Returns member id → topic id (or null when no eligible topic exists).
+// Coverage: over a full cycle of days, every topic is prayed for by someone.
+export function assignPersonalTopics(
+  memberIds: number[], topics: { id: number; ownerId: number }[], dayNum: number,
+): Map<number, number | null> {
+  const result = new Map<number, number | null>();
+  const m = topics.length;
+  memberIds.forEach((member, i) => {
+    if (m === 0) { result.set(member, null); return; }
+    for (let k = 0; k < m; k++) {
+      const idx = (((i + dayNum + k) % m) + m) % m;
+      const candidate = topics[idx];
+      if (candidate.ownerId !== member) { result.set(member, candidate.id); return; }
+    }
+    result.set(member, null); // every topic belongs to this member
+  });
+  return result;
+}
