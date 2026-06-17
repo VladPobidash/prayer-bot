@@ -13,8 +13,13 @@ export function mainMenu(locale: string) {
     [Markup.button.callback(t(locale, 'btn_my_rooms'), 'menu:rooms')],
     [Markup.button.callback(t(locale, 'btn_create_room'), 'menu:create')],
     [Markup.button.callback(t(locale, 'btn_join_room'), 'menu:join')],
+    [Markup.button.callback(t(locale, 'btn_reminder'), 'menu:reminder')],
     [Markup.button.callback(t(locale, 'btn_help'), 'menu:help')],
   ]);
+}
+
+export function prayedKeyboard(topicId: number, locale: string) {
+  return Markup.inlineKeyboard([[Markup.button.callback(t(locale, 'btn_prayed'), `pray:done:${topicId}`)]]);
 }
 
 export function roomsList(rooms: RoomWithRole[], locale: string): { text: string; keyboard: ReturnType<typeof Markup.inlineKeyboard> } {

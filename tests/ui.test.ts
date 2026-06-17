@@ -53,6 +53,14 @@ test('i18n: Stage 2b reminder keys exist in all locales', () => {
   }
 });
 
+import { prayedKeyboard } from '../src/ui.ts';
+test('prayedKeyboard carries pray:done:<topicId>', () => {
+  assert.ok(JSON.stringify(prayedKeyboard(77, 'en')).includes('pray:done:77'));
+});
+test('mainMenu includes the reminder button', () => {
+  assert.ok(JSON.stringify(mainMenu('en')).includes('menu:reminder'));
+});
+
 test('renderRoomView shows admin buttons only for the admin', () => {
   const topics = [topic({ id: 9, ownerId: 2, kind: 'personal', text: 'Mine' })];
   const members: Member[] = [
