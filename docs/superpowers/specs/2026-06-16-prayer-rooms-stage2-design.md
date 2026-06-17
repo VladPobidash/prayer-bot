@@ -1,8 +1,7 @@
 # Prayer Rooms — Stage 2 (Daily Rotation + Reminders + Confirmation) Design Spec
 
 **Date:** 2026-06-16
-**Status:** Draft — vision captured while fresh; **open design decisions (§7) must be
-resolved before an implementation plan is written.**
+**Status:** Approved — design decisions resolved (§7); ready for an implementation plan.
 **Builds on:** Stage 1 (rooms + topics).
 
 ## 1. Context
@@ -72,42 +71,47 @@ CREATE TABLE prayer_log (
 
 ## 6. Mechanics (high level)
 
-- **Daily assignment generation, per room:** at the day boundary, pick the room's shared
-  topic of the day and compute each member's personal-topic assignment, writing
-  `daily_assignment` rows.
-- **Reminder delivery:** the scheduler (node-cron, already in the template) fires; at each
-  member's `reminder_time` (in their `timezone`) it sends that member's assignment messages
-  (one per assigned topic) with the "🙏 Prayed today" button.
+- **Day boundary:** a single bot timezone (`Europe/Podgorica`, the configured `TZ`) defines
+  "today", the daily rollover, and the reminder clock for everyone. (Per-member timezones may
+  be added later.)
+- **Daily assignment generation, per room (precomputed once at the daily rollover):**
+  - *Shared topic of the day:* rotate the admin's **active** shared topics in order (by day),
+    same for every member; if the chosen one is answered, advance to the next active.
+  - *Personal topic:* assign each member **one other member's** active personal topic, rotating
+    day-to-day so every active personal topic is covered within a cycle; never the member's own;
+    a room with only the admin → no personal assignment that day; a member with zero personal
+    topics still receives assignments to pray for others.
+  - Written to `daily_assignment` rows (one per member per room per day).
+- **Reminder delivery:** each member has **one** daily `reminder_time` (bot tz). The node-cron
+  job fires per due member and sends the day's assignments as **separate messages — one per
+  assigned topic** across all the member's rooms (up to 3 shared + 3 personal). Each message
+  shows the topic (+ which room) and a "🙏 Prayed today" button; the member acts on each
+  independently, at any time during the day.
 - **Prayed button:** upserts `prayer_log` (idempotent per topic/day) and acknowledges.
-- **Voice/video reply:** map the replied-to message → topic → owner; forward the media to the
-  owner's DM as encouragement.
+- **Voice/video reply:** a voice/video reply to an assignment message is forwarded to that
+  topic's **owner** (personal → the posting member; shared → the room admin), **named**
+  ("{name} prayed for your topic"). Skipped gracefully if the owner has left or the topic is
+  answered/closed.
 
-## 7. Open Design Decisions (RESOLVE BEFORE PLANNING)
+## 7. Resolved Design Decisions
 
-- **O1 — Shared-topic-of-the-day selection.** Rotate through the admin's 1–5 shared topics
-  in order (fair, predictable — *recommended*) vs random pick. Behaviour when a shared topic
-  is marked answered mid-cycle.
-- **O2 — Personal-topic assignment & coverage algorithm.** Each member prays for one other
-  member's personal topic per day. Since a room can have more personal topics than members,
-  "everyone's topic is prayed for" is a guarantee **over a rotation cycle**, not necessarily
-  every day. Define the matching: round-robin/rotation that (a) never assigns your own topic,
-  (b) is fair, (c) guarantees every active personal topic is covered within N days. Edge
-  cases: a room with only the admin (no other's personal topic → no personal assignment that
-  day); a member with zero personal topics (still prays for others); a topic answered/owner
-  left mid-cycle.
-- **O3 — Day boundary / timezone.** "Today" and the daily rollover: per-user timezone
-  (recommended for reminders/streaks) — but the *shared* topic of the day must be consistent
-  for the whole room, so reconcile (e.g. the room's shared rotation advances on the **admin's
-  tz**, while each member's "today" for their own marks uses their tz). Pick one model and
-  make it explicit.
-- **O4 — Generation timing.** Precompute the day's assignments per room at a single rollover
-  job, vs compute lazily when a member's reminder fires. (Precompute is simpler to reason
-  about for the shared-topic consistency.)
-- **O5 — Voice/video confirmation details.** Is the pray-er shown to the owner by name or
-  kept anonymous ("a member of your room prayed for this")? Which media types (voice note,
-  video, video-note)? Behaviour if the owner has left or the topic is answered.
-- **O6 — Reminder UX.** Default reminder time; one combined daily reminder across all the
-  member's rooms vs one per room; snooze; how the member sets/changes the time (menu).
+- **R1 — Shared topic of the day:** rotate the admin's **active** shared topics **in order** by
+  day (predictable, fair); if the next-in-order is answered, advance to the next active one.
+- **R2 — Personal assignment & coverage:** **one** other member's active personal topic per
+  member per day, rotated so every active personal topic is covered **within a cycle** (not
+  necessarily same-day); never self; edge cases as in §6 (admin-only room → no personal that
+  day; zero-personal member still prays for others; answered/owner-left topics drop out of the
+  rotation).
+- **R3 — Day boundary / timezone:** a **single bot timezone** (`Europe/Podgorica`) for "today",
+  the rollover, reminders, and (Stage 3) streak boundaries. Per-member timezones deferred.
+- **R4 — Generation timing:** **precompute** the day's assignments per room at one daily
+  rollover job (keeps the shared topic consistent across the room).
+- **R5 — Confirmation visibility:** **named** — the owner sees who prayed. Forward voice notes,
+  video, and video-notes. Shared-topic confirmations go to the room admin (kept simple).
+- **R6 — Reminder & delivery:** **one** daily reminder time per member (settable from the
+  menu); at that time the bot sends **one message per assigned topic** (not combined, not
+  per-room) — because the prayed-button and the voice/video reply are per-topic, and a member
+  may pray for different topics at different times.
 
 ## 8. Testing (anticipated)
 
