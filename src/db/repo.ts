@@ -242,3 +242,27 @@ export function listActiveTopics(roomId: number, kind: TopicKind): Topic[] {
 export function listActiveRooms(): Room[] {
   return (getDb().prepare(`SELECT * FROM rooms WHERE status = 'active' ORDER BY id`).all() as RoomRow[]).map(toRoom);
 }
+
+// ─────────────────────────── Stage 2b: sent_assignment ──────────────────────
+
+export interface SentAssignment { chatId: number; messageId: number; topicId: number; roomId: number; sentDate: string; }
+export function recordSent(chatId: number, messageId: number, topicId: number, roomId: number, sentDate: string): void {
+  getDb().prepare(
+    `INSERT OR IGNORE INTO sent_assignment (chat_id, message_id, topic_id, room_id, sent_date) VALUES (?, ?, ?, ?, ?)`,
+  ).run(chatId, messageId, topicId, roomId, sentDate);
+}
+export function getSentByMessage(chatId: number, messageId: number): SentAssignment | null {
+  const r = getDb().prepare(
+    `SELECT chat_id, message_id, topic_id, room_id, sent_date FROM sent_assignment WHERE chat_id = ? AND message_id = ?`,
+  ).get(chatId, messageId) as { chat_id: number; message_id: number; topic_id: number; room_id: number; sent_date: string } | undefined;
+  return r ? { chatId: r.chat_id, messageId: r.message_id, topicId: r.topic_id, roomId: r.room_id, sentDate: r.sent_date } : null;
+}
+export function hasSentToday(chatId: number, date: string): boolean {
+  return !!getDb().prepare(`SELECT 1 FROM sent_assignment WHERE chat_id = ? AND sent_date = ? LIMIT 1`).get(chatId, date);
+}
+export function listActiveRoomsForUser(telegramId: number): Room[] {
+  return (getDb().prepare(
+    `SELECT r.* FROM rooms r JOIN room_members m ON m.room_id = r.id
+     WHERE m.telegram_id = ? AND r.status = 'active' ORDER BY r.id`,
+  ).all(telegramId) as RoomRow[]).map(toRoom);
+}

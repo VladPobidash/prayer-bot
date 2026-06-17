@@ -10,6 +10,7 @@ import {
   setReminderTime, getUserPrefs, listReminderRecipients,
   upsertAssignment, getAssignmentsForUser, hasAssignmentsForRoomDate,
   recordPrayer, hasPrayed, listActiveTopics, listActiveRooms,
+  recordSent, getSentByMessage, hasSentToday, listActiveRoomsForUser,
 } from '../src/db/repo.ts';
 
 test('initDb creates the prayer-room tables', () => {
@@ -119,5 +120,23 @@ test('Stage 2 repo: prefs, assignments, prayer log, helpers', () => {
   assert.equal(listActiveTopics(roomId, 'shared').length, 1);
   assert.equal(listActiveTopics(roomId, 'personal').length, 1);
   assert.deepEqual(listActiveRooms().map((r) => r.id), [roomId]);
+  closeDb();
+});
+
+test('sent_assignment: record + lookup-by-message + sent-today + active-rooms-for-user', () => {
+  initDb(':memory:');
+  upsertUser(1, 'A');
+  const roomId = insertRoom('Room', 1, 'codesent');
+  addMember(roomId, 1, 'admin');
+  const topicId = insertTopic(roomId, 1, 'shared', 'church');
+
+  assert.equal(hasSentToday(1, '2026-06-17'), false);
+  recordSent(1, 555, topicId, roomId, '2026-06-17');
+  assert.equal(hasSentToday(1, '2026-06-17'), true);
+  const s = getSentByMessage(1, 555);
+  assert.equal(s?.topicId, topicId);
+  assert.equal(s?.roomId, roomId);
+  assert.equal(getSentByMessage(1, 999), null);
+  assert.deepEqual(listActiveRoomsForUser(1).map((r) => r.id), [roomId]);
   closeDb();
 });
