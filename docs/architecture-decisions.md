@@ -176,3 +176,51 @@ uses only simple type annotations, interfaces, and `as const` assertions.
 **Decision:** `/start` always shows a concise "how it works" explanation followed by the main action menu. `/help` shows the complete command and action reference. Both are available at any time and are driven by `i18n.ts` so they appear in the user's configured language. No external onboarding document is required to start using the bot.
 
 **Consequences:** New users landing on the bot via a deep-link join (`?start=join_<code>`) are onboarded immediately — the join succeeds and the welcome text explains the next steps. Keeping the strings in `i18n.ts` means the docs and the bot stay in sync automatically; there is no separate content layer to maintain.
+
+---
+
+## ADR 10 — Daily assignments precomputed per room; in-order shared rotation + personal rotation for cycle coverage
+
+**Status:** Accepted
+
+**Context:** Each member needs to receive one shared and one personal topic per day. The assignments must be deterministic (same result on any process that runs the same day), fair (all topics are eventually covered), and efficient (no cross-room joins at send time).
+
+**Decision:** Assignments are precomputed per room per date using two rotation strategies. The shared topic of the day is selected by `dayNumber(date) % activeShared.length` — a simple modulo index that advances one slot per calendar day. Personal topics use an offset-rotation (`(memberIndex + dayNum + k) % topics.length`) that skips self-assignment and guarantees that every topic is covered within a full cycle of days. Results are stored in the `daily_assignment` table (upsert, idempotent). The reminder dispatcher triggers generation on first touch for each room, so no background precompute job is needed.
+
+**Consequences:** Assignments are stable within a day regardless of how many times the dispatcher runs. Adding a new topic mid-cycle does not invalidate past assignments. The trade-off is that very large rooms or topic lists may produce repetitive patterns until the cycle length increases; this is acceptable for the small-group target (≤20 members, ≤5 shared + ≤3×n personal topics).
+
+---
+
+## ADR 11 — Per-minute reminder dispatch; due = local-time-reached AND not-sent-today (catch-up safe)
+
+**Status:** Accepted
+
+**Context:** Reminders must fire at each member's chosen time. Missed ticks (process restart, redeploy, a skipped cron minute) must not silently drop messages for that day.
+
+**Decision:** The scheduler fires a node-cron job every minute. Each tick calls `dispatchDueReminders(now, tz, send)`. A user is "due" when their local `HH:MM` (derived from `now` in `config.tz`) is greater than or equal to their `reminder_time` AND the `sent_assignment` table has no row for `(chat_id, sent_date)`. Because the check is `>=` rather than `==`, any tick after the due minute — even hours later after a restart — will still deliver the reminder for that day.
+
+**Consequences:** Each user receives at most one batch of reminder messages per calendar day (idempotency enforced by the `sent_assignment` table). The per-minute polling adds negligible load for small user counts. A timezone-aware `localDate` / `localTime` helper using `Intl.DateTimeFormat` avoids manual UTC-offset arithmetic.
+
+---
+
+## ADR 12 — `sent_assignment` table: dispatch idempotency + voice-reply-to-owner mapping
+
+**Status:** Accepted
+
+**Context:** Two problems share the same table: (1) the dispatcher must not re-send a reminder the user already received today; (2) when a user replies to a reminder with a voice or video note, the bot must look up which topic the original message was about and who owns it.
+
+**Decision:** `sent_assignment(chat_id, message_id, topic_id, room_id, sent_date)` is written immediately after each `sendMessage` call succeeds, keyed by `(chat_id, message_id)`. `hasSentToday(chatId, date)` queries the indexed `(chat_id, sent_date)` pair for idempotency. `getSentByMessage(chatId, messageId)` retrieves the topic/room for the voice-reply handler in `bot.ts`.
+
+**Consequences:** A single small table serves both concerns cleanly. If a `sendMessage` call fails, no row is written, so that topic will be retried on the next tick (per-send resilience). The table grows one row per topic per user per day; at small scale this is negligible and can be pruned by a future maintenance job.
+
+---
+
+## ADR 13 — Single bot timezone for Stage 2
+
+**Status:** Accepted
+
+**Context:** Supporting per-user timezones requires storing each user's IANA timezone string, converting all reminder times on every dispatch tick, and handling DST transitions per user. For Stage 2 the target community is geographically concentrated.
+
+**Decision:** A single IANA timezone (`config.tz`, defaulting to `UTC`, set to `Europe/Podgorica` in production) is used for all `localDate` / `localTime` calculations. Members set their reminder time as an `HH:MM` wall-clock time interpreted in this shared timezone.
+
+**Consequences:** All members experience the same DST transitions. Members in significantly different timezones cannot set an accurate local reminder time. Per-user timezone support is deferred to a future ADR; when added, it requires only adding a `timezone` column to `users` and passing it through `dispatchDueReminders` — no structural change to `sent_assignment` or the scheduler.

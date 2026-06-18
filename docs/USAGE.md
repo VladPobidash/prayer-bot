@@ -100,6 +100,45 @@ The bot replies with a clear error if a cap is reached.
 
 ---
 
+## Daily prayer rhythm
+
+The bot sends you a daily reminder for every topic assigned to you that day.
+
+### Setting your reminder time
+
+From the main menu, tap **⏰ Reminder time**. The bot will ask you to send a
+time in `HH:MM` format (24-hour clock, e.g. `08:00`). Send `off` to disable
+reminders.
+
+The reminder uses a single server timezone (Europe/Podgorica). All reminder
+times are interpreted in that timezone.
+
+### Receiving reminder messages
+
+At your set time, the bot sends you one message per assigned topic:
+
+- A **shared topic** (today's room topic, rotated daily in order among all active
+  shared topics).
+- A **personal topic** (one other member's personal topic, also rotated so that
+  every topic is covered over a full cycle).
+
+Each message carries a **🙏 Prayed today** button. Tap it to record that you
+prayed for that topic.
+
+If the bot was restarted or a minute was missed, the next tick catches up
+automatically — you will still receive your reminders.
+
+### Confirming to the topic owner
+
+After receiving a reminder, you can reply to it with a **voice note, video, or
+video note** to encourage the person who submitted the topic. The bot will
+forward your media to the topic's owner with a caption showing your first name
+and the topic text. Shared-topic confirmations go to the room admin.
+
+The bot does not forward your reply to yourself (self-forward is suppressed).
+
+---
+
 ## Languages
 
 The bot replies in the language set by the server's `DEFAULT_LOCALE` variable.
