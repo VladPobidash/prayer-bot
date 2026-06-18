@@ -1,38 +1,22 @@
 import cron, { type ScheduledTask } from 'node-cron';
 import config from './config.ts';
 import { LOG_PREFIX } from './preferences.ts';
+import { dispatchDueReminders, type SendFn } from './reminders.ts';
 
-export type Notify = (
-  chatId: number,
-  text: string,
-  extra?: unknown,
-) => Promise<unknown> | void;
+export type { SendFn };
 
-export interface SchedulerDeps {
-  notify: Notify;
-}
+export interface SchedulerDeps { send: SendFn; }
 
-// Each job is feature-flagged and fault-isolated (per-tick try/catch). The
-// heartbeat is the worked example; replace/extend with domain jobs later.
-export function register(_deps: SchedulerDeps): ScheduledTask[] {
+export function register(deps: SchedulerDeps): ScheduledTask[] {
   const tasks: ScheduledTask[] = [];
-
-  if (config.heartbeatCron) {
-    tasks.push(
-      cron.schedule(
-        config.heartbeatCron,
-        () => {
-          try {
-            console.log(`${LOG_PREFIX.scheduler} heartbeat`);
-          } catch (err) {
-            console.error(`${LOG_PREFIX.scheduler} heartbeat failed:`, err);
-          }
-        },
-        { timezone: config.tz },
-      ),
-    );
-    console.log(`${LOG_PREFIX.scheduler} heartbeat scheduled: ${config.heartbeatCron}`);
-  }
-
+  // Every minute: send any due, not-yet-sent reminders (catch-up safe).
+  tasks.push(
+    cron.schedule('* * * * *', () => {
+      dispatchDueReminders(new Date(), config.tz, deps.send).catch((err) => {
+        console.error(`${LOG_PREFIX.scheduler} reminder dispatch failed:`, err);
+      });
+    }, { timezone: config.tz }),
+  );
+  console.log(`${LOG_PREFIX.scheduler} reminder dispatch scheduled (every minute, tz=${config.tz})`);
   return tasks;
 }

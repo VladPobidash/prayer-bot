@@ -3,7 +3,8 @@ import { initDb, closeDb } from './db/connection.ts';
 import { getState, setState } from './db/repo.ts';
 import { createBot } from './bot.ts';
 import { startHealthServer } from './server.ts';
-import { register as registerSchedules, type Notify } from './scheduler.ts';
+import { register as registerSchedules, type SendFn } from './scheduler.ts';
+import { prayedKeyboard } from './ui.ts';
 import { LOG_PREFIX } from './preferences.ts';
 
 // Last-resort guards so a detached promise (cron/worker) logs instead of crashing.
@@ -19,12 +20,10 @@ initDb();
 
 const bot = createBot();
 
-const notify: Notify = (chatId, text, extra) =>
-  bot.telegram.sendMessage(
-    chatId,
-    text,
-    extra as Parameters<typeof bot.telegram.sendMessage>[2],
-  );
+const send: SendFn = async (chatId, text, topicId) => {
+  const m = await bot.telegram.sendMessage(chatId, text, prayedKeyboard(topicId, config.defaultLocale));
+  return m.message_id;
+};
 
 const server = startHealthServer(config.port);
 
@@ -32,7 +31,7 @@ bot.launch();
 console.log(`${LOG_PREFIX.bot} launched (long polling)`);
 
 reconcileOnBoot();
-registerSchedules({ notify });
+registerSchedules({ send });
 
 const shutdown = () => {
   console.log('Shutting down…');
