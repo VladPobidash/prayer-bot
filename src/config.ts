@@ -11,7 +11,6 @@ export interface Config {
   defaultLocale: Locale;
   adminUserIds: Set<number>;
   adminChatId: number | null;
-  heartbeatCron: string;
 }
 
 const REQUIRED = ['TELEGRAM_BOT_TOKEN'] as const;
@@ -50,7 +49,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     defaultLocale,
     adminUserIds,
     adminChatId: adminChatStr !== undefined ? Number(adminChatStr) : null,
-    heartbeatCron: read(env.HEARTBEAT_CRON) ?? '0 * * * *',
   });
 }
 
