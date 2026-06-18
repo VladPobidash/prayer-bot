@@ -5,6 +5,7 @@ import { t, resolveLocale } from './i18n.ts';
 import * as rooms from './rooms.ts';
 import * as repo from './db/repo.ts';
 import { mainMenu, roomsList, renderRoomView, confirmKb, ownTopicsKb, errorText } from './ui.ts';
+import { localDate } from './assignments.ts';
 
 // Pending multi-step input, keyed by user id (chat.id === user.id in DMs).
 type Pending =
@@ -13,7 +14,8 @@ type Pending =
   | { kind: 'add_shared'; roomId: number }
   | { kind: 'add_personal'; roomId: number }
   | { kind: 'update_text'; topicId: number }
-  | { kind: 'answer_note'; topicId: number };
+  | { kind: 'answer_note'; topicId: number }
+  | { kind: 'set_reminder' };
 const pending = new Map<number, Pending>();
 
 interface TextHelpers {
@@ -29,6 +31,7 @@ export function createBot(token: string = config.telegramBotToken): Telegraf {
 
   const loc = (ctx: Context) => resolveLocale(ctx);
   const uid = (ctx: Context): number => ctx.from?.id ?? 0;
+  const todayLocal = () => localDate(new Date(), config.tz);
 
   async function showMenu(ctx: Context) {
     repo.upsertUser(uid(ctx), ctx.from?.first_name ?? null);
@@ -71,6 +74,25 @@ export function createBot(token: string = config.telegramBotToken): Telegraf {
     await handleText(ctx, pending, { loc, uid, openRoom, showRooms });
   });
 
+  // Voice/video reply → forward to topic owner as confirmation.
+  bot.on(['voice', 'video', 'video_note'], async (ctx) => {
+    const msg = ctx.message as { reply_to_message?: { message_id: number } };
+    const replyTo = msg.reply_to_message?.message_id;
+    if (!replyTo) return;
+    const sent = repo.getSentByMessage(uid(ctx), replyTo);
+    if (!sent) return; // not a reply to an assignment message
+    const topic = repo.getTopic(sent.topicId);
+    if (!topic) return;
+    const ownerId = topic.kind === 'shared' ? (repo.getRoom(topic.roomId)?.adminId ?? null) : topic.ownerId;
+    if (!ownerId || ownerId === uid(ctx)) return; // no self-forward
+    const prayerName = ctx.from?.first_name ?? 'Someone';
+    try {
+      await ctx.telegram.copyMessage(ownerId, ctx.chat!.id, ctx.message.message_id, {
+        caption: t(loc(ctx), 'confirm_to_owner', { name: prayerName, text: topic.text }),
+      });
+    } catch (err) { console.error(`${LOG_PREFIX.bot} confirm forward failed:`, err); }
+  });
+
   // Single callback router.
   bot.on('callback_query', async (ctx) => {
     const data = (ctx.callbackQuery as { data?: string }).data ?? '';
@@ -78,12 +100,20 @@ export function createBot(token: string = config.telegramBotToken): Telegraf {
     const [ns, action, idRaw] = data.split(':');
     const id = Number(idRaw);
     try {
+      if (ns === 'pray' && action === 'done') {
+        const topic = repo.getTopic(id);
+        if (!topic) return void (await ctx.reply(t(loc(ctx), 'stale_button')));
+        if (repo.hasPrayed(uid(ctx), topic.id, todayLocal())) return void (await ctx.reply(t(loc(ctx), 'prayed_already')));
+        repo.recordPrayer(uid(ctx), topic.roomId, topic.id, todayLocal());
+        return void (await ctx.reply(t(loc(ctx), 'prayed_ack')));
+      }
       if (ns === 'menu') {
         if (action === 'home') return void (await showMenu(ctx));
         if (action === 'rooms') return void (await showRooms(ctx));
         if (action === 'help') return void (await ctx.reply(t(loc(ctx), 'help'), mainMenu(loc(ctx))));
         if (action === 'create') { pending.set(uid(ctx), { kind: 'create_name' }); return void (await ctx.reply(t(loc(ctx), 'create_prompt_name'))); }
         if (action === 'join') { pending.set(uid(ctx), { kind: 'join_code' }); return void (await ctx.reply(t(loc(ctx), 'join_prompt_code'))); }
+        if (action === 'reminder') { pending.set(uid(ctx), { kind: 'set_reminder' }); return void (await ctx.reply(t(loc(ctx), 'reminder_prompt'))); }
       }
       await handleRoomCallback(ctx, { ns, action, id, pending, loc, uid, openRoom, showRooms });
     } catch (err) {
@@ -115,6 +145,13 @@ async function handleText(ctx: Context, pend: Map<number, Pending>, h: TextHelpe
     if (!res.ok) return void (await ctx.reply(errorText(res.error, locale)));
     await ctx.reply(t(locale, 'joined', { name: res.value.name }));
     return void (await h.openRoom(ctx, res.value.id));
+  }
+  if (p.kind === 'set_reminder') {
+    if (/^off$/i.test(text)) { repo.setReminderEnabled(userId, false); return void (await ctx.reply(t(locale, 'reminder_off'))); }
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(text)) return void (await ctx.reply(t(locale, 'reminder_invalid')));
+    repo.setReminderTime(userId, text);
+    repo.setReminderEnabled(userId, true);
+    return void (await ctx.reply(t(locale, 'reminder_set', { time: text })));
   }
   // add_shared / add_personal / update_text / answer_note handled in Tasks 5-6:
   await handleTopicText(ctx, p, locale, h);
