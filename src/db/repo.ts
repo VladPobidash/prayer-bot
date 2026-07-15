@@ -266,3 +266,41 @@ export function listActiveRoomsForUser(telegramId: number): Room[] {
      WHERE m.telegram_id = ? AND r.status = 'active' ORDER BY r.id`,
   ).all(telegramId) as RoomRow[]).map(toRoom);
 }
+
+// ─────────────────────────── Stage 3: accountability ────────────────────────
+
+export interface MembershipState { roomId: number; telegramId: number; lastPrayedDate: string | null; missStreak: number; warnedAt: string | null; }
+export function getMembershipState(roomId: number, telegramId: number): MembershipState | null {
+  const r = getDb().prepare(
+    `SELECT room_id, telegram_id, last_prayed_date, miss_streak, warned_at FROM membership_state WHERE room_id = ? AND telegram_id = ?`,
+  ).get(roomId, telegramId) as { room_id: number; telegram_id: number; last_prayed_date: string | null; miss_streak: number; warned_at: string | null } | undefined;
+  return r ? { roomId: r.room_id, telegramId: r.telegram_id, lastPrayedDate: r.last_prayed_date, missStreak: r.miss_streak, warnedAt: r.warned_at } : null;
+}
+export function upsertMembershipState(roomId: number, telegramId: number, lastPrayedDate: string | null, missStreak: number, warnedAt: string | null): void {
+  getDb().prepare(
+    `INSERT INTO membership_state (room_id, telegram_id, last_prayed_date, miss_streak, warned_at) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(room_id, telegram_id) DO UPDATE SET
+       last_prayed_date = excluded.last_prayed_date, miss_streak = excluded.miss_streak, warned_at = excluded.warned_at`,
+  ).run(roomId, telegramId, lastPrayedDate, missStreak, warnedAt);
+}
+export function deleteMembershipState(roomId: number, telegramId: number): void {
+  getDb().prepare(`DELETE FROM membership_state WHERE room_id = ? AND telegram_id = ?`).run(roomId, telegramId);
+}
+export function lastPrayedDate(telegramId: number, roomId: number): string | null {
+  const r = getDb().prepare(
+    `SELECT MAX(prayed_date) AS d FROM prayer_log WHERE telegram_id = ? AND room_id = ?`,
+  ).get(telegramId, roomId) as { d: string | null };
+  return r.d;
+}
+// Memberships subject to accountability: plain members of active rooms (admins exempt in their own room).
+export function listEvaluableMemberships(): { roomId: number; telegramId: number; joinedAt: string }[] {
+  return (getDb().prepare(
+    `SELECT m.room_id, m.telegram_id, m.joined_at FROM room_members m JOIN rooms r ON r.id = m.room_id
+     WHERE m.role = 'member' AND r.status = 'active' ORDER BY m.room_id, m.telegram_id`,
+  ).all() as { room_id: number; telegram_id: number; joined_at: string }[])
+    .map((r) => ({ roomId: r.room_id, telegramId: r.telegram_id, joinedAt: r.joined_at }));
+}
+export function getDisplayName(telegramId: number): string | null {
+  const r = getDb().prepare(`SELECT display_name FROM users WHERE telegram_id = ?`).get(telegramId) as { display_name: string | null } | undefined;
+  return r ? r.display_name : null;
+}

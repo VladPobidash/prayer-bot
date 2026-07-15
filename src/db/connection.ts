@@ -117,6 +117,17 @@ export function initDb(path: string = config.dbPath): DB {
   `);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_sent_chat_date ON sent_assignment(chat_id, sent_date)`);
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS membership_state (
+      room_id          INTEGER NOT NULL,
+      telegram_id      INTEGER NOT NULL,
+      last_prayed_date TEXT,
+      miss_streak      INTEGER DEFAULT 0,
+      warned_at        TEXT,
+      PRIMARY KEY (room_id, telegram_id)
+    )
+  `);
+
   runMigrations(db);
   reconcile(db);
   console.log(`${LOG_PREFIX.db} initialized at ${path}`);

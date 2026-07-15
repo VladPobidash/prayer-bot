@@ -11,6 +11,8 @@ import {
   upsertAssignment, getAssignmentsForUser, hasAssignmentsForRoomDate,
   recordPrayer, hasPrayed, listActiveTopics, listActiveRooms,
   recordSent, getSentByMessage, hasSentToday, listActiveRoomsForUser,
+  getMembershipState, upsertMembershipState, deleteMembershipState,
+  lastPrayedDate, listEvaluableMemberships, getDisplayName,
 } from '../src/db/repo.ts';
 
 test('initDb creates the prayer-room tables', () => {
@@ -138,5 +140,43 @@ test('sent_assignment: record + lookup-by-message + sent-today + active-rooms-fo
   assert.equal(s?.roomId, roomId);
   assert.equal(getSentByMessage(1, 999), null);
   assert.deepEqual(listActiveRoomsForUser(1).map((r) => r.id), [roomId]);
+  closeDb();
+});
+
+test('membership_state: upsert/get/delete + lastPrayedDate + evaluable memberships + display name', () => {
+  initDb(':memory:');
+  upsertUser(1, 'Admin A'); upsertUser(2, 'Member B');
+  const roomId = insertRoom('Room', 1, 'codestate');
+  addMember(roomId, 1, 'admin'); addMember(roomId, 2, 'member');
+
+  // state CRUD
+  assert.equal(getMembershipState(roomId, 2), null);
+  upsertMembershipState(roomId, 2, null, 2, '2026-07-10');
+  assert.deepEqual(getMembershipState(roomId, 2), {
+    roomId, telegramId: 2, lastPrayedDate: null, missStreak: 2, warnedAt: '2026-07-10',
+  });
+  upsertMembershipState(roomId, 2, '2026-07-12', 0, null); // upsert overwrites
+  assert.equal(getMembershipState(roomId, 2)?.warnedAt, null);
+  deleteMembershipState(roomId, 2);
+  assert.equal(getMembershipState(roomId, 2), null);
+
+  // lastPrayedDate = MAX(prayed_date) per member+room
+  const topicId = insertTopic(roomId, 1, 'shared', 'church');
+  assert.equal(lastPrayedDate(2, roomId), null);
+  recordPrayer(2, roomId, topicId, '2026-07-10');
+  recordPrayer(2, roomId, topicId, '2026-07-12');
+  assert.equal(lastPrayedDate(2, roomId), '2026-07-12');
+
+  // evaluable = role 'member' in active rooms only
+  const evaluable = listEvaluableMemberships();
+  assert.equal(evaluable.length, 1);
+  assert.equal(evaluable[0].roomId, roomId);
+  assert.equal(evaluable[0].telegramId, 2);
+  assert.ok(evaluable[0].joinedAt.length >= 10);
+  setRoomStatus(roomId, 'closed');
+  assert.deepEqual(listEvaluableMemberships(), []);
+
+  assert.equal(getDisplayName(2), 'Member B');
+  assert.equal(getDisplayName(999), null);
   closeDb();
 });
