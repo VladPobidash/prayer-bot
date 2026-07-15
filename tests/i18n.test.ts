@@ -17,3 +17,12 @@ test('interpolates {vars}', () => {
 test('leaves an unsupplied placeholder intact', () => {
   assert.equal(t('en', 'greeting', {}), 'Hello, {name}!');
 });
+
+test('stage 3 accountability strings resolve in all locales', () => {
+  for (const locale of ['uk', 'en', 'ru']) {
+    assert.ok(t(locale, 'accountability_warning', { room: 'R' }).includes('R'));
+    assert.ok(t(locale, 'removed_member', { room: 'R' }).includes('R'));
+    const admin = t(locale, 'removed_admin', { name: 'N', room: 'R' });
+    assert.ok(admin.includes('N') && admin.includes('R'));
+  }
+});

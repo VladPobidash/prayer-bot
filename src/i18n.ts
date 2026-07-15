@@ -75,6 +75,9 @@ export const LOCALES = {
     reminder_set: 'Нагадування встановлено на {time}. ⏰',
     reminder_off: 'Нагадування вимкнено.',
     reminder_invalid: 'Невірний формат. Введіть ГГ:ХХ (напр. 08:00) або «off».',
+    accountability_warning: 'Ми сумуємо за вашими молитвами в кімнаті «{room}» 🙏 Минуло вже два дні. Якщо пауза триватиме 5 днів поспіль, ви вибудете з кімнати — але одне натискання «🙏 Помолився сьогодні» все скасовує.',
+    removed_member: 'Ви вибули з кімнати «{room}» після 5 днів без молитви. Це не прощання — вас можуть запросити знову будь-коли. 🙏',
+    removed_admin: '{name} вибув(-ла) з кімнати «{room}» після 5 днів без молитви. Ви можете надіслати запрошення знову будь-коли.',
   },
   en: {
     start: 'Hi! I\'m a prayer helper bot. Send /help to see the commands.',
@@ -149,6 +152,9 @@ export const LOCALES = {
     reminder_set: 'Reminder set for {time}. ⏰',
     reminder_off: 'Reminders disabled.',
     reminder_invalid: 'Invalid format. Send HH:MM (e.g. 08:00) or "off".',
+    accountability_warning: 'We miss your prayers in "{room}" 🙏 It has been two days. If the pause reaches 5 days in a row you will leave the room — but one tap on "🙏 Prayed today" resets everything.',
+    removed_member: 'You have left "{room}" after 5 days without prayer. This is not goodbye — you can be invited back anytime. 🙏',
+    removed_admin: '{name} left "{room}" after 5 days without prayer. You can send them an invite again anytime.',
   },
   ru: {
     start: 'Привет! Я бот-помощник для молитвы. Напишите /help, чтобы увидеть команды.',
@@ -223,6 +229,9 @@ export const LOCALES = {
     reminder_set: 'Напоминание установлено на {time}. ⏰',
     reminder_off: 'Напоминания выключены.',
     reminder_invalid: 'Неверный формат. Отправьте ЧЧ:ММ (напр. 08:00) или «off».',
+    accountability_warning: 'Мы скучаем по вашим молитвам в комнате «{room}» 🙏 Прошло уже два дня. Если пауза достигнет 5 дней подряд, вы выбудете из комнаты — но одно нажатие «🙏 Помолился сегодня» всё отменяет.',
+    removed_member: 'Вы выбыли из комнаты «{room}» после 5 дней без молитвы. Это не прощание — вас могут пригласить снова в любой момент. 🙏',
+    removed_admin: '{name} выбыл(а) из комнаты «{room}» после 5 дней без молитвы. Вы можете отправить приглашение снова в любой момент.',
   },
 } as const;
 
