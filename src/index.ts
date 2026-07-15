@@ -3,7 +3,8 @@ import { initDb, closeDb } from './db/connection.ts';
 import { getState, setState } from './db/repo.ts';
 import { createBot } from './bot.ts';
 import { startHealthServer } from './server.ts';
-import { register as registerSchedules, type SendFn } from './scheduler.ts';
+import { register as registerSchedules, type SendFn, type NotifyFn } from './scheduler.ts';
+import { evaluateAccountability } from './accountability.ts';
 import { prayedKeyboard } from './ui.ts';
 import { LOG_PREFIX } from './preferences.ts';
 
@@ -25,13 +26,22 @@ const send: SendFn = async (chatId, text, topicId) => {
   return m.message_id;
 };
 
+const notify: NotifyFn = async (chatId, text) => {
+  await bot.telegram.sendMessage(chatId, text);
+};
+
 const server = startHealthServer(config.port);
 
 bot.launch();
 console.log(`${LOG_PREFIX.bot} launched (long polling)`);
 
 reconcileOnBoot();
-registerSchedules({ send });
+registerSchedules({ send, notify });
+// Catch-up: a redeploy may have crossed the daily 09:00 tick. The sweep is
+// wall-clock derived and warn-once guarded, so running it again is safe.
+evaluateAccountability(new Date(), config.tz, notify).catch((err) => {
+  console.error(`${LOG_PREFIX.scheduler} boot accountability catch-up failed:`, err);
+});
 
 const shutdown = () => {
   console.log('Shutting down…');
