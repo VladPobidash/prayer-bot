@@ -48,6 +48,7 @@ export function leaveRoom(telegramId: number, roomId: number): Result<void> {
   if (!member || member.role === 'admin') return err('not_member'); // admins close, never leave
   repo.deleteActivePersonalTopics(roomId, telegramId);
   repo.removeMember(roomId, telegramId);
+  repo.deleteMembershipState(roomId, telegramId);
   return ok(undefined);
 }
 
