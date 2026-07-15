@@ -1,8 +1,8 @@
 # Prayer Rooms — Stage 3 (Accountability) Design Spec
 
 **Date:** 2026-06-16
-**Status:** Draft — vision captured while fresh; **open design decisions (§6) must be
-resolved before an implementation plan is written.**
+**Status:** Resolved & planned — §6 decisions resolved in
+`docs/superpowers/plans/2026-07-15-prayer-rooms-stage3-accountability.md` (Resolved design decisions).
 **Builds on:** Stage 1 (rooms + topics) and Stage 2 (daily assignments + `prayer_log`).
 
 ## 1. Context
