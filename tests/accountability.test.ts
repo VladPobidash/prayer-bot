@@ -39,6 +39,7 @@ function setupRoom(joined: string) {
   upsertUser(1, 'Admin A'); upsertUser(2, 'Member B');
   const roomId = insertRoom('Room', 1, 'codeacct1');
   addMember(roomId, 1, 'admin'); addMember(roomId, 2, 'member');
+  insertTopic(roomId, 1, 'shared', 'church');
   getDb().prepare(`UPDATE room_members SET joined_at = ? WHERE room_id = ? AND telegram_id = ?`)
     .run(`${joined} 10:00:00`, roomId, 2);
   return roomId;
@@ -123,5 +124,21 @@ test('a failing DM does not block the rest of the sweep', async () => {
   };
   await evaluateAccountability(NOW, 'UTC', notify);
   assert.deepEqual(sent, [3]);                         // member 3 still warned
+  closeDb();
+});
+
+test('does not warn or remove a member who has no topic they can receive', async () => {
+  const roomId = setupRoom('2026-07-01');
+  // A member's own personal topic is intentionally not assigned to them.
+  getDb().prepare(`DELETE FROM topics WHERE room_id = ?`).run(roomId);
+  insertTopic(roomId, 2, 'personal', 'my private topic');
+  upsertMembershipState(roomId, 2, null, 5, '2026-07-12');
+  const { sent, notify } = collector();
+
+  await evaluateAccountability(NOW, 'UTC', notify);
+
+  assert.equal(getMember(roomId, 2)?.telegramId, 2);
+  assert.equal(getMembershipState(roomId, 2), null);
+  assert.deepEqual(sent, []);
   closeDb();
 });

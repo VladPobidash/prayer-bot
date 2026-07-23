@@ -3,9 +3,9 @@ import { localDate, localTime, generateDailyAssignments } from './assignments.ts
 import { t } from './i18n.ts';
 import config from './config.ts';
 
-export type SendFn = (chatId: number, text: string, topicId: number) => Promise<number>;
+export type SendFn = (chatId: number, text: string, topicId: number | null) => Promise<number>;
 
-interface OutMsg { topicId: number; roomId: number; text: string; }
+interface OutMsg { topicId: number | null; roomId: number; text: string; }
 
 // Build today's per-topic messages for a user (shared + personal across rooms), skipping nulls.
 export function buildMessagesForUser(telegramId: number, date: string, locale: string): OutMsg[] {
@@ -25,6 +25,9 @@ export function buildMessagesForUser(telegramId: number, date: string, locale: s
       const tpc = repo.getTopic(a.personalTopicId);
       if (tpc && tpc.status === 'active') out.push({ topicId: tpc.id, roomId: room.id, text: t(locale, 'reminder_personal', { room: room.name, text: tpc.text }) });
     }
+    if (a.sharedTopicId == null && a.personalTopicId == null) {
+      out.push({ topicId: null, roomId: room.id, text: t(locale, 'reminder_no_assignment', { room: room.name }) });
+    }
   }
   return out;
 }
@@ -40,12 +43,14 @@ export async function dispatchDueReminders(now: Date, tz: string, send: SendFn):
     for (const m of msgs) {
       try {
         const messageId = await send(r.telegramId, m.text, m.topicId);
-        repo.recordSent(r.telegramId, messageId, m.topicId, m.roomId, date);
+        // Topic id 0 marks a plain nudge for a room with no assignment. It is
+        // deliberately recorded so the per-minute catch-up loop sends it once.
+        repo.recordSent(r.telegramId, messageId, m.topicId ?? 0, m.roomId, date);
       } catch (err) {
         console.error(`[scheduler] reminder send failed (topic ${m.topicId}):`, err);
       }
     }
-    // Note: if msgs is empty (all-null assignment), nothing is sent and hasSentToday stays
-    // false, so we retry next tick until there's something — acceptable for a daily nudge.
+    // A user with no active rooms has no message to send, so the next tick can
+    // still catch up if they join a room later today.
   }
 }

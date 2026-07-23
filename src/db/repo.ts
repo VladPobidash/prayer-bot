@@ -292,6 +292,18 @@ export function lastPrayedDate(telegramId: number, roomId: number): string | nul
   ).get(telegramId, roomId) as { d: string | null };
   return r.d;
 }
+
+export function hasPrayableTopicForMember(roomId: number, telegramId: number): boolean {
+  // A member can pray for shared topics and for other members' personal topics,
+  // never for their own personal topic. Do not hold someone accountable when
+  // the room gives them no topic they can actually receive or confirm.
+  return !!getDb().prepare(
+    `SELECT 1 FROM topics
+     WHERE room_id = ? AND status = 'active'
+       AND (kind = 'shared' OR (kind = 'personal' AND owner_id != ?))
+     LIMIT 1`,
+  ).get(roomId, telegramId);
+}
 // Memberships subject to accountability: plain members of active rooms (admins exempt in their own room).
 export function listEvaluableMemberships(): { roomId: number; telegramId: number; joinedAt: string }[] {
   return (getDb().prepare(

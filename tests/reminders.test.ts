@@ -18,9 +18,9 @@ function setup() {
 test('dispatchDueReminders sends per-topic messages to due users and is idempotent', async () => {
   setup();
   setReminderTime(1, '08:00');
-  const sent: { chatId: number; text: string; topicId: number }[] = [];
+  const sent: { chatId: number; text: string; topicId: number | null }[] = [];
   let mid = 1000;
-  const send = async (chatId: number, text: string, topicId: number) => { sent.push({ chatId, text, topicId }); return ++mid; };
+  const send = async (chatId: number, text: string, topicId: number | null) => { sent.push({ chatId, text, topicId }); return ++mid; };
   const now = new Date('2026-06-17T06:00:30Z'); // 08:00 Europe/Podgorica (UTC+2 summer)
 
   await dispatchDueReminders(now, 'Europe/Podgorica', send);
@@ -42,5 +42,30 @@ test('dispatchDueReminders skips users whose local time is before their reminder
   const send = async () => { sent.push(1); return 1; };
   await dispatchDueReminders(new Date('2026-06-17T06:00:30Z'), 'Europe/Podgorica', send); // 08:00 < 23:00
   assert.equal(sent.length, 0);
+  closeDb();
+});
+
+test('dispatchDueReminders sends a daily nudge when a member has no eligible topic', async () => {
+  initDb(':memory:');
+  upsertUser(1, 'A'); upsertUser(2, 'B');
+  const roomId = insertRoom('Empty room', 1, 'coderem2');
+  addMember(roomId, 1, 'admin'); addMember(roomId, 2, 'member');
+  // B only owns a personal topic, which is never assigned back to B.
+  insertTopic(roomId, 2, 'personal', 'my private topic');
+  setReminderTime(2, '08:00');
+  const sent: { chatId: number; text: string; topicId: number | null }[] = [];
+  const send = async (chatId: number, text: string, topicId: number | null) => {
+    sent.push({ chatId, text, topicId });
+    return 2000;
+  };
+  const now = new Date('2026-06-17T06:00:30Z');
+
+  await dispatchDueReminders(now, 'Europe/Podgorica', send);
+
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].chatId, 2);
+  assert.equal(sent[0].topicId, null);
+  assert.match(sent[0].text, /немає призначеної теми/i);
+  assert.equal(hasSentToday(2, '2026-06-17'), true);
   closeDb();
 });

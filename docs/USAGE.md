@@ -123,8 +123,13 @@ your rooms:
 - A **personal topic** (one other member's personal topic, also rotated so that
   every topic is covered over a full cycle).
 
-Each message carries a **🙏 Prayed today** button. Tap it to record that you
-prayed for that topic.
+Each assigned-topic message carries a **🙏 Prayed today** button. Tap it to
+record that you prayed for that topic.
+
+If a room has no shared topic and no other member's personal topic for you,
+the bot still sends a plain daily prayer-time nudge. There is no confirmation
+button because no topic can be assigned. You are not warned or removed for
+missed prayers in that room until an eligible topic exists.
 
 If the bot was restarted or a minute was missed, the next tick catches up
 automatically — you will still receive your reminders.
