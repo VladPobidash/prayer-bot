@@ -7,8 +7,9 @@ Deploy your own in about 10 minutes — no coding required.
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Status:** framework template. The core bot runs today (`/start`, `/help`,
-> `/ping`); prayer topics, reminders, and gamification are on the roadmap.
+> **Status:** active early release. Prayer rooms, daily topic reminders, and
+> gentle accountability are available; per-user languages, leaderboards, and
+> other gamification are future work.
 
 ---
 
@@ -25,14 +26,20 @@ members' prayer requests. You host it on your own account; your data stays yours
 **Available today**
 
 - `/start`, `/help`, `/ping` commands in Ukrainian, English, and Russian
+- Private prayer rooms with invite links/codes, shared topics, and private
+  personal topics
+- Daily per-topic reminders, a one-tap **Prayed today** confirmation, and
+  optional voice/video encouragement forwarded to the topic owner
+- Gentle accountability: members are warned after two missed days and removed
+  after five consecutive missed days, with a prior warning
 - Health check endpoint so Railway can monitor that the bot is running
 - Durable storage: prayer data is saved to SQLite on a Railway Volume and
   survives restarts and redeployments
 
 **On the roadmap**
 
-- Prayer topic submissions and a shared prayer list
-- Scheduled reminders (daily, weekly, or custom timing)
+- Per-user language and timezone preferences
+- Weekly or custom reminder schedules
 - Streaks and leaderboards to keep the group encouraged
 
 ---
@@ -52,6 +59,13 @@ Once deployed, send `/help` to your bot in Telegram to see all available
 commands.
 
 Full command reference: **[docs/USAGE.md](docs/USAGE.md)**
+
+## Developing or changing the bot
+
+Start with **[AGENTS.md](AGENTS.md)**, then read the detailed module map and
+architecture guide in **[CLAUDE.md](CLAUDE.md)**. These documents describe the
+database boundary, scheduling behavior, testing approach, and conventions that
+must be preserved when extending the bot.
 
 ---
 

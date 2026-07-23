@@ -110,12 +110,13 @@ From the main menu, tap **⏰ Reminder time**. The bot will ask you to send a
 time in `HH:MM` format (24-hour clock, e.g. `08:00`). Send `off` to disable
 reminders.
 
-The reminder uses a single server timezone (Europe/Podgorica). All reminder
-times are interpreted in that timezone.
+The reminder uses the single server timezone configured with `TZ` (UTC by
+default). All members' reminder times are interpreted in that timezone.
 
 ### Receiving reminder messages
 
-At your set time, the bot sends you one message per assigned topic:
+At your set time, the bot sends you one message per assigned topic in each of
+your rooms:
 
 - A **shared topic** (today's room topic, rotated daily in order among all active
   shared topics).
@@ -127,6 +128,20 @@ prayed for that topic.
 
 If the bot was restarted or a minute was missed, the next tick catches up
 automatically — you will still receive your reminders.
+
+### Gentle accountability
+
+The bot evaluates active non-admin members once each day in the configured
+server timezone. It counts completed local calendar days without a recorded
+**Prayed today** confirmation for that room:
+
+- After **two** consecutive missed days, the member receives a private warning.
+- After **five** missed days, the bot removes the member only if that warning
+  was sent at least three days earlier. This ensures a warning always comes
+  first, including after a restart or deployment outage.
+
+Recording a prayer resets the missed-day streak. Room admins are not evaluated
+or removed by this automatic process.
 
 ### Confirming to the topic owner
 
