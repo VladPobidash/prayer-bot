@@ -69,7 +69,7 @@ wiped every time the bot restarts or redeploys.
 | `DB_PATH` | `/data/prayer-bot.db` | Yes |
 | `DEFAULT_LOCALE` | `uk`, `en`, or `ru` (defaults to `uk`) | No |
 | `TZ` | Your timezone, e.g. `Europe/Kyiv` (defaults to `UTC`) | No |
-| `ADMIN_USER_IDS` | Comma-separated Telegram user IDs who can run admin commands | No |
+| `ADMIN_USER_IDS` | Reserved legacy setting; it is not needed for prayer-room administration | No |
 
 3. After saving, Railway will restart the service with the new variables.
 
@@ -103,5 +103,5 @@ available commands.
 |---|---|
 | Bot does not respond to messages | Double-check `TELEGRAM_BOT_TOKEN` — make sure you copied the full token from BotFather with no extra spaces. |
 | Data disappears after every redeploy | The Volume is missing or `DB_PATH` is not set to `/data/prayer-bot.db`. Repeat Step 3 and Step 4. |
-| Reminders fire at the wrong time (future feature) | Set the `TZ` variable to your local IANA timezone, e.g. `Europe/Kyiv` or `America/New_York`. |
+| Reminders fire at the wrong time | Set the `TZ` variable to your group's IANA timezone, e.g. `Europe/Kyiv` or `America/New_York`, then restart the service. |
 | Health endpoint returns an error | Check the **Deployments** tab in Railway for build or startup errors. The most common cause is a missing required variable. |
