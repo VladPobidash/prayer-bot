@@ -140,6 +140,9 @@ function runMigrations(db: DB): void {
   if (!cols.includes('timezone')) db.exec(`ALTER TABLE users ADD COLUMN timezone TEXT`);
   if (!cols.includes('reminder_time')) db.exec(`ALTER TABLE users ADD COLUMN reminder_time TEXT`);
   if (!cols.includes('reminder_enabled')) db.exec(`ALTER TABLE users ADD COLUMN reminder_enabled INTEGER DEFAULT 1`);
+
+  const topicCols = (db.prepare(`PRAGMA table_info(topics)`).all() as { name: string }[]).map((c) => c.name);
+  if (!topicCols.includes('is_anonymous')) db.exec(`ALTER TABLE topics ADD COLUMN is_anonymous INTEGER DEFAULT 0`);
 }
 
 // Recover transient state after a restart. No-op until the domain adds rows

@@ -71,12 +71,12 @@ export function addSharedTopic(adminId: number, roomId: number, text: string): R
   return t ? ok(t) : err('topic_not_found');
 }
 
-export function addPersonalTopic(telegramId: number, roomId: number, text: string): Result<Topic> {
+export function addPersonalTopic(telegramId: number, roomId: number, text: string, isAnonymous: boolean = false): Result<Topic> {
   const room = repo.getRoom(roomId);
   if (!room || room.status !== 'active') return err('room_not_found');
   if (!repo.getMember(roomId, telegramId)) return err('not_member');
   if (repo.countActiveTopics(roomId, 'personal', telegramId) >= MAX_PERSONAL_TOPICS_PER_MEMBER) return err('personal_cap');
-  const id = repo.insertTopic(roomId, telegramId, 'personal', text.trim());
+  const id = repo.insertTopic(roomId, telegramId, 'personal', text.trim(), isAnonymous);
   const t = repo.getTopic(id);
   return t ? ok(t) : err('topic_not_found');
 }

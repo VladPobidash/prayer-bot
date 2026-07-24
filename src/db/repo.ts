@@ -41,6 +41,7 @@ export interface RoomWithRole extends Room { role: MemberRole; }
 export interface Topic {
   id: number; roomId: number; ownerId: number; kind: TopicKind; text: string;
   status: TopicStatus; answerNote: string | null; createdAt: string; answeredAt: string | null;
+  isAnonymous?: boolean;
 }
 
 interface RoomRow {
@@ -130,18 +131,20 @@ export interface TopicUpdate { id: number; topicId: number; authorId: number; te
 interface TopicRow {
   id: number; room_id: number; owner_id: number; kind: string; text: string;
   status: string; answer_note: string | null; created_at: string; answered_at: string | null;
+  is_anonymous?: number;
 }
 function toTopic(r: TopicRow): Topic {
   return {
     id: r.id, roomId: r.room_id, ownerId: r.owner_id, kind: r.kind as TopicKind, text: r.text,
     status: r.status as TopicStatus, answerNote: r.answer_note, createdAt: r.created_at, answeredAt: r.answered_at,
+    isAnonymous: !!r.is_anonymous,
   };
 }
 
-export function insertTopic(roomId: number, ownerId: number, kind: TopicKind, text: string): number {
+export function insertTopic(roomId: number, ownerId: number, kind: TopicKind, text: string, isAnonymous: boolean = false): number {
   const r = getDb().prepare(
-    `INSERT INTO topics (room_id, owner_id, kind, text) VALUES (?, ?, ?, ?)`,
-  ).run(roomId, ownerId, kind, text);
+    `INSERT INTO topics (room_id, owner_id, kind, text, is_anonymous) VALUES (?, ?, ?, ?, ?)`,
+  ).run(roomId, ownerId, kind, text, isAnonymous ? 1 : 0);
   return Number(r.lastInsertRowid);
 }
 export function getTopic(id: number): Topic | null {

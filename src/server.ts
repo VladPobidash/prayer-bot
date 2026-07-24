@@ -111,7 +111,8 @@ export function startHealthServer(port: number = config.port): Server {
         return sendJson(res, 401, { error: 'Unauthorized: Invalid Telegram WebApp initData' });
       }
       const { userId, user } = auth;
-      repo.upsertUser(userId, user.first_name || null);
+      const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ') || null;
+      repo.upsertUser(userId, displayName);
       const today = localDate(new Date(), config.tz);
 
       try {
@@ -205,6 +206,7 @@ export function startHealthServer(port: number = config.port): Server {
           const room = repo.getRoom(roomId);
           if (!room) return sendJson(res, 404, { error: 'Room not found' });
           const members = repo.listMembers(roomId);
+          const adminName = repo.getDisplayName(room.adminId) || `User ${room.adminId}`;
           const allTopics = repo.listTopics(roomId);
           const sharedTopics = allTopics.filter(t => t.kind === 'shared').map(t => ({
             ...t,
@@ -212,11 +214,13 @@ export function startHealthServer(port: number = config.port): Server {
           }));
           const personalTopics = allTopics.filter(t => t.kind === 'personal').map(t => ({
             ...t,
+            authorName: t.isAnonymous ? 'Anonymous' : (repo.getDisplayName(t.ownerId) || `User ${t.ownerId}`),
             updates: repo.listTopicUpdates(t.id),
           }));
 
           return sendJson(res, 200, {
             ...room,
+            adminName,
             isAdmin: room.adminId === userId,
             members,
             sharedTopics,
@@ -228,7 +232,7 @@ export function startHealthServer(port: number = config.port): Server {
         const roomTopicMatch = path.match(/^\/api\/rooms\/(\d+)\/topics$/);
         if (method === 'POST' && roomTopicMatch) {
           const roomId = Number(roomTopicMatch[1]);
-          const body = await parseJsonBody<{ kind?: 'shared' | 'personal'; text?: string }>(req);
+          const body = await parseJsonBody<{ kind?: 'shared' | 'personal'; text?: string; isAnonymous?: boolean }>(req);
           if (!body.text || !body.kind) {
             return sendJson(res, 400, { error: 'Kind and text are required' });
           }
@@ -236,7 +240,7 @@ export function startHealthServer(port: number = config.port): Server {
           if (body.kind === 'shared') {
             result = rooms.addSharedTopic(userId, roomId, body.text.trim());
           } else {
-            result = rooms.addPersonalTopic(userId, roomId, body.text.trim());
+            result = rooms.addPersonalTopic(userId, roomId, body.text.trim(), !!body.isAnonymous);
           }
           if (!result.ok) return sendJson(res, 400, { error: result.error });
           return sendJson(res, 201, result.value);

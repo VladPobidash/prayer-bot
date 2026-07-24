@@ -81,8 +81,21 @@
         <div class="overlay-body">
           <div class="room-info-bar card">
             <div class="info-row">
-              <span class="label">Invite Link:</span>
+              <span class="label">Room ID:</span>
+              <code id="detail-room-id" class="copyable">#0</code>
+            </div>
+            <div class="info-row">
+              <span class="label">Invite Code:</span>
               <code id="detail-invite-code" class="copyable">CODE</code>
+              <button class="btn btn-sm btn-secondary" id="btn-copy-invite-link" title="Copy Invite Link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy Link
+              </button>
+            </div>
+            <div class="info-row">
+              <span class="label">Admin:</span>
+              <span id="detail-admin-info">Admin Name</span>
+              <a href="#" id="link-message-admin" target="_blank" class="btn btn-sm btn-outline hidden">Message Admin</a>
             </div>
             <div class="info-row">
               <span class="label">Members:</span>
@@ -93,6 +106,8 @@
           <div class="room-actions-bar">
             <button class="btn btn-sm btn-outline" id="btn-add-shared-topic">+ Shared Topic</button>
             <button class="btn btn-sm btn-outline" id="btn-add-personal-topic">+ Personal Topic</button>
+            <button class="btn btn-sm btn-danger" id="btn-leave-room">Leave Room</button>
+            <button class="btn btn-sm btn-danger hidden" id="btn-close-room">Close Room</button>
           </div>
 
           <div class="topics-section">
@@ -103,11 +118,6 @@
           <div class="topics-section">
             <h3>Personal Prayer Topics</h3>
             <div id="detail-personal-topics" class="cards-list"></div>
-          </div>
-
-          <div class="room-danger-zone">
-            <button class="btn btn-sm btn-danger" id="btn-leave-room">Leave Room</button>
-            <button class="btn btn-sm btn-danger hidden" id="btn-close-room">Close Room</button>
           </div>
         </div>
       </section>

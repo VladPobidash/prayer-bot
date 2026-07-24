@@ -25,7 +25,11 @@
   const roomOverlay = document.getElementById('room-detail-screen');
   const detailRoomName = document.getElementById('detail-room-name');
   const detailRoomRole = document.getElementById('detail-room-role');
+  const detailRoomId = document.getElementById('detail-room-id');
   const detailInviteCode = document.getElementById('detail-invite-code');
+  const detailAdminInfo = document.getElementById('detail-admin-info');
+  const linkMessageAdmin = document.getElementById('link-message-admin');
+  const btnCopyInviteLink = document.getElementById('btn-copy-invite-link');
   const detailMembersCount = document.getElementById('detail-members-count');
   const detailSharedTopics = document.getElementById('detail-shared-topics');
   const detailPersonalTopics = document.getElementById('detail-personal-topics');
@@ -55,15 +59,19 @@
     });
   });
 
-  // API helper
+  // API Helper
   async function apiRequest(endpoint, options = {}) {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${initData}`,
-      ...(options.headers || {})
-    };
+    const headers = options.headers || {};
+    if (initData) {
+      headers['Authorization'] = `Bearer ${initData}`;
+    }
+    if (options.body && typeof options.body === 'string') {
+      headers['Content-Type'] = 'application/json';
+    }
+    options.headers = headers;
+
     try {
-      const res = await fetch(endpoint, { ...options, headers });
+      const res = await fetch(endpoint, options);
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'API Request failed');
@@ -88,11 +96,9 @@
   async function loadToday() {
     todayListEl.innerHTML = '<div class="loading-state">Loading today\'s assignments...</div>';
     try {
-      const data = await apiRequest('/api/me');
-      me = data.user;
-      const assignments = data.todayAssignments || [];
+      const assignments = await apiRequest('/api/me/today');
       if (assignments.length === 0) {
-        todayListEl.innerHTML = '<div class="empty-state">No prayer assignments for today yet. Join a room or wait for daily rotation!</div>';
+        todayListEl.innerHTML = '<div class="empty-state">No prayer assignments for today yet. Join a room or check back later!</div>';
         return;
       }
       todayListEl.innerHTML = '';
@@ -101,22 +107,17 @@
         card.className = 'card';
         card.innerHTML = `
           <div class="card-header">
-            <span class="badge badge-${item.kind}">${item.kind} Topic</span>
-            <span class="card-meta">Room #${item.roomId}</span>
+            <span class="card-title">${escapeHtml(item.roomName)}</span>
+            <span class="badge ${item.kind === 'shared' ? 'badge-shared' : 'badge-personal'}">${item.kind === 'shared' ? 'Shared Focus' : 'Personal Request'}</span>
           </div>
-          <div class="card-title">${escapeHtml(item.text)}</div>
-          ${item.updates && item.updates.length ? `
-            <div class="topic-updates">
-              <strong>Latest Update:</strong> ${escapeHtml(item.updates[item.updates.length - 1].text)}
+          <div class="card-title" style="margin-top: 8px;">${escapeHtml(item.topicText)}</div>
+          ${item.prayedToday ? `
+            <div style="margin-top: 10px; font-size: 13px; color: var(--success-color); font-weight: 600;">✓ Prayed Today</div>
+          ` : `
+            <div style="margin-top: 10px;">
+              <button class="btn btn-sm btn-primary btn-pray" data-topic-id="${item.topicId}">Mark Prayed Today</button>
             </div>
-          ` : ''}
-          <div style="margin-top: 8px;">
-            ${item.prayedToday ? `
-              <button class="btn btn-sm btn-secondary btn-block" disabled>✓ Prayed Today</button>
-            ` : `
-              <button class="btn btn-sm btn-primary btn-block btn-pray" data-topic-id="${item.id}">Mark Prayed Today</button>
-            `}
-          </div>
+          `}
         `;
         todayListEl.appendChild(card);
       });
@@ -130,7 +131,7 @@
         });
       });
     } catch (e) {
-      todayListEl.innerHTML = '<div class="empty-state">Failed to load assignments.</div>';
+      todayListEl.innerHTML = '<div class="empty-state">Failed to load today assignments.</div>';
     }
   }
 
@@ -177,8 +178,19 @@
       detailRoomName.textContent = currentRoom.name;
       detailRoomRole.textContent = currentRoom.isAdmin ? 'Admin' : 'Member';
       detailRoomRole.className = `badge badge-${currentRoom.isAdmin ? 'admin' : 'member'}`;
+      if (detailRoomId) detailRoomId.textContent = `#${currentRoom.id}`;
       detailInviteCode.textContent = currentRoom.inviteCode;
       detailMembersCount.textContent = currentRoom.members.length;
+
+      if (detailAdminInfo) detailAdminInfo.textContent = currentRoom.adminName || `User ${currentRoom.adminId}`;
+      if (linkMessageAdmin) {
+        if (currentRoom.adminId) {
+          linkMessageAdmin.href = `tg://user?id=${currentRoom.adminId}`;
+          linkMessageAdmin.classList.remove('hidden');
+        } else {
+          linkMessageAdmin.classList.add('hidden');
+        }
+      }
 
       // Admin vs member actions
       if (currentRoom.isAdmin) {
@@ -200,6 +212,20 @@
     }
   }
 
+  if (btnCopyInviteLink) {
+    btnCopyInviteLink.addEventListener('click', async () => {
+      if (!currentRoom) return;
+      const inviteUrl = `https://t.me/next_tick_care_bot?start=join_${currentRoom.inviteCode}`;
+      try {
+        await navigator.clipboard.writeText(inviteUrl);
+        if (tg?.showAlert) tg.showAlert('Invite link copied!');
+        else alert('Invite link copied!');
+      } catch (err) {
+        prompt('Copy invite link:', inviteUrl);
+      }
+    });
+  }
+
   function renderTopics(container, topics, isShared) {
     if (!topics || topics.length === 0) {
       container.innerHTML = '<div class="empty-state">No topics added yet.</div>';
@@ -215,7 +241,7 @@
           <span class="badge ${t.status === 'answered' ? 'badge-answered' : (isShared ? 'badge-shared' : 'badge-personal')}">
             ${t.status === 'answered' ? 'Answered' : (isShared ? 'Shared' : 'Personal')}
           </span>
-          <span class="card-meta">Owner ID: ${t.ownerId}</span>
+          ${!isShared ? `<span class="card-meta">By: ${escapeHtml(t.authorName || 'Member')}</span>` : ''}
         </div>
         <div class="card-title">${escapeHtml(t.text)}</div>
         ${t.updates && t.updates.length ? `
@@ -301,10 +327,10 @@
   });
 
   btnAddPersonalTopic.addEventListener('click', () => {
-    showPromptModal('Add Personal Topic', 'Enter personal prayer topic:', async (text) => {
+    showTopicModal('Add Personal Topic', async (text, isAnonymous) => {
       await apiRequest(`/api/rooms/${currentRoom.id}/topics`, {
         method: 'POST',
-        body: JSON.stringify({ kind: 'personal', text })
+        body: JSON.stringify({ kind: 'personal', text, isAnonymous })
       });
       openRoomDetail(currentRoom.id);
     });
@@ -353,7 +379,7 @@
     else alert('Settings saved!');
   });
 
-  // Modal Helper
+  // Modal Helpers
   function showPromptModal(title, label, onSubmit) {
     modalTitle.textContent = title;
     modalBody.innerHTML = `
@@ -374,6 +400,39 @@
       modalContainer.classList.add('hidden');
       try {
         await onSubmit(val);
+      } catch (e) {}
+    };
+
+    submit.addEventListener('click', handle);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handle();
+    });
+  }
+
+  function showTopicModal(title, onSubmit) {
+    modalTitle.textContent = title;
+    modalBody.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <label style="font-size: 13px; color: var(--hint-color);">Enter personal prayer topic:</label>
+        <input type="text" id="modal-input" class="input-text" autofocus>
+        <label style="font-size: 13px; color: var(--text-color); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="modal-anon-check"> Add Anonymously
+        </label>
+        <button class="btn btn-primary btn-block" id="modal-submit">Submit</button>
+      </div>
+    `;
+    modalContainer.classList.remove('hidden');
+
+    const input = document.getElementById('modal-input');
+    const check = document.getElementById('modal-anon-check');
+    const submit = document.getElementById('modal-submit');
+
+    const handle = async () => {
+      const val = input.value.trim();
+      if (!val) return;
+      modalContainer.classList.add('hidden');
+      try {
+        await onSubmit(val, check.checked);
       } catch (e) {}
     };
 

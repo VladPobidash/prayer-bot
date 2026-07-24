@@ -25,7 +25,8 @@ body {
   color: var(--text-color);
   line-height: 1.4;
   overflow-x: hidden;
-  user-select: none;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 #app {
@@ -412,8 +413,18 @@ body {
   gap: 16px;
 }
 
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
 .room-actions-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
