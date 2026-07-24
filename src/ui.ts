@@ -1,4 +1,5 @@
 import { Markup } from 'telegraf';
+import config from './config.ts';
 import { t, errorKey } from './i18n.ts';
 import { truncate, lines } from './notify.ts';
 import type { Room, RoomWithRole, Topic, Member } from './db/repo.ts';
@@ -10,6 +11,7 @@ export function errorText(error: RoomError, locale: string): string {
 
 export function mainMenu(locale: string) {
   return Markup.inlineKeyboard([
+    [Markup.button.webApp(t(locale, 'btn_open_app'), config.webAppUrl)],
     [Markup.button.callback(t(locale, 'btn_my_rooms'), 'menu:rooms')],
     [Markup.button.callback(t(locale, 'btn_create_room'), 'menu:create')],
     [Markup.button.callback(t(locale, 'btn_join_room'), 'menu:join')],

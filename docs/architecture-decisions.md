@@ -215,12 +215,14 @@ uses only simple type annotations, interfaces, and `as const` assertions.
 
 ---
 
-## ADR 13 — Single bot timezone for Stage 2
+---
+
+## ADR 17 — Telegram Mini-App (Web App) UI + HMAC-SHA256 REST API Authentication
 
 **Status:** Accepted
 
-**Context:** Supporting per-user timezones requires storing each user's IANA timezone string, converting all reminder times on every dispatch tick, and handling DST transitions per user. For Stage 2 the target community is geographically concentrated.
+**Context:** Managing room details, topics, prayer logs, and settings via multi-step text commands and inline keyboard callbacks can be cumbersome on mobile devices. Telegram Mini-Apps allow embedding a full-featured web interface inside the Telegram client.
 
-**Decision:** A single IANA timezone (`config.tz`, defaulting to `UTC`, set to `Europe/Podgorica` in production) is used for all `localDate` / `localTime` calculations. Members set their reminder time as an `HH:MM` wall-clock time interpreted in this shared timezone.
+**Decision:** Embed a Single Page Application (SPA) served by Node `http.createServer` in `src/server.ts` (`public/index.html`, `public/style.css`, `public/app.js`). Authenticate API requests via `Authorization: Bearer <initData>` header using HMAC-SHA256 signature validation (`validateInitData` in `src/auth.ts`) against `TELEGRAM_BOT_TOKEN`. Configure the bot menu button (`setChatMenuButton`) to open the Mini App directly.
 
-**Consequences:** All members experience the same DST transitions. Members in significantly different timezones cannot set an accurate local reminder time. Per-user timezone support is deferred to a future ADR; when added, it requires only adding a `timezone` column to `users` and passing it through `dispatchDueReminders` — no structural change to `sent_assignment` or the scheduler.
+**Consequences:** Bot commands and inline text wizards are minimized while retaining core Telegram notifications (daily reminders, accountability warnings) and media-reply forwarding. The server operates statelessly for web requests by verifying Telegram `initData` per request without requiring separate session tokens or cookies.

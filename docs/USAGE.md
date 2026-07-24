@@ -10,15 +10,15 @@ Need to set up the bot first? See [SETUP.md](SETUP.md).
 
 ## Getting started
 
-Send `/start` to the bot at any time. You will see a welcome message that
-explains how rooms and topics work, followed by a menu with four buttons:
+Send `/start` to the bot at any time or tap the **Open Prayer App** menu button next to the input line in Telegram.
 
-- **My rooms** — view the rooms you belong to.
-- **Create room** — create a new prayer room (you become its admin).
-- **Join** — join a room using an invite link or code.
-- **Help** — show the full command reference.
+The built-in **Telegram Mini App** provides a complete user interface inside Telegram to:
+- View your **Today's Prayer Focus** and mark prayers as prayed with a single tap.
+- Manage **My Rooms**: view room details, invite codes, members, shared topics, and personal topics.
+- Perform room actions: **Create Room**, **Join Room**, **Add Shared/Personal Topic**, **Post Update**, **Mark Answered**, **Leave Room**, or **Close Room**.
+- Configure **Notification Settings**: toggle daily reminders and pick your preferred local reminder time.
 
-You can also use `/start`, `/help`, and `/rooms` as slash commands at any time.
+You can also use `/start`, `/help`, and `/rooms` commands at any time.
 
 ---
 

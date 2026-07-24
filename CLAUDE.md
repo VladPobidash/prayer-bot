@@ -24,7 +24,8 @@ the build/run commands. Read this before making changes.
 | `src/scheduler.ts` | `register({ send, notify })` — schedules a per-minute node-cron job calling `dispatchDueReminders(new Date(), config.tz, deps.send)` and a daily 09:00 job calling `evaluateAccountability(new Date(), config.tz, deps.notify)`; returns stoppable `ScheduledTask[]`. `SendFn` / `NotifyFn` are re-exported from `reminders.ts` / `accountability.ts`. |
 | `src/notify.ts` | `truncate(text, max)`, `lines(items)`, and `confirmKeyboard(yesData, noData)` — message-formatting helpers used by senders. |
 | `src/utils.ts` | `normalize(input)` (Cyrillic-safe), `withTimeout(promise, ms)`, `withRetry(fn, opts)` — pure utility functions with no side-effects. |
-| `src/server.ts` | `startHealthServer(port)` — minimal Node `http.createServer`; `GET /health` → `{"status":"ok"}`; everything else → 404. |
+| `src/auth.ts` | `validateInitData(initDataRaw, botToken)` verifies Telegram WebApp HMAC-SHA256 signature and returns authenticated `TelegramUser`. Includes test helper `generateTestInitData`. |
+| `src/server.ts` | `startHealthServer(port)` — Node `http.createServer` serving `GET /health`, static Mini App frontend (`public/index.html`, `public/style.css`, `public/app.js`), and authenticated REST API endpoints (`/api/me`, `/api/rooms`, `/api/topics`, etc.). |
 
 ---
 

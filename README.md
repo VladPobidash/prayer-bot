@@ -25,11 +25,9 @@ members' prayer requests. You host it on your own account; your data stays yours
 
 **Available today**
 
-- `/start`, `/help`, `/ping` commands in Ukrainian, English, and Russian
-- Private prayer rooms with invite links/codes, shared topics, and private
-  personal topics
-- Daily per-topic reminders, a one-tap **Prayed today** confirmation, and
-  optional voice/video encouragement forwarded to the topic owner
+- Built-in **Telegram Mini-App (Web App)**: seamless room overview, topic management, prayer focus, and settings directly inside Telegram UI
+- Private prayer rooms with invite links/codes, shared topics, and private personal topics
+- Daily per-topic reminders, a one-tap **Prayed today** confirmation, and optional voice/video encouragement forwarded to the topic owner
 - Gentle accountability: members are warned after two missed days and removed
   after five consecutive missed days, with a prior warning
 - Health check endpoint so Railway can monitor that the bot is running
