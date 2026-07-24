@@ -33,6 +33,13 @@ export async function evaluateAccountability(now: Date, tz: string, notify: Noti
   for (const m of repo.listEvaluableMemberships()) {
     const room = repo.getRoom(m.roomId);
     if (!room) continue;
+    if (!repo.hasPrayableTopicForMember(m.roomId, m.telegramId)) {
+      // No shared topic or another member's personal topic means there is no
+      // reminder with a prayer-confirmation button. Clear any old warning so
+      // this member cannot be removed for a room they cannot participate in.
+      repo.deleteMembershipState(m.roomId, m.telegramId);
+      continue;
+    }
     const lastPrayed = repo.lastPrayedDate(m.telegramId, m.roomId);
     const streak = computeMissStreak(lastPrayed, m.joinedAt.slice(0, 10), today);
     // a prayer on/after the warning date (or a streak below 2) makes the warning stale

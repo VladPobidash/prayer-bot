@@ -22,7 +22,8 @@ initDb();
 const bot = createBot();
 
 const send: SendFn = async (chatId, text, topicId) => {
-  const m = await bot.telegram.sendMessage(chatId, text, prayedKeyboard(topicId, config.defaultLocale));
+  const extra = topicId === null ? undefined : prayedKeyboard(topicId, config.defaultLocale);
+  const m = await bot.telegram.sendMessage(chatId, text, extra);
   return m.message_id;
 };
 
