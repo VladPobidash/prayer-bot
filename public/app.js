@@ -103,8 +103,19 @@
 
   // Load User & Today
   async function init() {
+    if (tg?.initDataUnsafe?.user) {
+      me = { id: tg.initDataUnsafe.user.id };
+    }
     todayDateEl.textContent = new Date().toLocaleDateString();
+    await loadUser();
     await loadToday();
+  }
+
+  async function loadUser() {
+    try {
+      const data = await apiRequest('/api/me');
+      me = data.user;
+    } catch (e) {}
   }
 
   async function loadToday() {
@@ -188,6 +199,7 @@
   // Room Detail
   async function openRoomDetail(roomId) {
     try {
+      if (!me) await loadUser();
       currentRoom = await apiRequest(`/api/rooms/${roomId}`);
       detailRoomName.textContent = currentRoom.name;
       detailRoomRole.textContent = currentRoom.isAdmin ? 'Admin' : 'Member';
