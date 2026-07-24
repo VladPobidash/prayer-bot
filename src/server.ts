@@ -157,6 +157,39 @@ export function startHealthServer(port: number = config.port): Server {
           });
         }
 
+        // GET /api/me/today
+        if (method === 'GET' && path === '/api/me/today') {
+          const activeRooms = repo.listActiveRoomsForUser(userId);
+          const todayAssignments: Array<{
+            topicId: number;
+            roomId: number;
+            roomName: string;
+            topicText: string;
+            kind: string;
+            prayedToday: boolean;
+            updates?: Array<{ id: number; text: string; createdAt: string }>;
+          }> = [];
+
+          for (const room of activeRooms) {
+            const topics = repo.listTopics(room.id);
+            for (const topic of topics) {
+              if (topic.status === 'active') {
+                const prayed = repo.hasPrayed(userId, topic.id, today);
+                todayAssignments.push({
+                  topicId: topic.id,
+                  roomId: room.id,
+                  roomName: room.name,
+                  topicText: topic.text,
+                  kind: topic.kind,
+                  prayedToday: prayed,
+                  updates: repo.listTopicUpdates(topic.id),
+                });
+              }
+            }
+          }
+          return sendJson(res, 200, todayAssignments);
+        }
+
         // PUT /api/me/reminder
         if (method === 'PUT' && path === '/api/me/reminder') {
           const body = await parseJsonBody<{ enabled?: boolean; time?: string }>(req);
@@ -205,7 +238,10 @@ export function startHealthServer(port: number = config.port): Server {
           }
           const room = repo.getRoom(roomId);
           if (!room) return sendJson(res, 404, { error: 'Room not found' });
-          const members = repo.listMembers(roomId);
+          const members = repo.listMembers(roomId).map(m => ({
+            ...m,
+            displayName: repo.getDisplayName(m.telegramId) || `User ${m.telegramId}`,
+          }));
           const adminName = repo.getDisplayName(room.adminId) || `User ${room.adminId}`;
           const allTopics = repo.listTopics(roomId);
           const sharedTopics = allTopics.filter(t => t.kind === 'shared').map(t => ({
@@ -221,6 +257,7 @@ export function startHealthServer(port: number = config.port): Server {
           return sendJson(res, 200, {
             ...room,
             adminName,
+            botUsername: config.botUsername,
             isAdmin: room.adminId === userId,
             members,
             sharedTopics,

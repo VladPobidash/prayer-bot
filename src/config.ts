@@ -5,6 +5,7 @@ export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 export interface Config {
   telegramBotToken: string;
+  botUsername: string;
   dbPath: string;
   port: number;
   tz: string;
@@ -43,9 +44,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const port = portStr !== undefined ? Number(portStr) : 3000;
   const adminChatStr = read(env.ADMIN_CHAT_ID);
   const webAppUrl = read(env.WEBAPP_URL) ?? `http://localhost:${port}`;
+  const botUsername = read(env.BOT_USERNAME) ?? 'next_tick_care_bot';
 
   return Object.freeze({
     telegramBotToken: env.TELEGRAM_BOT_TOKEN as string,
+    botUsername,
     dbPath: read(env.DB_PATH) ?? './data/prayer-bot.db',
     port,
     tz: read(env.TZ) ?? 'UTC',

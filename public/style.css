@@ -19,14 +19,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+body, #app, .card, .overlay-screen, .topic-updates, .card-title, code, span, p, label, strong {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.4;
   overflow-x: hidden;
-  user-select: text;
-  -webkit-user-select: text;
 }
 
 #app {
@@ -413,19 +419,82 @@ body {
   gap: 16px;
 }
 
-.info-row {
+.room-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Room Summary & Members List */
+.room-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--secondary-bg);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.summary-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   flex-wrap: wrap;
-  padding: 4px 0;
 }
 
-.room-actions-bar {
+.admin-profile {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.invite-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.invite-code-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.invite-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-title-row h3 {
+  margin-bottom: 0;
+}
+
+.members-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-color);
+  border-radius: 8px;
+  font-size: 13px;
 }
 
 .modal-backdrop {

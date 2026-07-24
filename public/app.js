@@ -28,9 +28,11 @@
   const detailRoomId = document.getElementById('detail-room-id');
   const detailInviteCode = document.getElementById('detail-invite-code');
   const detailAdminInfo = document.getElementById('detail-admin-info');
-  const linkMessageAdmin = document.getElementById('link-message-admin');
+  const btnMessageAdmin = document.getElementById('btn-message-admin');
+  const btnCopyCode = document.getElementById('btn-copy-code');
   const btnCopyInviteLink = document.getElementById('btn-copy-invite-link');
   const detailMembersCount = document.getElementById('detail-members-count');
+  const detailMembersList = document.getElementById('detail-members-list');
   const detailSharedTopics = document.getElementById('detail-shared-topics');
   const detailPersonalTopics = document.getElementById('detail-personal-topics');
   const btnCloseRoomDetail = document.getElementById('btn-close-room-detail');
@@ -53,6 +55,7 @@
       tabPages.forEach(p => p.classList.remove('active'));
       item.classList.add('active');
       document.getElementById(`tab-${tab}`).classList.add('active');
+
       if (tab === 'today') loadToday();
       if (tab === 'rooms') loadRooms();
       if (tab === 'settings') loadSettings();
@@ -135,7 +138,7 @@
     }
   }
 
-  // Load Rooms
+  // Rooms Tab
   async function loadRooms() {
     roomsListEl.innerHTML = '<div class="loading-state">Loading rooms...</div>';
     try {
@@ -183,12 +186,35 @@
       detailMembersCount.textContent = currentRoom.members.length;
 
       if (detailAdminInfo) detailAdminInfo.textContent = currentRoom.adminName || `User ${currentRoom.adminId}`;
-      if (linkMessageAdmin) {
+      if (btnMessageAdmin) {
         if (currentRoom.adminId) {
-          linkMessageAdmin.href = `tg://user?id=${currentRoom.adminId}`;
-          linkMessageAdmin.classList.remove('hidden');
+          btnMessageAdmin.classList.remove('hidden');
+          btnMessageAdmin.onclick = () => {
+            const link = `https://t.me/user?id=${currentRoom.adminId}`;
+            if (tg?.openTelegramLink) {
+              tg.openTelegramLink(link);
+            } else {
+              window.open(link, '_blank');
+            }
+          };
         } else {
-          linkMessageAdmin.classList.add('hidden');
+          btnMessageAdmin.classList.add('hidden');
+        }
+      }
+
+      // Render Members List
+      if (detailMembersList) {
+        detailMembersList.innerHTML = '';
+        if (currentRoom.members && currentRoom.members.length) {
+          currentRoom.members.forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'member-item';
+            item.innerHTML = `
+              <span style="font-weight: 500;">${escapeHtml(m.displayName || ('User ' + m.telegramId))}</span>
+              <span class="badge badge-${m.role === 'admin' ? 'admin' : 'member'}">${m.role === 'admin' ? 'Admin' : 'Member'}</span>
+            `;
+            detailMembersList.appendChild(item);
+          });
         }
       }
 
@@ -212,10 +238,24 @@
     }
   }
 
+  if (btnCopyCode) {
+    btnCopyCode.addEventListener('click', async () => {
+      if (!currentRoom) return;
+      try {
+        await navigator.clipboard.writeText(currentRoom.inviteCode);
+        if (tg?.showAlert) tg.showAlert('Invite code copied!');
+        else alert('Invite code copied!');
+      } catch (err) {
+        prompt('Copy invite code:', currentRoom.inviteCode);
+      }
+    });
+  }
+
   if (btnCopyInviteLink) {
     btnCopyInviteLink.addEventListener('click', async () => {
       if (!currentRoom) return;
-      const inviteUrl = `https://t.me/next_tick_care_bot?start=join_${currentRoom.inviteCode}`;
+      const botName = currentRoom.botUsername || 'next_tick_care_bot';
+      const inviteUrl = `https://t.me/${botName}?start=join_${currentRoom.inviteCode}`;
       try {
         await navigator.clipboard.writeText(inviteUrl);
         if (tg?.showAlert) tg.showAlert('Invite link copied!');
