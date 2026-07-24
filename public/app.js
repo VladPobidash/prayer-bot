@@ -268,7 +268,7 @@
   if (btnCopyInviteLink) {
     btnCopyInviteLink.addEventListener('click', async () => {
       if (!currentRoom) return;
-      const botName = currentRoom.botUsername || 'next_tick_care_bot';
+      const botName = currentRoom.botUsername || 'prayer_me_bot';
       const inviteUrl = `https://t.me/${botName}?start=join_${currentRoom.inviteCode}`;
       try {
         await navigator.clipboard.writeText(inviteUrl);

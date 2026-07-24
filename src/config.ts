@@ -44,7 +44,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const port = portStr !== undefined ? Number(portStr) : 3000;
   const adminChatStr = read(env.ADMIN_CHAT_ID);
   const webAppUrl = read(env.WEBAPP_URL) ?? `http://localhost:${port}`;
-  const botUsername = read(env.BOT_USERNAME) ?? 'next_tick_care_bot';
+  const botUsername = read(env.BOT_USERNAME) ?? 'prayer_me_bot';
 
   return Object.freeze({
     telegramBotToken: env.TELEGRAM_BOT_TOKEN as string,
