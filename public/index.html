@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Prayer Bot App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Content Views -->
+    <main class="app-content">
+      <!-- Tab 1: Today's Assignments -->
+      <section id="tab-today" class="tab-page active">
+        <div class="section-title">
+          <h2>Today's Prayer Focus</h2>
+          <span class="date-badge" id="today-date">--/--/----</span>
+        </div>
+        <div id="today-list" class="cards-list">
+          <div class="loading-state">Loading today's prayers...</div>
+        </div>
+      </section>
+
+      <!-- Tab 2: My Rooms -->
+      <section id="tab-rooms" class="tab-page">
+        <div class="section-header">
+          <h2>My Prayer Rooms</h2>
+          <div class="header-actions">
+            <button class="btn btn-sm btn-primary" id="btn-create-room-modal">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Create
+            </button>
+            <button class="btn btn-sm btn-secondary" id="btn-join-room-modal">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              Join
+            </button>
+          </div>
+        </div>
+        <div id="rooms-list" class="cards-list">
+          <div class="loading-state">Loading rooms...</div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Settings -->
+      <section id="tab-settings" class="tab-page">
+        <div class="section-title">
+          <h2>Notification Settings</h2>
+        </div>
+        <div class="card settings-card">
+          <div class="setting-item">
+            <label for="reminder-toggle" class="setting-label">
+              <span>Daily Reminders</span>
+              <span class="setting-desc">Receive daily prayer reminders</span>
+            </label>
+            <input type="checkbox" id="reminder-toggle" class="toggle-switch">
+          </div>
+          <div class="setting-item">
+            <label for="reminder-time" class="setting-label">
+              <span>Reminder Time</span>
+              <span class="setting-desc">Local time for your daily reminder</span>
+            </label>
+            <input type="time" id="reminder-time" class="input-time" value="09:00">
+          </div>
+          <div class="setting-item">
+            <button id="btn-save-settings" class="btn btn-block btn-primary">Save Preferences</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Room Detail View (Overlay Screen) -->
+      <section id="room-detail-screen" class="overlay-screen hidden">
+        <div class="overlay-header">
+          <button class="btn-icon" id="btn-close-room-detail">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back
+          </button>
+          <h2 id="detail-room-name">Room Details</h2>
+          <span class="badge" id="detail-room-role">Member</span>
+        </div>
+        <div class="overlay-body">
+          <div class="room-info-bar card">
+            <div class="info-row">
+              <span class="label">Invite Link:</span>
+              <code id="detail-invite-code" class="copyable">CODE</code>
+            </div>
+            <div class="info-row">
+              <span class="label">Members:</span>
+              <span id="detail-members-count">0</span>
+            </div>
+          </div>
+
+          <div class="room-actions-bar">
+            <button class="btn btn-sm btn-outline" id="btn-add-shared-topic">+ Shared Topic</button>
+            <button class="btn btn-sm btn-outline" id="btn-add-personal-topic">+ Personal Topic</button>
+          </div>
+
+          <div class="topics-section">
+            <h3>Shared Prayer Topics</h3>
+            <div id="detail-shared-topics" class="cards-list"></div>
+          </div>
+
+          <div class="topics-section">
+            <h3>Personal Prayer Topics</h3>
+            <div id="detail-personal-topics" class="cards-list"></div>
+          </div>
+
+          <div class="room-danger-zone">
+            <button class="btn btn-sm btn-danger" id="btn-leave-room">Leave Room</button>
+            <button class="btn btn-sm btn-danger hidden" id="btn-close-room">Close Room</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="modal-container" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modal-title">Modal Title</h3>
+          <button class="btn-icon" id="btn-close-modal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <!-- Dynamic Content -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar with Vector SVGs -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="today">
+        <span class="nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </span>
+        <span class="nav-label">Today</span>
+      </button>
+      <button class="nav-item" data-tab="rooms">
+        <span class="nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <span class="nav-label">Rooms</span>
+      </button>
+      <button class="nav-item" data-tab="settings">
+        <span class="nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </span>
+        <span class="nav-label">Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

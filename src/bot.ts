@@ -270,3 +270,17 @@ export async function safeEditMessageText(
     if (!/message is not modified/i.test(msg)) throw err;
   }
 }
+
+export async function configureBotMenu(bot: Telegraf, webAppUrl: string = config.webAppUrl): Promise<void> {
+  try {
+    await bot.telegram.setChatMenuButton({
+      menuButton: {
+        type: 'web_app',
+        text: 'Prayer App',
+        web_app: { url: webAppUrl },
+      },
+    });
+  } catch (err) {
+    console.error(`${LOG_PREFIX.bot} failed to set chat menu button:`, err);
+  }
+}

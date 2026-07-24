@@ -67,6 +67,7 @@ wiped every time the bot restarts or redeploys.
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | The token you copied from BotFather in Step 1 | Yes |
 | `DB_PATH` | `/data/prayer-bot.db` | Yes |
+| `WEBAPP_URL` | Public HTTPS domain URL of your deployment (e.g. `https://your-service.railway.app`) | Recommended |
 | `DEFAULT_LOCALE` | `uk`, `en`, or `ru` (defaults to `uk`) | No |
 | `TZ` | Your timezone, e.g. `Europe/Kyiv` (defaults to `UTC`) | No |
 | `ADMIN_USER_IDS` | Reserved legacy setting; it is not needed for prayer-room administration | No |

@@ -11,6 +11,7 @@ export interface Config {
   defaultLocale: Locale;
   adminUserIds: Set<number>;
   adminChatId: number | null;
+  webAppUrl: string;
 }
 
 const REQUIRED = ['TELEGRAM_BOT_TOKEN'] as const;
@@ -39,16 +40,19 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   );
 
   const portStr = read(env.PORT);
+  const port = portStr !== undefined ? Number(portStr) : 3000;
   const adminChatStr = read(env.ADMIN_CHAT_ID);
+  const webAppUrl = read(env.WEBAPP_URL) ?? `http://localhost:${port}`;
 
   return Object.freeze({
     telegramBotToken: env.TELEGRAM_BOT_TOKEN as string,
     dbPath: read(env.DB_PATH) ?? './data/prayer-bot.db',
-    port: portStr !== undefined ? Number(portStr) : 3000,
+    port,
     tz: read(env.TZ) ?? 'UTC',
     defaultLocale,
     adminUserIds,
     adminChatId: adminChatStr !== undefined ? Number(adminChatStr) : null,
+    webAppUrl,
   });
 }
 

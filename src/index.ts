@@ -1,7 +1,7 @@
 import config from './config.ts';
 import { initDb, closeDb } from './db/connection.ts';
 import { getState, setState } from './db/repo.ts';
-import { createBot } from './bot.ts';
+import { createBot, configureBotMenu } from './bot.ts';
 import { startHealthServer } from './server.ts';
 import { register as registerSchedules, type SendFn, type NotifyFn } from './scheduler.ts';
 import { evaluateAccountability } from './accountability.ts';
@@ -35,6 +35,7 @@ const server = startHealthServer(config.port);
 
 bot.launch();
 console.log(`${LOG_PREFIX.bot} launched (long polling)`);
+configureBotMenu(bot);
 
 reconcileOnBoot();
 registerSchedules({ send, notify });
