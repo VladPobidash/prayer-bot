@@ -120,8 +120,18 @@
 
   async function loadToday() {
     todayListEl.innerHTML = '<div class="loading-state">Loading today\'s assignments...</div>';
+    const progressPill = document.getElementById('today-progress-pill');
+    const progressFill = document.getElementById('today-progress-fill');
+
     try {
       const assignments = await apiRequest('/api/me/today');
+      const total = assignments.length;
+      const completed = assignments.filter(a => a.prayedToday).length;
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      if (progressPill) progressPill.textContent = `${completed}/${total} Completed`;
+      if (progressFill) progressFill.style.width = `${percent}%`;
+
       if (assignments.length === 0) {
         todayListEl.innerHTML = '<div class="empty-state">No prayer assignments for today yet. Join a room or check back later!</div>';
         return;
@@ -129,20 +139,28 @@
       todayListEl.innerHTML = '';
       assignments.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'today-card';
         card.innerHTML = `
-          <div class="card-header">
-            <span class="card-title">${escapeHtml(item.roomName)}</span>
+          <div class="today-card-header">
+            <span class="room-tag">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              ${escapeHtml(item.roomName)}
+            </span>
             <span class="badge ${item.kind === 'shared' ? 'badge-shared' : 'badge-personal'}">${item.kind === 'shared' ? 'Shared Focus' : 'Personal Request'}</span>
           </div>
-          <div class="card-title" style="margin-top: 8px;">${escapeHtml(item.topicText)}</div>
-          ${item.prayedToday ? `
-            <div style="margin-top: 10px; font-size: 13px; color: var(--success-color); font-weight: 600;">✓ Prayed Today</div>
-          ` : `
-            <div style="margin-top: 10px;">
-              <button class="btn btn-sm btn-primary btn-pray" data-topic-id="${item.topicId}">Mark Prayed Today</button>
-            </div>
-          `}
+          <div class="today-prayer-text">${escapeHtml(item.topicText)}</div>
+          <div class="today-card-footer">
+            ${item.prayedToday ? `
+              <div class="prayed-done-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Prayed Today
+              </div>
+            ` : `
+              <button class="btn btn-sm btn-primary btn-block btn-pray" data-topic-id="${item.topicId}">
+                🙏 Mark as Prayed Today
+              </button>
+            `}
+          </div>
         `;
         todayListEl.appendChild(card);
       });

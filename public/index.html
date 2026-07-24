@@ -13,12 +13,22 @@
     <main class="app-content">
       <!-- Tab 1: Today's Assignments -->
       <section id="tab-today" class="tab-page active">
-        <div class="section-title">
-          <h2>Today's Prayer Focus</h2>
-          <span class="date-badge" id="today-date">--/--/----</span>
+        <!-- Progress Header Banner -->
+        <div class="today-banner-card card">
+          <div class="banner-top">
+            <div>
+              <h2 class="banner-title">Today's Focus</h2>
+              <span class="banner-subtitle" id="today-date">--/--/----</span>
+            </div>
+            <div class="progress-pill" id="today-progress-pill">0/0 Completed</div>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="today-progress-fill" style="width: 0%;"></div>
+          </div>
         </div>
+
         <div id="today-list" class="cards-list">
-          <div class="loading-state">Loading today's prayers...</div>
+          <div class="loading-state">Loading today's focus...</div>
         </div>
       </section>
 
