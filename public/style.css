@@ -485,6 +485,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .member-item {

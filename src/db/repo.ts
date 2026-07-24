@@ -56,11 +56,13 @@ function toRoom(r: RoomRow): Room {
 }
 
 // ---- users ----
-export function upsertUser(telegramId: number, displayName: string | null): void {
+export function upsertUser(telegramId: number, displayName: string | null, username: string | null = null): void {
   getDb().prepare(
-    `INSERT INTO users (telegram_id, display_name) VALUES (?, ?)
-     ON CONFLICT(telegram_id) DO UPDATE SET display_name = COALESCE(excluded.display_name, users.display_name)`,
-  ).run(telegramId, displayName);
+    `INSERT INTO users (telegram_id, display_name, username) VALUES (?, ?, ?)
+     ON CONFLICT(telegram_id) DO UPDATE SET
+       display_name = COALESCE(excluded.display_name, users.display_name),
+       username = COALESCE(excluded.username, users.username)`,
+  ).run(telegramId, displayName, username);
 }
 
 // ---- rooms ----
@@ -318,4 +320,8 @@ export function listEvaluableMemberships(): { roomId: number; telegramId: number
 export function getDisplayName(telegramId: number): string | null {
   const r = getDb().prepare(`SELECT display_name FROM users WHERE telegram_id = ?`).get(telegramId) as { display_name: string | null } | undefined;
   return r ? r.display_name : null;
+}
+export function getUserInfo(telegramId: number): { displayName: string | null; username: string | null } | null {
+  const r = getDb().prepare(`SELECT display_name, username FROM users WHERE telegram_id = ?`).get(telegramId) as { display_name: string | null; username: string | null } | undefined;
+  return r ? { displayName: r.display_name, username: r.username } : null;
 }

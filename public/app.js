@@ -40,6 +40,17 @@
   const btnAddPersonalTopic = document.getElementById('btn-add-personal-topic');
   const btnLeaveRoom = document.getElementById('btn-leave-room');
   const btnCloseRoom = document.getElementById('btn-close-room');
+  const headerMembersToggle = document.getElementById('header-members-toggle');
+
+  if (headerMembersToggle) {
+    headerMembersToggle.addEventListener('click', () => {
+      detailMembersList.classList.toggle('hidden');
+      const iconMembersToggle = document.getElementById('icon-members-toggle');
+      if (iconMembersToggle) {
+        iconMembersToggle.textContent = detailMembersList.classList.contains('hidden') ? '▼' : '▲';
+      }
+    });
+  }
 
   // Modals
   const modalContainer = document.getElementById('modal-container');
@@ -187,10 +198,10 @@
 
       if (detailAdminInfo) detailAdminInfo.textContent = currentRoom.adminName || `User ${currentRoom.adminId}`;
       if (btnMessageAdmin) {
-        if (currentRoom.adminId) {
+        if (!currentRoom.isAdmin && currentRoom.adminUsername) {
           btnMessageAdmin.classList.remove('hidden');
           btnMessageAdmin.onclick = () => {
-            const link = `https://t.me/user?id=${currentRoom.adminId}`;
+            const link = `https://t.me/${currentRoom.adminUsername}`;
             if (tg?.openTelegramLink) {
               tg.openTelegramLink(link);
             } else {
@@ -202,8 +213,11 @@
         }
       }
 
-      // Render Members List
+      // Render Members List (Collapsed by default)
       if (detailMembersList) {
+        detailMembersList.classList.add('hidden');
+        const iconMembersToggle = document.getElementById('icon-members-toggle');
+        if (iconMembersToggle) iconMembersToggle.textContent = '▼';
         detailMembersList.innerHTML = '';
         if (currentRoom.members && currentRoom.members.length) {
           currentRoom.members.forEach(m => {

@@ -112,7 +112,8 @@ export function startHealthServer(port: number = config.port): Server {
       }
       const { userId, user } = auth;
       const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ') || null;
-      repo.upsertUser(userId, displayName);
+      const username = user.username || null;
+      repo.upsertUser(userId, displayName, username);
       const today = localDate(new Date(), config.tz);
 
       try {
@@ -242,7 +243,9 @@ export function startHealthServer(port: number = config.port): Server {
             ...m,
             displayName: repo.getDisplayName(m.telegramId) || `User ${m.telegramId}`,
           }));
-          const adminName = repo.getDisplayName(room.adminId) || `User ${room.adminId}`;
+          const adminUser = repo.getUserInfo(room.adminId);
+          const adminName = adminUser?.displayName || `User ${room.adminId}`;
+          const adminUsername = adminUser?.username || null;
           const allTopics = repo.listTopics(roomId);
           const sharedTopics = allTopics.filter(t => t.kind === 'shared').map(t => ({
             ...t,
@@ -257,6 +260,7 @@ export function startHealthServer(port: number = config.port): Server {
           return sendJson(res, 200, {
             ...room,
             adminName,
+            adminUsername,
             botUsername: config.botUsername,
             isAdmin: room.adminId === userId,
             members,
