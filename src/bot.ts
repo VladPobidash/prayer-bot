@@ -6,6 +6,7 @@ import * as rooms from './rooms.ts';
 import * as repo from './db/repo.ts';
 import { mainMenu, roomsList, renderRoomView, confirmKb, ownTopicsKb, errorText } from './ui.ts';
 import { localDate } from './assignments.ts';
+import { getStreakSummary } from './streak.ts';
 
 // Pending multi-step input, keyed by user id (chat.id === user.id in DMs).
 type Pending =
@@ -105,7 +106,10 @@ export function createBot(token: string = config.telegramBotToken): Telegraf {
         if (!topic) return void (await ctx.reply(t(loc(ctx), 'stale_button')));
         if (repo.hasPrayed(uid(ctx), topic.id, todayLocal())) return void (await ctx.reply(t(loc(ctx), 'prayed_already')));
         repo.recordPrayer(uid(ctx), topic.roomId, topic.id, todayLocal());
-        return void (await ctx.reply(t(loc(ctx), 'prayed_ack')));
+        // Read the streak after recording: today now counts towards it.
+        const streak = getStreakSummary(uid(ctx), todayLocal());
+        const ack = `${t(loc(ctx), 'prayed_ack')}\n${t(loc(ctx), 'streak_kept', { n: streak.current })}`;
+        return void (await ctx.reply(ack));
       }
       if (ns === 'menu') {
         if (action === 'home') return void (await showMenu(ctx));

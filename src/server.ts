@@ -7,6 +7,7 @@ import { validateInitData, type TelegramUser } from './auth.ts';
 import * as repo from './db/repo.ts';
 import * as rooms from './rooms.ts';
 import { localDate } from './assignments.ts';
+import { getStreakSummary } from './streak.ts';
 import { LOCALES } from './i18n.ts';
 
 function sendJson(res: ServerResponse, status: number, data: unknown): void {
@@ -158,7 +159,13 @@ export function startHealthServer(port: number = config.port): Server {
             },
             locales: LOCALES,
             todayAssignments,
+            streak: getStreakSummary(userId, today),
           });
+        }
+
+        // GET /api/me/streak
+        if (method === 'GET' && path === '/api/me/streak') {
+          return sendJson(res, 200, getStreakSummary(userId, today));
         }
 
         // GET /api/me/today

@@ -53,6 +53,17 @@ test('i18n: Stage 2b reminder keys exist in all locales', () => {
   }
 });
 
+test('i18n: streak keys exist in all locales', () => {
+  for (const loc of ['uk', 'en', 'ru']) {
+    assert.ok(t(loc, 'streak_line', { n: 5 }).includes('5'));
+    assert.ok(t(loc, 'streak_kept', { n: 5 }).includes('5'));
+    assert.ok(t(loc, 'streak_line_start').length > 0);
+    assert.ok(t(loc, 'ui_streak').length > 0);
+    assert.ok(t(loc, 'ui_streak_best', { n: 9 }).includes('9'));
+    assert.ok(t(loc, 'ui_streak_none').length > 0);
+  }
+});
+
 import { prayedKeyboard } from '../src/ui.ts';
 test('prayedKeyboard carries pray:done:<topicId>', () => {
   assert.ok(JSON.stringify(prayedKeyboard(77, 'en')).includes('pray:done:77'));
