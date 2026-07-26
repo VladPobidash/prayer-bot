@@ -1,0 +1,36 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>SVG → PNG rasterizer</title>
+<style>body{font:14px system-ui;background:#111;color:#eee;padding:16px}</style>
+<pre id="log">working…</pre>
+<script>
+// Renders every brand SVG to a pixel-exact PNG and POSTs it back to the dev
+// server, which writes it into brand/render/. Run with: node serve.mjs <brand dir>
+const JOBS = [
+  ['logo/option-a-flame-circle.svg', 'botpic-option-a.png', 512, 512],
+  ['logo/option-b-hands-arch.svg',   'botpic-option-b.png', 512, 512],
+  ['logo/option-c-bubble-flame.svg', 'botpic-option-c.png', 512, 512],
+  ['logo/option-d-streak-ring.svg',  'botpic-option-d.png', 512, 512],
+  ['description-picture-uk.svg', 'description-picture-uk.png', 640, 360],
+  ['description-picture-en.svg', 'description-picture-en.png', 640, 360],
+];
+
+const log = (m) => { document.getElementById('log').textContent += '\n' + m; };
+
+async function run() {
+  for (const [src, out, w, h] of JOBS) {
+    const svg = await (await fetch('/' + src)).text();
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    const img = new Image();
+    await new Promise((ok, err) => { img.onload = ok; img.onerror = err; img.src = url; });
+    const canvas = Object.assign(document.createElement('canvas'), { width: w, height: h });
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    const blob = await new Promise((ok) => canvas.toBlob(ok, 'image/png'));
+    await fetch('/save/' + out, { method: 'POST', body: blob });
+    log(out + ' → ' + w + 'x' + h);
+    URL.revokeObjectURL(url);
+  }
+  log('done');
+}
+run().catch((e) => log('ERROR ' + e));
+</script>
