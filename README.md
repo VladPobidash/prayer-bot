@@ -58,6 +58,8 @@ commands.
 
 Full command reference: **[docs/USAGE.md](docs/USAGE.md)**
 
+Multi-environment Railway setup (Dev/Staging & Production): **[docs/STAGING_DEPLOYMENT_GUIDE.md](docs/STAGING_DEPLOYMENT_GUIDE.md)**
+
 ## Developing or changing the bot
 
 Start with **[AGENTS.md](AGENTS.md)**, then read the detailed module map and
