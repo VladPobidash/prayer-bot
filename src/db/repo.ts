@@ -240,6 +240,13 @@ export function hasPrayed(telegramId: number, topicId: number, prayedDate: strin
     `SELECT 1 FROM prayer_log WHERE telegram_id = ? AND topic_id = ? AND prayed_date = ?`,
   ).get(telegramId, topicId, prayedDate);
 }
+// Distinct dates (ascending) on which the user recorded at least one prayer,
+// across every room — the input to the daily streak.
+export function listPrayedDates(telegramId: number): string[] {
+  return (getDb().prepare(
+    `SELECT DISTINCT prayed_date AS d FROM prayer_log WHERE telegram_id = ? ORDER BY d`,
+  ).all(telegramId) as { d: string }[]).map((r) => r.d);
+}
 
 // Active topics of a kind in a room, ordered by id (stable rotation order).
 export function listActiveTopics(roomId: number, kind: TopicKind): Topic[] {

@@ -125,12 +125,47 @@
       }
       return data;
     } catch (err) {
-      if (tg?.showAlert) {
-        tg.showAlert(err.message);
-      } else {
-        alert(err.message);
+      if (!options.silent) {
+        if (tg?.showAlert) {
+          tg.showAlert(err.message);
+        } else {
+          alert(err.message);
+        }
       }
       throw err;
+    }
+  }
+
+  // Daily streak line (🔥 current streak + last 7 days)
+  async function loadStreak() {
+    const lineEl = document.getElementById('streak-line');
+    if (!lineEl) return;
+    try {
+      const s = await apiRequest('/api/me/streak', { silent: true });
+      const flameEl = document.getElementById('streak-flame');
+      const countEl = document.getElementById('streak-count');
+      const labelEl = document.getElementById('streak-label');
+      const bestEl = document.getElementById('streak-best');
+      const weekEl = document.getElementById('streak-week');
+
+      countEl.textContent = s.current;
+      labelEl.textContent = s.current > 0
+        ? t(currentLocale, 'ui_streak')
+        : t(currentLocale, 'ui_streak_none');
+      countEl.style.display = s.current > 0 ? '' : 'none';
+      flameEl.className = `streak-flame${s.current > 0 ? '' : ' cold'}`;
+      bestEl.textContent = s.best > 1 ? t(currentLocale, 'ui_streak_best', { n: s.best }) : '';
+
+      const todayIso = s.week.length ? s.week[s.week.length - 1].date : '';
+      weekEl.innerHTML = s.week.map(d => {
+        const classes = ['streak-dot'];
+        if (d.prayed) classes.push('on');
+        if (d.date === todayIso) classes.push('today');
+        return `<span class="${classes.join(' ')}">${Number(d.date.slice(8, 10))}</span>`;
+      }).join('');
+      lineEl.classList.remove('hidden');
+    } catch (e) {
+      lineEl.classList.add('hidden');
     }
   }
 
@@ -160,6 +195,7 @@
     todayListEl.innerHTML = `<div class="loading-state">${t(currentLocale, 'ui_loading_today')}</div>`;
     const progressPill = document.getElementById('today-progress-pill');
     const progressFill = document.getElementById('today-progress-fill');
+    loadStreak();
 
     try {
       const assignments = await apiRequest('/api/me/today');

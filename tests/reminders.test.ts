@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initDb, closeDb } from '../src/db/connection.ts';
-import { upsertUser, insertRoom, addMember, insertTopic, setReminderTime, hasSentToday } from '../src/db/repo.ts';
+import { upsertUser, insertRoom, addMember, insertTopic, setReminderTime, hasSentToday, recordPrayer } from '../src/db/repo.ts';
 import { dispatchDueReminders } from '../src/reminders.ts';
 
 function setup() {
@@ -32,6 +32,36 @@ test('dispatchDueReminders sends per-topic messages to due users and is idempote
   const before = sent.length;
   await dispatchDueReminders(now, 'Europe/Podgorica', send); // same day, already sent → no re-send
   assert.equal(sent.length, before);
+  closeDb();
+});
+
+test('the streak line rides on the first reminder message only', async () => {
+  const roomId = setup();
+  setReminderTime(1, '08:00');
+  // user 1 prayed on the two days before 2026-06-17 → a live 2-day streak
+  recordPrayer(1, roomId, 1, '2026-06-15');
+  recordPrayer(1, roomId, 1, '2026-06-16');
+  const sent: string[] = [];
+  let mid = 3000;
+  const send = async (_chatId: number, text: string) => { sent.push(text); return ++mid; };
+
+  await dispatchDueReminders(new Date('2026-06-17T06:00:30Z'), 'Europe/Podgorica', send);
+
+  assert.equal(sent.length, 2);
+  assert.match(sent[0], /🔥 Ваша серія: 2 дн/);
+  assert.doesNotMatch(sent[1], /🔥/);
+  closeDb();
+});
+
+test('a user with no streak yet gets the start-your-streak line', async () => {
+  setup();
+  setReminderTime(1, '08:00');
+  const sent: string[] = [];
+  const send = async (_chatId: number, text: string) => { sent.push(text); return 4000; };
+
+  await dispatchDueReminders(new Date('2026-06-17T06:00:30Z'), 'Europe/Podgorica', send);
+
+  assert.match(sent[0], /щоб почати свою серію/i);
   closeDb();
 });
 
