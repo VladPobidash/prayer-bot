@@ -1,5 +1,6 @@
 import * as repo from './db/repo.ts';
 import { localDate, localTime, generateDailyAssignments } from './assignments.ts';
+import { getStreakSummary } from './streak.ts';
 import { t } from './i18n.ts';
 import config from './config.ts';
 
@@ -29,7 +30,17 @@ export function buildMessagesForUser(telegramId: number, date: string, locale: s
       out.push({ topicId: null, roomId: room.id, text: t(locale, 'reminder_no_assignment', { room: room.name }) });
     }
   }
+  // The streak belongs to the day, not to a topic: it rides on the first
+  // message only, so a user with several topics is not told it three times.
+  if (out.length > 0) out[0].text += `\n\n${streakLine(telegramId, date, locale)}`;
   return out;
+}
+
+// One-line streak footer as of `date` (today's prayers are not in yet at
+// reminder time, so this reflects the run the user is about to extend).
+export function streakLine(telegramId: number, date: string, locale: string): string {
+  const s = getStreakSummary(telegramId, date);
+  return s.current > 0 ? t(locale, 'streak_line', { n: s.current }) : t(locale, 'streak_line_start');
 }
 
 // Send due reminders. Due = local time >= reminder_time AND not already sent today.
