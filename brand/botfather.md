@@ -39,40 +39,30 @@ A private prayer room in Telegram: shared topics, daily reminders, and people wh
 
 ## Description — `/setdescription` ("What can this bot do?")
 
-**UK (487 chars):**
+**UK (235 chars):**
 
 ```
-🙏 Молитва — це звичка. Тримайте її разом.
+🙏 Тримайте молитву разом.
 
-Prayer Room — приватна кімната молитви для вашої групи, сім'ї чи церкви:
+Приватна кімната для вашої групи, сім'ї чи церкви:
+• спільні теми + до 3 особистих прохань
+• щодня бот пише, за кого молитись сьогодні
+• одне «🙏 Помолився» — і людина це бачить
 
-• створіть кімнату і запросіть своїх одним посиланням
-• спільні теми групи + до 3 особистих прохань кожного
-• щодня у ваш час бот пише, за кого молитись сьогодні
-• одне «🙏 Помолився» — і людина бачить, що за неї молились
-• отримали відповідь? позначте ✅ і збережіть свідчення
-
-Без реклами. Тільки ваші люди. Ваші прохання не бачить ніхто чужий.
-
-Натисніть «Запустити» ⬇️
+Без реклами. Тільки ваші люди.
 ```
 
-**EN (453 chars):**
+**EN (232 chars):**
 
 ```
-🙏 Prayer is a habit. Keep it together.
+🙏 Keep the prayer habit together.
 
-Prayer Room is a private prayer room for your group, family or church:
+A private room for your group, family or church:
+• shared topics + up to 3 personal requests
+• each day the bot tells you who to pray for
+• tap «🙏 Prayed» and they see it
 
-• create a room and invite your people with one link
-• shared group topics + up to 3 personal requests each
-• every day, at your time, the bot tells you who to pray for
-• one tap on «🙏 Prayed today» and they see they were carried
-• answered? mark it ✅ and keep the testimony
-
-No ads, no strangers — only the people you invited.
-
-Tap Start ⬇️
+No ads. Only your people.
 ```
 
 ---
