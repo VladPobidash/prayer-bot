@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B1F4B"/>
+      <stop offset="0.55" stop-color="#141735"/>
+      <stop offset="1" stop-color="#0B0D20"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.35" r="0.55">
+      <stop offset="0" stop-color="#7C5CFF" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#7C5CFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="0.10" cy="0.88" r="0.5">
+      <stop offset="0" stop-color="#FF9A3C" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#FF9A3C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#FFE9A8"/>
+      <stop offset="0.45" stop-color="#FFC24A"/>
+      <stop offset="1" stop-color="#FF8A3D"/>
+    </linearGradient>
+    <linearGradient id="cta" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFD469"/>
+      <stop offset="1" stop-color="#FF8A3D"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <rect width="640" height="360" fill="url(#glow)"/>
+  <rect width="640" height="360" fill="url(#warm)"/>
+
+  <g transform="translate(21,26) scale(0.1)">
+    <path d="M256 96 C 268 152 312 178 330 216 C 348 256 342 302 316 330 C 292 356 264 366 256 366 C 248 366 220 356 196 330 C 170 302 164 256 182 216 C 200 178 244 152 256 96 Z" fill="url(#flame)"/>
+  </g>
+  <text x="70" y="55" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#EDEBFF" letter-spacing="0.4">Prayer Room</text>
+
+  <text x="40" y="126" font-family="Segoe UI, Arial, sans-serif" font-size="37" font-weight="800" fill="#FFFFFF">Pray together.</text>
+  <text x="40" y="172" font-family="Segoe UI, Arial, sans-serif" font-size="37" font-weight="800" fill="url(#cta)">Every day.</text>
+
+  <text x="40" y="212" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#B9B7DC">A private prayer room inside Telegram:</text>
+  <text x="40" y="234" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#B9B7DC">topics, reminders, real support.</text>
+
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">
+    <rect x="40" y="256" width="126" height="28" rx="14" fill="#FFFFFF" fill-opacity="0.08" stroke="#7C5CFF" stroke-opacity="0.45"/>
+    <text x="56" y="274" fill="#DAD7FF">⏰ Your own time</text>
+    <rect x="174" y="256" width="112" height="28" rx="14" fill="#FFFFFF" fill-opacity="0.08" stroke="#7C5CFF" stroke-opacity="0.45"/>
+    <text x="190" y="274" fill="#DAD7FF">🔒 Invite-only</text>
+  </g>
+
+  <text x="40" y="316" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#7E7CAE">Free · open source · no ads</text>
+
+  <g transform="translate(400,40)">
+    <rect x="0" y="0" width="204" height="280" rx="26" fill="#191C3D" stroke="#3A3F7A" stroke-width="2"/>
+    <rect x="14" y="16" width="176" height="8" rx="4" fill="#2C3160"/>
+
+    <rect x="14" y="38" width="176" height="74" rx="14" fill="#232750"/>
+    <rect x="14" y="38" width="4" height="74" rx="2" fill="#FFC24A"/>
+    <text x="28" y="60" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#FFC24A" letter-spacing="0.6">SHARED FOCUS</text>
+    <text x="28" y="80" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#EDEBFF">Peace in Ukraine</text>
+    <text x="28" y="99" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8E8CBE">Room “Our group”</text>
+
+    <rect x="14" y="122" width="176" height="74" rx="14" fill="#232750"/>
+    <rect x="14" y="122" width="4" height="74" rx="2" fill="#7C5CFF"/>
+    <text x="28" y="144" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#9E8BFF" letter-spacing="0.6">PERSONAL REQUEST</text>
+    <text x="28" y="164" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#EDEBFF">Healing for Olia's mum</text>
+    <text x="28" y="183" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8E8CBE">you carry Olia today</text>
+
+    <rect x="14" y="208" width="176" height="38" rx="19" fill="url(#cta)"/>
+    <text x="102" y="233" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#20130A">🙏 Prayed today</text>
+
+    <text x="14" y="268" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8E8CBE">Streak:</text>
+    <g>
+      <circle cx="66" cy="264" r="5" fill="#FFC24A"/>
+      <circle cx="82" cy="264" r="5" fill="#FFC24A"/>
+      <circle cx="98" cy="264" r="5" fill="#FFC24A"/>
+      <circle cx="114" cy="264" r="5" fill="#FFC24A"/>
+      <circle cx="130" cy="264" r="5" fill="#FFC24A"/>
+      <circle cx="146" cy="264" r="5" fill="#FFC24A"/>
+      <circle cx="162" cy="264" r="5" fill="none" stroke="#4B4F86" stroke-width="2"/>
+    </g>
+  </g>
+</svg>
