@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B1F4B"/>
+      <stop offset="0.55" stop-color="#141735"/>
+      <stop offset="1" stop-color="#0B0D20"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.1" r="0.7">
+      <stop offset="0" stop-color="#7C5CFF" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#7C5CFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="0.5" cy="1" r="0.6">
+      <stop offset="0" stop-color="#FF9A3C" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#FF9A3C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#FFE9A8"/>
+      <stop offset="0.45" stop-color="#FFC24A"/>
+      <stop offset="1" stop-color="#FF8A3D"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFD469"/>
+      <stop offset="1" stop-color="#FF8A3D"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect width="1280" height="720" fill="url(#glow)"/>
+  <rect width="1280" height="720" fill="url(#warm)"/>
+
+  <!-- header -->
+  <g transform="translate(51,36) scale(0.16)">
+    <path d="M256 96 C 268 152 312 178 330 216 C 348 256 342 302 316 330 C 292 356 264 366 256 366 C 248 366 220 356 196 330 C 170 302 164 256 182 216 C 200 178 244 152 256 96 Z" fill="url(#flame)"/>
+  </g>
+  <text x="130" y="82" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#EDEBFF" letter-spacing="0.5">Prayer Room</text>
+
+  <text x="64" y="164" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="800" fill="#FFFFFF">Як це працює</text>
+  <text x="64" y="204" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#B9B7DC">Молитовна кімната нашої групи — три кроки, далі бот сам</text>
+
+  <!-- step 1 -->
+  <g>
+    <rect x="64" y="248" width="368" height="336" rx="28" fill="#FFFFFF" fill-opacity="0.055" stroke="#3A3F7A"/>
+    <circle cx="120" cy="308" r="30" fill="url(#gold)"/>
+    <text x="120" y="320" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#20130A">1</text>
+    <text x="368" y="322" text-anchor="end" font-size="40">🔗</text>
+    <text x="104" y="396" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF">Приєднуєшся</text>
+    <text x="104" y="440" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#B9B7DC">Тиснеш посилання</text>
+    <text x="104" y="470" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#B9B7DC">і «Запустити».</text>
+    <text x="104" y="514" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#8E8CBE">Кімната закрита —</text>
+    <text x="104" y="544" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#8E8CBE">тільки свої.</text>
+  </g>
+
+  <!-- step 2 -->
+  <g>
+    <rect x="456" y="248" width="368" height="336" rx="28" fill="#FFFFFF" fill-opacity="0.055" stroke="#3A3F7A"/>
+    <circle cx="512" cy="308" r="30" fill="url(#gold)"/>
+    <text x="512" y="320" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#20130A">2</text>
+    <text x="760" y="322" text-anchor="end" font-size="40">✍️</text>
+    <text x="496" y="396" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF">Пишеш прохання</text>
+    <text x="496" y="440" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#B9B7DC">До 3 своїх тем —</text>
+    <text x="496" y="470" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#B9B7DC">можна почати з однієї.</text>
+    <text x="496" y="514" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#8E8CBE">Обираєш час</text>
+    <text x="496" y="544" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#8E8CBE">нагадування.</text>
+  </g>
+
+  <!-- step 3 -->
+  <g>
+    <rect x="848" y="248" width="368" height="336" rx="28" fill="#FFFFFF" fill-opacity="0.055" stroke="#3A3F7A"/>
+    <circle cx="904" cy="308" r="30" fill="url(#gold)"/>
+    <text x="904" y="320" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#20130A">3</text>
+    <text x="1152" y="322" text-anchor="end" font-size="40">🙏</text>
+    <text x="888" y="396" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF">Молишся щодня</text>
+    <text x="888" y="440" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#B9B7DC">Бот пише, за кого</text>
+    <text x="888" y="470" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#B9B7DC">молитись сьогодні.</text>
+    <text x="888" y="514" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#8E8CBE">Помолився — тиснеш</text>
+    <text x="888" y="544" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#8E8CBE">кнопку 🙏 Помолився</text>
+  </g>
+
+  <!-- footer strip -->
+  <rect x="64" y="620" width="1152" height="64" rx="32" fill="#FFFFFF" fill-opacity="0.06" stroke="#7C5CFF" stroke-opacity="0.4"/>
+  <text x="104" y="660" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#DAD7FF">✅ Бог відповів — позначаєш тему, і група бачить не лише прохання, а й відповіді</text>
+</svg>

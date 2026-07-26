@@ -6,7 +6,9 @@ imported by the runtime; this folder is design source + generated PNGs.
 | Path | What it is |
 |------|------------|
 | [botfather.md](botfather.md) | Ready-to-paste Name / About / Description / Commands / Privacy Policy |
+| [invite/invite-uk.md](invite/invite-uk.md) | Ukrainian invite message for a real group + the infographics that go with it |
 | `logo/*.svg` | Four botpic concepts, 512×512 source |
+| `invite/*.svg` | 1280×720 how-it-works infographics |
 | `description-picture-{uk,en}.svg` | 640×360 "What can this bot do?" banner source |
 | `render/*.png` | Generated, pixel-exact uploads for BotFather |
 | `rasterize.html` + `serve.mjs` | The SVG → PNG pipeline |

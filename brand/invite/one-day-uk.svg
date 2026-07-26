@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B1F4B"/>
+      <stop offset="0.55" stop-color="#141735"/>
+      <stop offset="1" stop-color="#0B0D20"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.15" cy="0.15" r="0.7">
+      <stop offset="0" stop-color="#7C5CFF" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#7C5CFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="0.85" cy="0.9" r="0.6">
+      <stop offset="0" stop-color="#FF9A3C" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#FF9A3C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#FFE9A8"/>
+      <stop offset="0.45" stop-color="#FFC24A"/>
+      <stop offset="1" stop-color="#FF8A3D"/>
+    </linearGradient>
+    <!-- userSpaceOnUse: the timeline is a zero-height bbox, so an
+         objectBoundingBox gradient would not paint at all -->
+    <linearGradient id="line" gradientUnits="userSpaceOnUse" x1="200" y1="286" x2="1079" y2="286">
+      <stop offset="0" stop-color="#7C5CFF"/>
+      <stop offset="1" stop-color="#FFC24A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect width="1280" height="720" fill="url(#glow)"/>
+  <rect width="1280" height="720" fill="url(#warm)"/>
+
+  <g transform="translate(51,36) scale(0.16)">
+    <path d="M256 96 C 268 152 312 178 330 216 C 348 256 342 302 316 330 C 292 356 264 366 256 366 C 248 366 220 356 196 330 C 170 302 164 256 182 216 C 200 178 244 152 256 96 Z" fill="url(#flame)"/>
+  </g>
+  <text x="130" y="82" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#EDEBFF" letter-spacing="0.5">Prayer Room</text>
+
+  <text x="64" y="164" font-family="Segoe UI, Arial, sans-serif" font-size="50" font-weight="800" fill="#FFFFFF">Один день у кімнаті</text>
+  <text x="64" y="204" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#B9B7DC">Не ще один чат. Одне ім'я на день — і людина знає, що її не забули</text>
+
+  <!-- timeline -->
+  <path d="M200 286 H1079" stroke="url(#line)" stroke-width="4" stroke-linecap="round" stroke-opacity="0.7"/>
+  <g>
+    <circle cx="200" cy="286" r="13" fill="#7C5CFF"/>
+    <circle cx="493" cy="286" r="13" fill="#9B7BFF"/>
+    <circle cx="786" cy="286" r="13" fill="#E0A85C"/>
+    <circle cx="1079" cy="286" r="13" fill="#FFC24A"/>
+  </g>
+
+  <!-- node 1 -->
+  <g>
+    <rect x="64" y="330" width="272" height="252" rx="26" fill="#FFFFFF" fill-opacity="0.055" stroke="#3A3F7A"/>
+    <text x="96" y="392" font-size="34">🔔</text>
+    <text x="96" y="444" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#FFFFFF">08:00, твій час</text>
+    <text x="96" y="484" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">Приходить одне</text>
+    <text x="96" y="510" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">повідомлення: «Сьогодні</text>
+    <text x="96" y="536" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">молись за Олю».</text>
+  </g>
+
+  <!-- node 2 -->
+  <g>
+    <rect x="357" y="330" width="272" height="252" rx="26" fill="#FFFFFF" fill-opacity="0.055" stroke="#3A3F7A"/>
+    <text x="389" y="392" font-size="34">🙏</text>
+    <text x="389" y="444" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#FFFFFF">Одна хвилина</text>
+    <text x="389" y="484" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">Молишся своїми</text>
+    <text x="389" y="510" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">словами. Без списку</text>
+    <text x="389" y="536" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">на двадцять пунктів.</text>
+  </g>
+
+  <!-- node 3 -->
+  <g>
+    <rect x="650" y="330" width="272" height="252" rx="26" fill="#FFFFFF" fill-opacity="0.055" stroke="#3A3F7A"/>
+    <text x="682" y="392" font-size="34">👆</text>
+    <text x="682" y="444" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#FFFFFF">Один тап</text>
+    <text x="682" y="484" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">Тиснеш кнопку</text>
+    <text x="682" y="510" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">🙏 Помолився</text>
+    <text x="682" y="536" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#B9B7DC">сьогодні.</text>
+  </g>
+
+  <!-- node 4 -->
+  <g>
+    <rect x="943" y="330" width="272" height="252" rx="26" fill="#FFC24A" fill-opacity="0.10" stroke="#FFC24A" stroke-opacity="0.55"/>
+    <text x="975" y="392" font-size="34">💛</text>
+    <text x="975" y="444" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#FFD469">Оля це бачить</text>
+    <text x="975" y="484" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#E8DFC8">«Влад помолився за</text>
+    <text x="975" y="510" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#E8DFC8">твою тему» — і вона</text>
+    <text x="975" y="536" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#E8DFC8">знає, що не сама.</text>
+  </g>
+
+  <text x="640" y="660" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#FFFFFF">Хвилина на день. Ніхто не забутий.</text>
+</svg>
