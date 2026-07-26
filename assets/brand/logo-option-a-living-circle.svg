@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Prayer Circle logo option A — The Living Circle</title>
+  <desc id="desc">A warm flame and spark held within a radiant violet circle.</desc>
+  <defs>
+    <radialGradient id="bg" cx="36%" cy="28%" r="82%">
+      <stop offset="0" stop-color="#3E2D87"/>
+      <stop offset="0.55" stop-color="#211A54"/>
+      <stop offset="1" stop-color="#100D2E"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="160" y1="140" x2="840" y2="880" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A990FF"/>
+      <stop offset="0.48" stop-color="#6C4BFF"/>
+      <stop offset="1" stop-color="#FF5E70"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="430" y1="340" x2="602" y2="704" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4DC"/>
+      <stop offset="0.43" stop-color="#FFC75A"/>
+      <stop offset="1" stop-color="#FF5E70"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="332" fill="none" stroke="#8E72FF" stroke-opacity=".2" stroke-width="76" filter="url(#glow)"/>
+  <circle cx="512" cy="512" r="332" fill="none" stroke="url(#ring)" stroke-width="58" stroke-linecap="round" stroke-dasharray="1710 376" transform="rotate(-51 512 512)"/>
+  <circle cx="512" cy="512" r="246" fill="#17143B" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="3"/>
+  <path d="M517 722c-103 0-174-72-165-167 8-82 66-120 99-179 18-32 26-67 25-105 92 49 170 126 181 229 8 75-15 122-52 158-22 21-52 41-88 64Z" fill="url(#flame)"/>
+  <path d="M521 659c-54 0-90-38-84-88 5-44 36-64 53-96 10-17 14-36 14-56 47 26 88 67 93 121 5 40-8 65-28 84-12 12-28 23-48 35Z" fill="#FFF8E9" fill-opacity=".92"/>
+  <circle cx="690" cy="310" r="19" fill="#FFF4DC"/>
+  <path d="M690 255v-32M690 397v-32M635 310h-32M777 310h-32M651 271l-23-23M752 372l-23-23M651 349l-23 23M752 248l-23 23" stroke="#FFF4DC" stroke-width="13" stroke-linecap="round"/>
+</svg>

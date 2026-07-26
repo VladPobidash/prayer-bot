@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Prayer Circle logo option B — The Prayer Signal</title>
+  <desc id="desc">A blue conversation shape framing a glowing sanctuary window and rising rays.</desc>
+  <defs>
+    <linearGradient id="bg" x1="120" y1="80" x2="900" y2="940" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#103B84"/>
+      <stop offset=".5" stop-color="#082454"/>
+      <stop offset="1" stop-color="#06152F"/>
+    </linearGradient>
+    <linearGradient id="bubble" x1="290" y1="260" x2="760" y2="740" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38C7FF"/>
+      <stop offset="1" stop-color="#356BFF"/>
+    </linearGradient>
+    <linearGradient id="window" x1="512" y1="390" x2="512" y2="704" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7CF"/>
+      <stop offset=".58" stop-color="#FFD65B"/>
+      <stop offset="1" stop-color="#FF8A4C"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="28"/></filter>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <circle cx="512" cy="516" r="316" fill="#1F74FF" fill-opacity=".15"/>
+  <path d="M276 258h472c65 0 118 53 118 118v276c0 65-53 118-118 118H506L328 879l42-109h-94c-65 0-118-53-118-118V376c0-65 53-118 118-118Z" fill="url(#bubble)"/>
+  <path d="M294 305h436c49 0 89 40 89 89v238c0 49-40 89-89 89H486L379 787l25-66H294c-49 0-89-40-89-89V394c0-49 40-89 89-89Z" fill="#071C43" fill-opacity=".68"/>
+  <path d="M512 386c-84 62-134 150-134 255h268c0-105-50-193-134-255Z" fill="#FFD65B" fill-opacity=".26" filter="url(#glow)"/>
+  <path d="M512 377c-84 62-134 150-134 264h268c0-114-50-202-134-264Z" fill="url(#window)"/>
+  <path d="M512 377v264M390 552h244" stroke="#0A285A" stroke-width="28" stroke-linecap="round"/>
+  <path d="M512 295v-56M416 315l-29-49M608 315l29-49" stroke="#FFF4C3" stroke-width="21" stroke-linecap="round"/>
+</svg>

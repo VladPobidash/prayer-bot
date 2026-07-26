@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Prayer Circle logo option C — Together, Upward</title>
+  <desc id="desc">Three colorful figures gather around a central spark to form an upward symbol.</desc>
+  <defs>
+    <linearGradient id="bg" x1="130" y1="100" x2="880" y2="920" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24204F"/>
+      <stop offset="1" stop-color="#0C1730"/>
+    </linearGradient>
+    <linearGradient id="left" x1="250" y1="690" x2="540" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#46D7C3"/>
+      <stop offset="1" stop-color="#7FF0D9"/>
+    </linearGradient>
+    <linearGradient id="right" x1="770" y1="690" x2="500" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8A62FF"/>
+      <stop offset="1" stop-color="#BA9CFF"/>
+    </linearGradient>
+    <linearGradient id="center" x1="512" y1="760" x2="512" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF5E70"/>
+      <stop offset="1" stop-color="#FFB85C"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="30"/></filter>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="326" fill="none" stroke="#FFFFFF" stroke-opacity=".06" stroke-width="2"/>
+  <path d="M445 720c-77 80-206 42-228-62-16-74 23-137 86-167 61-30 126-76 171-142 20 137 11 267-29 371Z" fill="url(#left)"/>
+  <path d="M579 720c77 80 206 42 228-62 16-74-23-137-86-167-61-30-126-76-171-142-20 137-11 267 29 371Z" fill="url(#right)"/>
+  <path d="M512 782c-75-43-115-107-115-181 0-76 42-130 115-191 73 61 115 115 115 191 0 74-40 138-115 181Z" fill="url(#center)"/>
+  <circle cx="512" cy="328" r="62" fill="#FFE7A2" fill-opacity=".22" filter="url(#glow)"/>
+  <circle cx="512" cy="328" r="28" fill="#FFF6D9"/>
+  <path d="M512 267v-38M512 427v-38M451 328h-38M611 328h-38" stroke="#FFF6D9" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="299" cy="438" r="57" fill="#7FF0D9"/>
+  <circle cx="725" cy="438" r="57" fill="#BA9CFF"/>
+</svg>
