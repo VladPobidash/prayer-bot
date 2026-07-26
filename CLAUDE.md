@@ -136,3 +136,11 @@ npm test
 Runtime dependencies: `telegraf`, `better-sqlite3`, `node-cron`, `dotenv`
 
 Dev dependencies: `typescript`, `@types/node`, `@types/better-sqlite3`
+
+---
+
+## Deployment & Branch Workflow
+
+- **`staging` branch**: Triggers automatic deployment to Railway Staging (`prayer-bot-staging.up.railway.app`) connected to dev bot `@MyPrayerDevBot`.
+- **`main` branch**: Triggers automatic deployment to Railway Production (`prayer-bot-production-58d7.up.railway.app`) connected to the production bot.
+- See `docs/STAGING_DEPLOYMENT_GUIDE.md` for multi-environment setup details and `docs/LOCAL_TESTING_RUNBOOK.md` for local testing.

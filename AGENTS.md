@@ -39,6 +39,14 @@ Update the relevant user-facing document when changing bot behavior:
 - `README.md` for the feature summary and local-development entry point.
 - `docs/SETUP.md` for deployment/configuration.
 - `docs/USAGE.md` for Telegram behavior.
+- `docs/STAGING_DEPLOYMENT_GUIDE.md` for multi-environment (Staging & Production) Railway setup.
+- `docs/LOCAL_TESTING_RUNBOOK.md` for local testing workflows.
 - `docs/architecture-decisions.md` for a durable architectural decision.
 - `CLAUDE.md` when module responsibilities, data flow, or coding conventions
   change.
+
+## Deployment & Branch Workflow
+
+- **`staging` branch**: Triggers automatic deployment on Railway Staging (`prayer-bot-staging.up.railway.app`) connected to dev bot `@MyPrayerDevBot`. Always test changes on `staging` before promoting to production.
+- **`main` branch**: Triggers automatic deployment on Railway Production (`prayer-bot-production-58d7.up.railway.app`) connected to the primary production bot.
+
