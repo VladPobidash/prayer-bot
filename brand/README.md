@@ -38,6 +38,10 @@ the marketing alike.
 
 Type: Segoe UI / system sans, 800 weight for headlines, 600 for chips.
 
+The Mini App carries the same tokens in `public/style.css` (`--gold`, `--violet`,
+`--grad-cta`, …) with a light and a dark set behind `[data-theme]`. Change a
+brand colour here and there.
+
 ## Regenerating the PNGs
 
 ```bash

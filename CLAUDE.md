@@ -94,6 +94,22 @@ timestamps) goes in SQLite via `src/db/repo.ts`. Ephemeral state (in-flight
 variables, module-local caches) may be held in plain JavaScript variables. Do
 not introduce an external cache (Redis, etc.) without an ADR.
 
+### Mini App theming: brand tokens behind `[data-theme]`
+
+`public/style.css` defines the Prayer Room palette (`--gold`, `--violet`,
+`--grad-cta`, `--surface`, …) twice: once under `:root, :root[data-theme='dark']`
+and once under `:root[data-theme='light']`. The tokens mirror `brand/README.md`,
+so the app and the marketing artwork stay in step; Telegram's own
+`--tg-theme-*` variables are deliberately **not** used — only the light/dark
+*mode* follows the client.
+
+The mode lives in `users.theme` (`'auto' | 'light' | 'dark'`, `'auto'` = follow
+the Telegram client, then the OS) and is exposed through `GET /api/me` and
+`PUT /api/me/settings`. An inline script in `public/index.html` resolves the
+theme from `localStorage` before first paint so the app never flashes the wrong
+one; `app.js` re-applies the server value once it loads. When adding UI, use the
+tokens — no raw hex, no `rgba(0,0,0,…)` overlays, since those break in light mode.
+
 ### Erasable-only TypeScript + `.ts` import extensions
 
 `tsconfig.json` sets `erasableSyntaxOnly: true` and
