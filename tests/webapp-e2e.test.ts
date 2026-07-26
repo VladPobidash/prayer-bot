@@ -18,7 +18,7 @@ test('Full Mini App E2E Flow: Static assets, Auth, Room Lifecycle, Topics, Updat
   const htmlRes = await fetch(`${baseUrl}/`);
   assert.equal(htmlRes.status, 200);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('Prayer Bot App'));
+  assert.ok(htmlText.includes('Prayer Room'));
 
   const cssRes = await fetch(`${baseUrl}/style.css`);
   assert.equal(cssRes.status, 200);

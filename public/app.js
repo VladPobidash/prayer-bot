@@ -7,6 +7,73 @@
 
   const initData = tg?.initData || '';
 
+  // ── Dialogs ───────────────────────────────────────────────────────────────
+  // Telegram's WebView blocks window.confirm on several clients, so the native
+  // dialogs are the primary path and the browser ones only a local-dev fallback.
+  function notify(message) {
+    try {
+      if (tg?.showAlert) return tg.showAlert(message);
+    } catch (e) {}
+    alert(message);
+  }
+
+  function confirmAsk(message) {
+    return new Promise((resolve) => {
+      try {
+        if (tg?.showConfirm) return tg.showConfirm(message, (ok) => resolve(!!ok));
+      } catch (e) {}
+      resolve(window.confirm(message));
+    });
+  }
+
+  // ── Theme ─────────────────────────────────────────────────────────────────
+  // 'auto' follows the Telegram client (then the OS); 'light'/'dark' are the
+  // user's explicit choice in Settings. Stored server-side next to the locale,
+  // mirrored to localStorage so the pre-paint script in index.html can use it.
+  const THEME_BG = { dark: '#0f1229', light: '#f5f4fb' };
+  let themeMode = 'auto';
+
+  function resolveTheme(mode) {
+    if (mode === 'light' || mode === 'dark') return mode;
+    if (tg?.colorScheme) return tg.colorScheme;
+    return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+
+  function applyTheme(mode, persist) {
+    themeMode = ['auto', 'light', 'dark'].includes(mode) ? mode : 'auto';
+    const resolved = resolveTheme(themeMode);
+    document.documentElement.setAttribute('data-theme', resolved);
+    try { localStorage.setItem('pr-theme', themeMode); } catch (e) {}
+
+    document.querySelectorAll('#theme-switch button').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.getAttribute('data-theme-value') === themeMode));
+    });
+
+    try {
+      tg?.setBackgroundColor?.(THEME_BG[resolved]);
+      tg?.setHeaderColor?.(THEME_BG[resolved]);
+    } catch (e) {}
+
+    if (persist) {
+      apiRequest('/api/me/settings', {
+        method: 'PUT',
+        body: JSON.stringify({ theme: themeMode }),
+      }).catch(() => {});
+    }
+  }
+
+  document.querySelectorAll('#theme-switch button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      applyTheme(btn.getAttribute('data-theme-value'), true);
+      if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+    });
+  });
+
+  // Follow the client / OS while the mode is 'auto'.
+  try { tg?.onEvent?.('themeChanged', () => { if (themeMode === 'auto') applyTheme('auto'); }); } catch (e) {}
+  window.matchMedia?.('(prefers-color-scheme: light)')
+    .addEventListener?.('change', () => { if (themeMode === 'auto') applyTheme('auto'); });
+
   // State
   let me = null;
   let rooms = [];
@@ -121,17 +188,11 @@
       const res = await fetch(endpoint, options);
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'API Request failed');
+        throw new Error(data.error || t(currentLocale, 'err_generic'));
       }
       return data;
     } catch (err) {
-      if (!options.silent) {
-        if (tg?.showAlert) {
-          tg.showAlert(err.message);
-        } else {
-          alert(err.message);
-        }
-      }
+      if (!options.silent) notify(err.message);
       throw err;
     }
   }
@@ -174,7 +235,6 @@
     if (tg?.initDataUnsafe?.user) {
       me = { id: tg.initDataUnsafe.user.id };
     }
-    todayDateEl.textContent = new Date().toLocaleDateString();
     await loadUser();
     await loadToday();
   }
@@ -187,11 +247,15 @@
       if (me?.locale && ['uk', 'en', 'ru'].includes(me.locale)) {
         currentLocale = me.locale;
       }
+      if (me?.theme) applyTheme(me.theme, false);
       applyLanguage(currentLocale);
     } catch (e) {}
   }
 
   async function loadToday() {
+    todayDateEl.textContent = new Date().toLocaleDateString(currentLocale, {
+      weekday: 'long', day: 'numeric', month: 'long',
+    });
     todayListEl.innerHTML = `<div class="loading-state">${t(currentLocale, 'ui_loading_today')}</div>`;
     const progressPill = document.getElementById('today-progress-pill');
     const progressFill = document.getElementById('today-progress-fill');
@@ -361,8 +425,7 @@
       if (!currentRoom) return;
       try {
         await navigator.clipboard.writeText(currentRoom.inviteCode);
-        if (tg?.showAlert) tg.showAlert(t(currentLocale, 'ui_copy_code'));
-        else alert(t(currentLocale, 'ui_copy_code'));
+        notify(t(currentLocale, 'ui_copied'));
       } catch (err) {
         prompt(t(currentLocale, 'ui_copy_code'), currentRoom.inviteCode);
       }
@@ -376,8 +439,7 @@
       const inviteUrl = `https://t.me/${botName}?start=join_${currentRoom.inviteCode}`;
       try {
         await navigator.clipboard.writeText(inviteUrl);
-        if (tg?.showAlert) tg.showAlert(t(currentLocale, 'ui_copy_link'));
-        else alert(t(currentLocale, 'ui_copy_link'));
+        notify(t(currentLocale, 'ui_copied'));
       } catch (err) {
         prompt(t(currentLocale, 'ui_copy_link'), inviteUrl);
       }
@@ -394,23 +456,26 @@
       const isOwner = tItem.ownerId === me?.id || (isShared && currentRoom?.isAdmin);
       const card = document.createElement('div');
       card.className = 'card';
+      const authorName = tItem.authorName === 'Anonymous'
+        ? t(currentLocale, 'ui_anonymous')
+        : (tItem.authorName || t(currentLocale, 'ui_member'));
       card.innerHTML = `
         <div class="card-header">
           <span class="badge ${tItem.status === 'answered' ? 'badge-answered' : (isShared ? 'badge-shared' : 'badge-personal')}">
-            ${tItem.status === 'answered' ? t(currentLocale, 'answered_ok') : (isShared ? t(currentLocale, 'ui_shared_badge') : t(currentLocale, 'ui_personal_badge'))}
+            ${tItem.status === 'answered' ? t(currentLocale, 'ui_answered_badge') : (isShared ? t(currentLocale, 'ui_shared_badge') : t(currentLocale, 'ui_personal_badge'))}
           </span>
-          ${!isShared ? `<span class="card-meta">By: ${escapeHtml(tItem.authorName || 'Member')}</span>` : ''}
+          ${!isShared ? `<span class="card-meta">${t(currentLocale, 'ui_author')}: ${escapeHtml(authorName)}</span>` : ''}
         </div>
         <div class="card-title">${escapeHtml(tItem.text)}</div>
         ${tItem.updates && tItem.updates.length ? `
           <div class="topic-updates">
-            <strong>Updates:</strong>
+            <strong>${t(currentLocale, 'ui_updates')}:</strong>
             ${tItem.updates.map(u => `<div class="update-item">• ${escapeHtml(u.text)}</div>`).join('')}
           </div>
         ` : ''}
         ${tItem.answeredNote ? `
-          <div class="topic-updates" style="background: rgba(52, 199, 89, 0.1);">
-            <strong>Answered Praise:</strong> ${escapeHtml(tItem.answeredNote)}
+          <div class="topic-updates answered">
+            <strong>${t(currentLocale, 'ui_answered_praise')}:</strong> ${escapeHtml(tItem.answeredNote)}
           </div>
         ` : ''}
         ${isOwner && tItem.status !== 'answered' ? `
@@ -495,7 +560,7 @@
   });
 
   btnLeaveRoom.addEventListener('click', async () => {
-    if (confirm(t(currentLocale, 'ui_confirm_leave'))) {
+    if (await confirmAsk(t(currentLocale, 'ui_confirm_leave'))) {
       await apiRequest(`/api/rooms/${currentRoom.id}/leave`, { method: 'POST' });
       roomOverlay.classList.add('hidden');
       loadRooms();
@@ -503,7 +568,7 @@
   });
 
   btnCloseRoom.addEventListener('click', async () => {
-    if (confirm(t(currentLocale, 'ui_confirm_close'))) {
+    if (await confirmAsk(t(currentLocale, 'ui_confirm_close'))) {
       await apiRequest(`/api/rooms/${currentRoom.id}/close`, { method: 'POST' });
       roomOverlay.classList.add('hidden');
       loadRooms();
@@ -522,6 +587,7 @@
       if (me.locale) {
         currentLocale = me.locale;
       }
+      if (me.theme) applyTheme(me.theme, false);
       applyLanguage(currentLocale);
     } catch (e) {}
   }
@@ -554,22 +620,20 @@
       })
     });
     applyLanguage(selectedLocale);
-    const msg = t(currentLocale, 'ui_settings_saved');
-    if (tg?.showAlert) tg.showAlert(msg);
-    else alert(msg);
+    notify(t(currentLocale, 'ui_settings_saved'));
   });
 
   // Modal Helpers
   function showPromptModal(title, label, onSubmit) {
     modalTitle.textContent = title;
     modalBody.innerHTML = `
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <label style="font-size: 13px; color: var(--hint-color);">${escapeHtml(label)}</label>
+      <div class="modal-field">
+        <label class="modal-label" for="modal-input">${escapeHtml(label)}</label>
         <input type="text" id="modal-input" class="input-text" autofocus>
-        <button class="btn btn-primary btn-block" id="modal-submit">Submit</button>
+        <button class="btn btn-primary btn-block" id="modal-submit">${t(currentLocale, 'ui_submit')}</button>
       </div>
     `;
-    modalContainer.classList.remove('hidden');
+    openModal();
 
     const input = document.getElementById('modal-input');
     const submit = document.getElementById('modal-submit');
@@ -577,7 +641,7 @@
     const handle = async () => {
       const val = input.value.trim();
       if (!val) return;
-      modalContainer.classList.add('hidden');
+      closeModal();
       try {
         await onSubmit(val);
       } catch (e) {}
@@ -592,16 +656,16 @@
   function showTopicModal(title, onSubmit) {
     modalTitle.textContent = title;
     modalBody.innerHTML = `
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <label style="font-size: 13px; color: var(--hint-color);">Enter personal prayer topic:</label>
+      <div class="modal-field">
+        <label class="modal-label" for="modal-input">${t(currentLocale, 'personal_prompt')}</label>
         <input type="text" id="modal-input" class="input-text" autofocus>
-        <label style="font-size: 13px; color: var(--text-color); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="checkbox" id="modal-anon-check"> Add Anonymously
+        <label class="modal-check">
+          <input type="checkbox" id="modal-anon-check"> ${t(currentLocale, 'ui_add_anonymously')}
         </label>
-        <button class="btn btn-primary btn-block" id="modal-submit">Submit</button>
+        <button class="btn btn-primary btn-block" id="modal-submit">${t(currentLocale, 'ui_submit')}</button>
       </div>
     `;
-    modalContainer.classList.remove('hidden');
+    openModal();
 
     const input = document.getElementById('modal-input');
     const check = document.getElementById('modal-anon-check');
@@ -610,7 +674,7 @@
     const handle = async () => {
       const val = input.value.trim();
       if (!val) return;
-      modalContainer.classList.add('hidden');
+      closeModal();
       try {
         await onSubmit(val, check.checked);
       } catch (e) {}
@@ -622,8 +686,27 @@
     });
   }
 
-  btnCloseModal.addEventListener('click', () => {
+  function openModal() {
+    modalContainer.classList.remove('hidden');
+    setTimeout(() => document.getElementById('modal-input')?.focus(), 0);
+  }
+
+  function closeModal() {
     modalContainer.classList.add('hidden');
+  }
+
+  btnCloseModal.addEventListener('click', closeModal);
+
+  // Tapping the backdrop or pressing Escape dismisses the modal — without
+  // these the only way out is the small × in the corner.
+  modalContainer.addEventListener('click', (e) => {
+    if (e.target === modalContainer) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!modalContainer.classList.contains('hidden')) return closeModal();
+    if (!roomOverlay.classList.contains('hidden')) roomOverlay.classList.add('hidden');
   });
 
   function escapeHtml(str) {

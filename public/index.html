@@ -1,14 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Prayer Bot App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Prayer Room</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    // Resolve the theme before first paint so the app never flashes the wrong
+    // one. 'auto' follows the Telegram client, then the OS. app.js re-applies
+    // this once the saved server-side preference arrives.
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('pr-theme'); } catch (e) {}
+      var mode = saved || 'auto';
+      var resolved = mode;
+      if (mode === 'auto') {
+        var tgScheme = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.colorScheme;
+        resolved = tgScheme || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      }
+      document.documentElement.setAttribute('data-theme', resolved);
+    })();
+  </script>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <div id="app">
+    <header class="app-topbar">
+      <svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true">
+        <defs>
+          <linearGradient id="brandFlame" x1="0.5" y1="0" x2="0.5" y2="1">
+            <stop offset="0" stop-color="#FFE9A8"/>
+            <stop offset="0.45" stop-color="#FFC24A"/>
+            <stop offset="1" stop-color="#FF8A3D"/>
+          </linearGradient>
+        </defs>
+        <path d="M256 96C268 152 312 178 330 216c18 40 12 86-14 114-24 26-52 36-60 36s-36-10-60-36c-26-28-32-74-14-114 18-38 62-64 74-120Z" fill="url(#brandFlame)"/>
+      </svg>
+      <span class="brand-name">Prayer Room</span>
+    </header>
+
     <!-- Content Views -->
     <main class="app-content">
       <!-- Tab 1: Today's Assignments -->
@@ -97,6 +127,23 @@
             <button id="btn-save-settings" class="btn btn-block btn-primary" data-i18n="ui_save_preferences">Save Preferences</button>
           </div>
         </div>
+
+        <div class="section-title">
+          <h2 data-i18n="ui_appearance">Appearance</h2>
+        </div>
+        <div class="card settings-card">
+          <div class="setting-item stacked">
+            <span class="setting-label">
+              <span data-i18n="ui_theme">Theme</span>
+              <span class="setting-desc" data-i18n="ui_theme_desc">Light, dark, or follow Telegram</span>
+            </span>
+            <div class="segmented" id="theme-switch" role="group" aria-label="Theme">
+              <button type="button" data-theme-value="auto" aria-pressed="true" data-i18n="ui_theme_auto">Auto</button>
+              <button type="button" data-theme-value="light" aria-pressed="false" data-i18n="ui_theme_light">Light</button>
+              <button type="button" data-theme-value="dark" aria-pressed="false" data-i18n="ui_theme_dark">Dark</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Room Detail View (Overlay Screen) -->
@@ -114,7 +161,7 @@
           <div class="card room-summary-card">
             <div class="summary-header">
               <div class="admin-profile">
-                <span class="label">Admin:</span>
+                <span class="label" data-i18n="ui_room_admin">Room admin</span>
                 <strong id="detail-admin-info">Admin Name</strong>
               </div>
               <button class="btn btn-sm btn-outline hidden" id="btn-message-admin">
