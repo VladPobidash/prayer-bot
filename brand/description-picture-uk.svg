@@ -1,85 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1B1F4B"/>
-      <stop offset="0.55" stop-color="#141735"/>
-      <stop offset="1" stop-color="#0B0D20"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0.78" cy="0.35" r="0.55">
-      <stop offset="0" stop-color="#7C5CFF" stop-opacity="0.45"/>
-      <stop offset="1" stop-color="#7C5CFF" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="warm" cx="0.10" cy="0.88" r="0.5">
-      <stop offset="0" stop-color="#FF9A3C" stop-opacity="0.28"/>
-      <stop offset="1" stop-color="#FF9A3C" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="flame" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0" stop-color="#FFE9A8"/>
-      <stop offset="0.45" stop-color="#FFC24A"/>
-      <stop offset="1" stop-color="#FF8A3D"/>
-    </linearGradient>
-    <linearGradient id="cta" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#FFD469"/>
-      <stop offset="1" stop-color="#FF8A3D"/>
-    </linearGradient>
-  </defs>
+  <!-- Paper white, ink black, one red. Straight lines only: no radius, no
+       gradient, no shadow. Red is reserved for the one thing that matters on
+       the surface — today's action. -->
+  <rect width="640" height="360" fill="#FFFFFF"/>
 
-  <rect width="640" height="360" fill="url(#bg)"/>
-  <rect width="640" height="360" fill="url(#glow)"/>
-  <rect width="640" height="360" fill="url(#warm)"/>
-
-  <!-- brand mark + wordmark -->
-  <g transform="translate(21,26) scale(0.1)">
-    <path d="M256 96 C 268 152 312 178 330 216 C 348 256 342 302 316 330 C 292 356 264 366 256 366 C 248 366 220 356 196 330 C 170 302 164 256 182 216 C 200 178 244 152 256 96 Z" fill="url(#flame)"/>
-  </g>
-  <text x="70" y="55" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#EDEBFF" letter-spacing="0.4">Prayer Room</text>
+  <!-- wordmark -->
+  <rect x="40" y="34" width="14" height="14" fill="#D0021B"/>
+  <rect x="44" y="52" width="6" height="20" fill="#101010"/>
+  <text x="70" y="49" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#101010" letter-spacing="3.4">PRAYER ROOM</text>
 
   <!-- headline -->
-  <text x="40" y="126" font-family="Segoe UI, Arial, sans-serif" font-size="37" font-weight="800" fill="#FFFFFF">Моліться разом.</text>
-  <text x="40" y="172" font-family="Segoe UI, Arial, sans-serif" font-size="37" font-weight="800" fill="url(#cta)">Щодня.</text>
+  <text x="40" y="150" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800" fill="#101010" letter-spacing="-0.5">Моліться разом.</text>
+  <text x="40" y="198" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800" fill="#D0021B" letter-spacing="-0.5">Щодня.</text>
 
-  <text x="40" y="212" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#B9B7DC">Приватна кімната молитви у Telegram:</text>
-  <text x="40" y="234" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#B9B7DC">теми, нагадування, підтримка групи.</text>
+  <rect x="40" y="222" width="56" height="3" fill="#101010"/>
 
-  <!-- feature chips -->
-  <g font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">
-    <rect x="40" y="256" width="112" height="28" rx="14" fill="#FFFFFF" fill-opacity="0.08" stroke="#7C5CFF" stroke-opacity="0.45"/>
-    <text x="56" y="274" fill="#DAD7FF">⏰ Твій час</text>
-    <rect x="160" y="256" width="126" height="28" rx="14" fill="#FFFFFF" fill-opacity="0.08" stroke="#7C5CFF" stroke-opacity="0.45"/>
-    <text x="176" y="274" fill="#DAD7FF">🔒 Тільки свої</text>
-  </g>
+  <text x="40" y="256" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#4A4A4A">Приватна кімната молитви у Telegram:</text>
+  <text x="40" y="276" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#4A4A4A">теми, нагадування, підтримка групи.</text>
 
-  <text x="40" y="316" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#7E7CAE">Безкоштовно · відкритий код · без реклами</text>
+  <rect x="40" y="304" width="320" height="1" fill="#DADADA"/>
+  <text x="40" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#8A8A8A" letter-spacing="1.6">БЕЗ РЕКЛАМИ · ВІДКРИТИЙ КОД · ТІЛЬКИ СВОЇ</text>
 
-  <!-- phone mock -->
-  <g transform="translate(400,40)">
-    <rect x="0" y="0" width="204" height="280" rx="26" fill="#191C3D" stroke="#3A3F7A" stroke-width="2"/>
-    <rect x="14" y="16" width="176" height="8" rx="4" fill="#2C3160"/>
+  <!-- right panel -->
+  <rect x="400" y="0" width="240" height="360" fill="#101010"/>
 
-    <rect x="14" y="38" width="176" height="74" rx="14" fill="#232750"/>
-    <rect x="14" y="38" width="4" height="74" rx="2" fill="#FFC24A"/>
-    <text x="28" y="60" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#FFC24A" letter-spacing="0.6">СПІЛЬНА ТЕМА</text>
-    <text x="28" y="80" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#EDEBFF">Мир в Україні</text>
-    <text x="28" y="99" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8E8CBE">Кімната «Наша група»</text>
+  <text x="428" y="52" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="700" fill="#8A8A8A" letter-spacing="2">СЬОГОДНІ</text>
 
-    <rect x="14" y="122" width="176" height="74" rx="14" fill="#232750"/>
-    <rect x="14" y="122" width="4" height="74" rx="2" fill="#7C5CFF"/>
-    <text x="28" y="144" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#9E8BFF" letter-spacing="0.6">ОСОБИСТЕ ПРОХАННЯ</text>
-    <text x="28" y="164" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#EDEBFF">Здоров'я мами Олі</text>
-    <text x="28" y="183" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8E8CBE">сьогодні молишся за Олю</text>
+  <rect x="428" y="70" width="184" height="1" fill="#333333"/>
+  <rect x="428" y="86" width="8" height="8" fill="#D0021B"/>
+  <text x="448" y="94" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#FFFFFF">Мир в Україні</text>
+  <text x="448" y="112" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8A8A8A" letter-spacing="1.2">СПІЛЬНА ТЕМА</text>
 
-    <rect x="14" y="208" width="176" height="38" rx="19" fill="url(#cta)"/>
-    <text x="102" y="233" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#20130A">🙏 Помолився сьогодні</text>
+  <rect x="428" y="132" width="184" height="1" fill="#333333"/>
+  <rect x="428" y="148" width="8" height="8" fill="#D0021B"/>
+  <text x="448" y="156" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#FFFFFF">Здоров'я мами Олі</text>
+  <text x="448" y="174" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8A8A8A" letter-spacing="1.2">ОСОБИСТЕ ПРОХАННЯ</text>
 
-    <text x="14" y="268" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#8E8CBE">Серія:</text>
-    <g>
-      <circle cx="62" cy="264" r="5" fill="#FFC24A"/>
-      <circle cx="78" cy="264" r="5" fill="#FFC24A"/>
-      <circle cx="94" cy="264" r="5" fill="#FFC24A"/>
-      <circle cx="110" cy="264" r="5" fill="#FFC24A"/>
-      <circle cx="126" cy="264" r="5" fill="#FFC24A"/>
-      <circle cx="142" cy="264" r="5" fill="#FFC24A"/>
-      <circle cx="158" cy="264" r="5" fill="none" stroke="#4B4F86" stroke-width="2"/>
-    </g>
+  <rect x="428" y="194" width="184" height="1" fill="#333333"/>
+
+  <!-- primary action -->
+  <rect x="428" y="216" width="184" height="44" fill="#D0021B"/>
+  <text x="520" y="243" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" letter-spacing="0.6">ПОМОЛИВСЯ СЬОГОДНІ</text>
+
+  <!-- week strip -->
+  <text x="428" y="296" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="700" fill="#8A8A8A" letter-spacing="2">СЕРІЯ 6</text>
+  <g>
+    <rect x="428" y="308" width="22" height="6" fill="#D0021B"/>
+    <rect x="455" y="308" width="22" height="6" fill="#D0021B"/>
+    <rect x="482" y="308" width="22" height="6" fill="#D0021B"/>
+    <rect x="509" y="308" width="22" height="6" fill="#D0021B"/>
+    <rect x="536" y="308" width="22" height="6" fill="#D0021B"/>
+    <rect x="563" y="308" width="22" height="6" fill="#D0021B"/>
+    <rect x="590" y="308" width="22" height="6" fill="#3A3A3A"/>
   </g>
 </svg>

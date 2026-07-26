@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- A — Frame. A room drawn as an open square; the red block is the person
+       inside it. Everything sits inside r=200 so Telegram's circular avatar
+       crop never touches it. -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+
+  <!-- open frame: top, left, right, and two stubs of the bottom edge -->
+  <g fill="#101010">
+    <rect x="128" y="128" width="256" height="16"/>
+    <rect x="128" y="128" width="16" height="256"/>
+    <rect x="368" y="128" width="16" height="256"/>
+    <rect x="128" y="368" width="72" height="16"/>
+    <rect x="312" y="368" width="72" height="16"/>
+  </g>
+
+  <rect x="176" y="176" width="88" height="88" fill="#D0021B"/>
+</svg>

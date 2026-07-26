@@ -77,15 +77,16 @@ No ads. Only your people.
 
 ## Botpic — `/setuserpic`
 
-Pick one of `brand/render/botpic-option-{a,b,c,d}.png` (512×512, sources in
-`brand/logo/`).
+Pick one of `brand/render/botpic-{a-frame,b-week,c-window,d-candle}.png`
+(512×512, sources in `brand/logo/`). All four are rectangles only — no radius,
+no gradient — per [DESIGN.md](../DESIGN.md).
 
 | Option | Mark | Reads as |
 |--------|------|----------|
-| **A — Flame & circle** | Gold flame inside a dotted ring of eight dots | A group gathered around one prayer. Strongest at small sizes. |
-| **B — Cupped hands** | Indigo hands holding a flame on warm cream | Warm, human, unmistakably prayer. The only light-background option — stands out in a dark chat list. |
-| **C — Bubble & flame** | Telegram-style speech bubble with a flame | "Prayer, in a messenger." Note: Telegram crops avatars to a circle, so the bubble tail is partly clipped. |
-| **D — Sunrise ring** | Sunrise inside a 7-segment ring, one segment unlit | The daily streak — habit and morning rhythm. Most abstract. |
+| **A — Frame** | Open black square, red block inside, on white | The room, and a person held inside it. Most literal to the product name. |
+| **B — Week** | Seven bars on off-white, the seventh red | The habit itself — one day at a time. Ties the avatar to the streak. |
+| **C — Window** | Red field split by two white gaps | Strongest at 20px; pure shape, zero detail to lose. |
+| **D — Candle** | Red square over a straight white stem, on black | Keeps the old flame idea with every curve removed. The only dark option — a hard black circle in a light chat list. |
 
 ---
 

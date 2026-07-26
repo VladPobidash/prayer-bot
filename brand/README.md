@@ -7,6 +7,7 @@ imported by the runtime; this folder is design source + generated PNGs.
 |------|------------|
 | [botfather.md](botfather.md) | Ready-to-paste Name / About / Description / Commands / Privacy Policy |
 | [invite/invite-uk.md](invite/invite-uk.md) | Ukrainian invite message for a real group + the infographics that go with it |
+| [../DESIGN.md](../DESIGN.md) | The design system: principles, tokens, components, checklist |
 | `logo/*.svg` | Four botpic concepts, 512×512 source |
 | `invite/*.svg` | 1280×720 how-it-works infographics |
 | `description-picture-{uk,en}.svg` | 640×360 "What can this bot do?" banner source |
@@ -14,6 +15,27 @@ imported by the runtime; this folder is design source + generated PNGs.
 | `rasterize.html` + `serve.mjs` | The SVG → PNG pipeline |
 
 ## Design direction
+
+Paper, ink, and one red. Straight lines only — no radius, no gradient, no
+shadow. Red is a budget rather than a decoration: one red element per view, and
+it is always the thing that matters right now. The full system, including the
+tokens the Mini App uses, lives in [DESIGN.md](../DESIGN.md).
+
+| Token | Light | Dark |
+|-------|-------|------|
+| Paper | `#FFFFFF` | `#101010` |
+| Paper 2 | `#F4F2EF` | `#1A1A1A` |
+| Ink | `#101010` | `#FFFFFF` |
+| Ink 2 | `#4A4A4A` | `#C9C9C9` |
+| Muted | `#6B6B6B` | `#A3A3A3` |
+| Rule | `#DADADA` | `#2E2E2E` |
+| Red | `#D0021B` | `#FF2B3D` |
+
+Type: system sans; 800 for display and numerals, 700 for uppercase labels with
+1.6–2.4px tracking, 400–600 for body.
+
+<details>
+<summary>Previous direction (replaced 2026-07-26)</summary>
 
 Night-sky indigo with a warm flame. The dark base reads as the early morning or
 late evening when people actually pray; the gold is the one lit thing in it —
@@ -39,6 +61,8 @@ the marketing alike.
 | Cream | `#FFF7EA` | Light background (logo option B) |
 
 Type: Segoe UI / system sans, 800 weight for headlines, 600 for chips.
+
+</details>
 
 ## Regenerating the PNGs
 
