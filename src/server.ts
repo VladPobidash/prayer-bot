@@ -7,6 +7,7 @@ import { validateInitData, type TelegramUser } from './auth.ts';
 import * as repo from './db/repo.ts';
 import * as rooms from './rooms.ts';
 import { localDate } from './assignments.ts';
+import { LOCALES } from './i18n.ts';
 
 function sendJson(res: ServerResponse, status: number, data: unknown): void {
   res.writeHead(status, {
@@ -153,7 +154,9 @@ export function startHealthServer(port: number = config.port): Server {
               firstName: user.first_name,
               reminderTime: userPrefs?.reminderTime ?? '09:00',
               reminderEnabled: userPrefs?.reminderEnabled ?? true,
+              locale: userPrefs?.locale ?? config.defaultLocale,
             },
+            locales: LOCALES,
             todayAssignments,
           });
         }
@@ -191,14 +194,17 @@ export function startHealthServer(port: number = config.port): Server {
           return sendJson(res, 200, todayAssignments);
         }
 
-        // PUT /api/me/reminder
-        if (method === 'PUT' && path === '/api/me/reminder') {
-          const body = await parseJsonBody<{ enabled?: boolean; time?: string }>(req);
+        // PUT /api/me/reminder or PUT /api/me/settings
+        if (method === 'PUT' && (path === '/api/me/reminder' || path === '/api/me/settings')) {
+          const body = await parseJsonBody<{ enabled?: boolean; time?: string; locale?: string }>(req);
           if (typeof body.enabled === 'boolean') {
             repo.setReminderEnabled(userId, body.enabled);
           }
           if (typeof body.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(body.time)) {
             repo.setReminderTime(userId, body.time);
+          }
+          if (typeof body.locale === 'string' && ['uk', 'en', 'ru'].includes(body.locale)) {
+            repo.setUserLocale(userId, body.locale);
           }
           return sendJson(res, 200, { ok: true });
         }
