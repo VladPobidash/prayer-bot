@@ -10,9 +10,9 @@ Need to set up the bot first? See [SETUP.md](SETUP.md).
 
 ## Getting started
 
-Send `/start` to the bot at any time or tap the **Open Prayer App** menu button next to the input line in Telegram.
+Send `/start` to the bot at any time to receive the onboarding welcome message and main menu, or tap the **Prayer App** menu button next to the input line in Telegram.
 
-The built-in **Telegram Mini App** provides a complete user interface inside Telegram to:
+The onboarding message explains how to open the built-in **Telegram Mini App**, which provides a complete visual user interface inside Telegram to:
 - View your **Today's Prayer Focus** and mark prayers as prayed with a single tap.
 - Manage **My Rooms**: view room details, invite codes, members, shared topics, and personal topics.
 - Perform room actions: **Create Room**, **Join Room**, **Add Shared/Personal Topic**, **Post Update**, **Mark Answered**, **Leave Room**, or **Close Room**.
@@ -26,7 +26,7 @@ You can also use `/start`, `/help`, and `/rooms` commands at any time.
 
 | Command | What it does |
 |---|---|
-| `/start` | Shows the welcome message and main menu. Also handles invite deep-links (`?start=join_<code>`). |
+| `/start` | Shows the welcome message with Mini App onboarding instructions and main menu. Also handles invite deep-links (`?start=join_<code>`). |
 | `/help` | Shows the full list of actions and commands. |
 | `/rooms` | Lists your active rooms with one-tap access to each. |
 | `/join <code>` | Joins a room by its invite code. Omit the code and the bot will ask for it. |
