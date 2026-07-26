@@ -440,7 +440,7 @@ body {
   transform: translateX(20px);
 }
 
-.input-time, .input-text {
+.input-time, .input-text, .input-select {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid rgba(0,0,0,0.1);

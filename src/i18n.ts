@@ -1,5 +1,6 @@
 import config, { type Locale } from './config.ts';
 import type { RoomError } from './rooms.ts';
+import { getUserPrefs } from './db/repo.ts';
 
 export const LOCALES = {
   uk: {
@@ -80,6 +81,46 @@ export const LOCALES = {
     accountability_warning: 'Ми сумуємо за вашими молитвами в кімнаті «{room}» 🙏 Минуло вже два дні. Якщо пауза триватиме 5 днів поспіль, ви вибудете з кімнати — але одне натискання «🙏 Помолився сьогодні» все скасовує.',
     removed_member: 'Ви вибули з кімнати «{room}» після 5 днів без молитви. Це не прощання — вас можуть запросити знову будь-коли. 🙏',
     removed_admin: '{name} вибув(-ла) з кімнати «{room}» після 5 днів без молитви. Ви можете надіслати запрошення знову будь-коли.',
+    ui_todays_focus: 'Сьогоднішній фокус',
+    ui_my_prayer_rooms: 'Мої молитовні кімнати',
+    ui_notification_settings: 'Налаштування сповіщень',
+    ui_daily_reminders: 'Щоденні нагадування',
+    ui_daily_reminders_desc: 'Отримувати щоденні нагадування про молитву',
+    ui_reminder_time: 'Час нагадування',
+    ui_reminder_time_desc: 'Місцевий час щоденного нагадування',
+    ui_language: 'Мова',
+    ui_language_desc: 'Мова інтерфейсу',
+    ui_save_preferences: 'Зберегти налаштування',
+    ui_completed: 'Виконано',
+    ui_loading_today: 'Завантаження...',
+    ui_no_assignments: 'На сьогодні немає молитовних тем. Приєднайтесь до кімнати або перевірте пізніше!',
+    ui_prayed_today: 'Помолився(-лась) сьогодні',
+    ui_mark_prayed: '🙏 Помолився(-лась) сьогодні',
+    ui_admin: 'Адмін',
+    ui_member: 'Учасник',
+    ui_create: 'Створити',
+    ui_join: 'Приєднатися',
+    ui_loading_rooms: 'Завантаження кімнат...',
+    ui_no_rooms: 'Ви ще не у молитовних кімнатах. Створіть або приєднайтесь!',
+    ui_view_room: 'Деталі кімнати',
+    ui_room_details: 'Деталі кімнати',
+    ui_invite_code_label: 'Код запрошення:',
+    ui_copy_code: 'Скопіювати код',
+    ui_copy_link: 'Скопіювати посилання',
+    ui_message_admin: 'Написати адміну',
+    ui_shared_focus: 'Спільний молитовний фокус',
+    ui_personal_requests: 'Особисті прохання',
+    ui_members: 'Учасники',
+    ui_tab_today: 'Сьогодні',
+    ui_tab_rooms: 'Кімнати',
+    ui_tab_settings: 'Налаштування',
+    ui_settings_saved: 'Налаштування збережено!',
+    ui_confirm_leave: 'Ви впевнені, що хочете покинути цю кімнату?',
+    ui_confirm_close: 'Ви впевнені, що хочете закрити цю кімнату для всех?',
+    ui_add_personal_topic: '+ Особиста тема',
+    ui_add_shared_topic: '+ Спільна тема',
+    ui_shared_badge: 'Спільний фокус',
+    ui_personal_badge: 'Особисте прохання',
   },
   en: {
     start: 'Hi! I\'m a prayer helper bot. Send /help to see the commands.',
@@ -159,6 +200,46 @@ export const LOCALES = {
     accountability_warning: 'We miss your prayers in "{room}" 🙏 It has been two days. If the pause reaches 5 days in a row you will leave the room — but one tap on "🙏 Prayed today" resets everything.',
     removed_member: 'You have left "{room}" after 5 days without prayer. This is not goodbye — you can be invited back anytime. 🙏',
     removed_admin: '{name} left "{room}" after 5 days without prayer. You can send them an invite again anytime.',
+    ui_todays_focus: 'Today\'s Focus',
+    ui_my_prayer_rooms: 'My Prayer Rooms',
+    ui_notification_settings: 'Notification Settings',
+    ui_daily_reminders: 'Daily Reminders',
+    ui_daily_reminders_desc: 'Receive daily prayer reminders',
+    ui_reminder_time: 'Reminder Time',
+    ui_reminder_time_desc: 'Local time for your daily reminder',
+    ui_language: 'Language',
+    ui_language_desc: 'Interface language',
+    ui_save_preferences: 'Save Preferences',
+    ui_completed: 'Completed',
+    ui_loading_today: 'Loading today\'s focus...',
+    ui_no_assignments: 'No prayer assignments for today yet. Join a room or check back later!',
+    ui_prayed_today: 'Prayed Today',
+    ui_mark_prayed: '🙏 Mark as Prayed Today',
+    ui_admin: 'Admin',
+    ui_member: 'Member',
+    ui_create: 'Create',
+    ui_join: 'Join',
+    ui_loading_rooms: 'Loading rooms...',
+    ui_no_rooms: 'You are not in any prayer rooms yet. Create or join one!',
+    ui_view_room: 'View Room Details',
+    ui_room_details: 'Room Details',
+    ui_invite_code_label: 'Invite Code:',
+    ui_copy_code: 'Copy Code',
+    ui_copy_link: 'Copy Link',
+    ui_message_admin: 'Message Admin',
+    ui_shared_focus: 'Shared Prayer Focus',
+    ui_personal_requests: 'Personal Requests',
+    ui_members: 'Members',
+    ui_tab_today: 'Today',
+    ui_tab_rooms: 'Rooms',
+    ui_tab_settings: 'Settings',
+    ui_settings_saved: 'Settings saved!',
+    ui_confirm_leave: 'Are you sure you want to leave this room?',
+    ui_confirm_close: 'Are you sure you want to close this room for all members?',
+    ui_add_personal_topic: '+ Personal Topic',
+    ui_add_shared_topic: '+ Shared Topic',
+    ui_shared_badge: 'Shared Focus',
+    ui_personal_badge: 'Personal Request',
   },
   ru: {
     start: 'Привет! Я бот-помощник для молитвы. Напишите /help, чтобы увидеть команды.',
@@ -238,6 +319,46 @@ export const LOCALES = {
     accountability_warning: 'Мы скучаем по вашим молитвам в комнате «{room}» 🙏 Прошло уже два дня. Если пауза достигнет 5 дней подряд, вы выбудете из комнаты — но одно нажатие «🙏 Помолился сегодня» всё отменяет.',
     removed_member: 'Вы выбыли из комнаты «{room}» после 5 дней без молитвы. Это не прощание — вас могут пригласить снова в любой момент. 🙏',
     removed_admin: '{name} выбыл(а) из комнаты «{room}» после 5 дней без молитвы. Вы можете отправить приглашение снова в любой момент.',
+    ui_todays_focus: 'Сегодняшний фокус',
+    ui_my_prayer_rooms: 'Мои молитвенные комнаты',
+    ui_notification_settings: 'Настройки уведомлений',
+    ui_daily_reminders: 'Ежедневные напоминания',
+    ui_daily_reminders_desc: 'Получать ежедневные напоминания о молитве',
+    ui_reminder_time: 'Время напоминания',
+    ui_reminder_time_desc: 'Местное время ежедневного напоминания',
+    ui_language: 'Язык',
+    ui_language_desc: 'Язык интерфейса',
+    ui_save_preferences: 'Сохранить настройки',
+    ui_completed: 'Выполнено',
+    ui_loading_today: 'Загрузка...',
+    ui_no_assignments: 'На сегодня нет молитвенных тем. Присоединитесь к комнате или проверьте позже!',
+    ui_prayed_today: 'Помолился(-лась) сегодня',
+    ui_mark_prayed: '🙏 Помолился(-лась) сегодня',
+    ui_admin: 'Админ',
+    ui_member: 'Участник',
+    ui_create: 'Создать',
+    ui_join: 'Присоединиться',
+    ui_loading_rooms: 'Загрузка комнат...',
+    ui_no_rooms: 'Вы ещё не в молитвенных комнатах. Создайте или присоединитесь!',
+    ui_view_room: 'Детали комнаты',
+    ui_room_details: 'Детали комнаты',
+    ui_invite_code_label: 'Код приглашения:',
+    ui_copy_code: 'Скопировать код',
+    ui_copy_link: 'Скопировать ссылку',
+    ui_message_admin: 'Написать админу',
+    ui_shared_focus: 'Общий молитвенный фокус',
+    ui_personal_requests: 'Личные просьбы',
+    ui_members: 'Участники',
+    ui_tab_today: 'Сегодня',
+    ui_tab_rooms: 'Комнаты',
+    ui_tab_settings: 'Настройки',
+    ui_settings_saved: 'Настройки сохранены!',
+    ui_confirm_leave: 'Вы уверены, что хотите покинуть эту комнату?',
+    ui_confirm_close: 'Вы уверены, что хотите закрыть эту комнату для всех?',
+    ui_add_personal_topic: '+ Личная тема',
+    ui_add_shared_topic: '+ Общая тема',
+    ui_shared_badge: 'Общий фокус',
+    ui_personal_badge: 'Личная просьба',
   },
 } as const;
 
@@ -258,8 +379,23 @@ export function t(
   );
 }
 
-// TODO: once groups/users carry a locale in the DB, resolve it per-chat here.
-export function resolveLocale(_ctx: unknown): Locale {
+export function resolveLocale(ctx: any): Locale {
+  const userId = ctx?.from?.id;
+  if (userId) {
+    try {
+      const prefs = getUserPrefs(userId);
+      if (prefs?.locale && (prefs.locale === 'uk' || prefs.locale === 'en' || prefs.locale === 'ru')) {
+        return prefs.locale as Locale;
+      }
+    } catch {}
+  }
+  const lang = ctx?.from?.language_code;
+  if (lang) {
+    const prefix = lang.slice(0, 2).toLowerCase();
+    if (prefix === 'uk' || prefix === 'en' || prefix === 'ru') {
+      return prefix as Locale;
+    }
+  }
   return config.defaultLocale;
 }
 

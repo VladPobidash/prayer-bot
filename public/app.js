@@ -11,6 +11,9 @@
   let me = null;
   let rooms = [];
   let currentRoom = null;
+  let currentLocale = (tg?.initDataUnsafe?.user?.language_code || 'uk').slice(0, 2);
+  if (!['uk', 'en', 'ru'].includes(currentLocale)) currentLocale = 'uk';
+  let locales = {};
 
   // DOM Elements
   const navItems = document.querySelectorAll('.nav-item');
@@ -20,6 +23,7 @@
   const roomsListEl = document.getElementById('rooms-list');
   const reminderToggleEl = document.getElementById('reminder-toggle');
   const reminderTimeEl = document.getElementById('reminder-time');
+  const languageSelectEl = document.getElementById('language-select');
 
   // Room Overlay
   const roomOverlay = document.getElementById('room-detail-screen');
@@ -57,6 +61,35 @@
   const modalTitle = document.getElementById('modal-title');
   const modalBody = document.getElementById('modal-body');
   const btnCloseModal = document.getElementById('btn-close-modal');
+
+  function t(locale, key, vars = {}) {
+    const dict = locales[locale] || locales['uk'] || {};
+    let template = dict[key] || key;
+    return template.replace(/\{(\w+)\}/g, (_, name) => (name in vars ? String(vars[name]) : `{${name}}`));
+  }
+
+  function applyLanguage(lang) {
+    if (lang && ['uk', 'en', 'ru'].includes(lang)) {
+      currentLocale = lang;
+    }
+    if (languageSelectEl && languageSelectEl.value !== currentLocale) {
+      languageSelectEl.value = currentLocale;
+    }
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const val = t(currentLocale, key);
+      if (val) el.textContent = val;
+    });
+
+    // Re-render active screens to update dynamic text in real time
+    const activeTab = document.querySelector('.nav-item.active')?.getAttribute('data-tab');
+    if (activeTab === 'today') loadToday();
+    if (activeTab === 'rooms') loadRooms();
+    if (currentRoom && roomOverlay && !roomOverlay.classList.contains('hidden')) {
+      openRoomDetail(currentRoom.id);
+    }
+  }
 
   // Navigation
   navItems.forEach(item => {
@@ -115,11 +148,16 @@
     try {
       const data = await apiRequest('/api/me');
       me = data.user;
+      if (data.locales) locales = data.locales;
+      if (me?.locale && ['uk', 'en', 'ru'].includes(me.locale)) {
+        currentLocale = me.locale;
+      }
+      applyLanguage(currentLocale);
     } catch (e) {}
   }
 
   async function loadToday() {
-    todayListEl.innerHTML = '<div class="loading-state">Loading today\'s assignments...</div>';
+    todayListEl.innerHTML = `<div class="loading-state">${t(currentLocale, 'ui_loading_today')}</div>`;
     const progressPill = document.getElementById('today-progress-pill');
     const progressFill = document.getElementById('today-progress-fill');
 
@@ -129,11 +167,11 @@
       const completed = assignments.filter(a => a.prayedToday).length;
       const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-      if (progressPill) progressPill.textContent = `${completed}/${total} Completed`;
+      if (progressPill) progressPill.textContent = `${completed}/${total} ${t(currentLocale, 'ui_completed')}`;
       if (progressFill) progressFill.style.width = `${percent}%`;
 
       if (assignments.length === 0) {
-        todayListEl.innerHTML = '<div class="empty-state">No prayer assignments for today yet. Join a room or check back later!</div>';
+        todayListEl.innerHTML = `<div class="empty-state">${t(currentLocale, 'ui_no_assignments')}</div>`;
         return;
       }
       todayListEl.innerHTML = '';
@@ -146,18 +184,18 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               ${escapeHtml(item.roomName)}
             </span>
-            <span class="badge ${item.kind === 'shared' ? 'badge-shared' : 'badge-personal'}">${item.kind === 'shared' ? 'Shared Focus' : 'Personal Request'}</span>
+            <span class="badge ${item.kind === 'shared' ? 'badge-shared' : 'badge-personal'}">${item.kind === 'shared' ? t(currentLocale, 'ui_shared_badge') : t(currentLocale, 'ui_personal_badge')}</span>
           </div>
           <div class="today-prayer-text">${escapeHtml(item.topicText)}</div>
           <div class="today-card-footer">
             ${item.prayedToday ? `
               <div class="prayed-done-badge">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Prayed Today
+                ${t(currentLocale, 'ui_prayed_today')}
               </div>
             ` : `
               <button class="btn btn-sm btn-primary btn-block btn-pray" data-topic-id="${item.topicId}">
-                🙏 Mark as Prayed Today
+                ${t(currentLocale, 'ui_mark_prayed')}
               </button>
             `}
           </div>
@@ -174,17 +212,17 @@
         });
       });
     } catch (e) {
-      todayListEl.innerHTML = '<div class="empty-state">Failed to load today assignments.</div>';
+      todayListEl.innerHTML = `<div class="empty-state">${t(currentLocale, 'err_generic')}</div>`;
     }
   }
 
   // Rooms Tab
   async function loadRooms() {
-    roomsListEl.innerHTML = '<div class="loading-state">Loading rooms...</div>';
+    roomsListEl.innerHTML = `<div class="loading-state">${t(currentLocale, 'ui_loading_rooms')}</div>`;
     try {
       rooms = await apiRequest('/api/rooms');
       if (rooms.length === 0) {
-        roomsListEl.innerHTML = '<div class="empty-state">You are not in any prayer rooms yet. Create or join one!</div>';
+        roomsListEl.innerHTML = `<div class="empty-state">${t(currentLocale, 'ui_no_rooms')}</div>`;
         return;
       }
       roomsListEl.innerHTML = '';
@@ -194,11 +232,11 @@
         card.innerHTML = `
           <div class="card-header">
             <span class="card-title">${escapeHtml(r.name)}</span>
-            <span class="badge badge-${r.isAdmin ? 'admin' : 'member'}">${r.isAdmin ? 'Admin' : 'Member'}</span>
+            <span class="badge badge-${r.isAdmin ? 'admin' : 'member'}">${r.isAdmin ? t(currentLocale, 'ui_admin') : t(currentLocale, 'ui_member')}</span>
           </div>
-          <div class="card-meta">Invite Code: <code>${r.inviteCode}</code></div>
+          <div class="card-meta">${t(currentLocale, 'ui_invite_code_label')} <code>${r.inviteCode}</code></div>
           <div style="margin-top: 8px;">
-            <button class="btn btn-sm btn-secondary btn-block btn-open-room" data-room-id="${r.id}">View Room Details</button>
+            <button class="btn btn-sm btn-secondary btn-block btn-open-room" data-room-id="${r.id}">${t(currentLocale, 'ui_view_room')}</button>
           </div>
         `;
         roomsListEl.appendChild(card);
@@ -210,7 +248,7 @@
         });
       });
     } catch (e) {
-      roomsListEl.innerHTML = '<div class="empty-state">Failed to load rooms.</div>';
+      roomsListEl.innerHTML = `<div class="empty-state">${t(currentLocale, 'err_generic')}</div>`;
     }
   }
 
@@ -220,7 +258,7 @@
       if (!me) await loadUser();
       currentRoom = await apiRequest(`/api/rooms/${roomId}`);
       detailRoomName.textContent = currentRoom.name;
-      detailRoomRole.textContent = currentRoom.isAdmin ? 'Admin' : 'Member';
+      detailRoomRole.textContent = currentRoom.isAdmin ? t(currentLocale, 'ui_admin') : t(currentLocale, 'ui_member');
       detailRoomRole.className = `badge badge-${currentRoom.isAdmin ? 'admin' : 'member'}`;
       if (detailRoomId) detailRoomId.textContent = `#${currentRoom.id}`;
       detailInviteCode.textContent = currentRoom.inviteCode;
@@ -243,7 +281,7 @@
         }
       }
 
-      // Render Members List (Collapsed by default)
+      // Render Members List
       if (detailMembersList) {
         detailMembersList.classList.add('hidden');
         const iconMembersToggle = document.getElementById('icon-members-toggle');
@@ -255,7 +293,7 @@
             item.className = 'member-item';
             item.innerHTML = `
               <span style="font-weight: 500;">${escapeHtml(m.displayName || ('User ' + m.telegramId))}</span>
-              <span class="badge badge-${m.role === 'admin' ? 'admin' : 'member'}">${m.role === 'admin' ? 'Admin' : 'Member'}</span>
+              <span class="badge badge-${m.role === 'admin' ? 'admin' : 'member'}">${m.role === 'admin' ? t(currentLocale, 'ui_admin') : t(currentLocale, 'ui_member')}</span>
             `;
             detailMembersList.appendChild(item);
           });
@@ -287,10 +325,10 @@
       if (!currentRoom) return;
       try {
         await navigator.clipboard.writeText(currentRoom.inviteCode);
-        if (tg?.showAlert) tg.showAlert('Invite code copied!');
-        else alert('Invite code copied!');
+        if (tg?.showAlert) tg.showAlert(t(currentLocale, 'ui_copy_code'));
+        else alert(t(currentLocale, 'ui_copy_code'));
       } catch (err) {
-        prompt('Copy invite code:', currentRoom.inviteCode);
+        prompt(t(currentLocale, 'ui_copy_code'), currentRoom.inviteCode);
       }
     });
   }
@@ -302,47 +340,47 @@
       const inviteUrl = `https://t.me/${botName}?start=join_${currentRoom.inviteCode}`;
       try {
         await navigator.clipboard.writeText(inviteUrl);
-        if (tg?.showAlert) tg.showAlert('Invite link copied!');
-        else alert('Invite link copied!');
+        if (tg?.showAlert) tg.showAlert(t(currentLocale, 'ui_copy_link'));
+        else alert(t(currentLocale, 'ui_copy_link'));
       } catch (err) {
-        prompt('Copy invite link:', inviteUrl);
+        prompt(t(currentLocale, 'ui_copy_link'), inviteUrl);
       }
     });
   }
 
   function renderTopics(container, topics, isShared) {
     if (!topics || topics.length === 0) {
-      container.innerHTML = '<div class="empty-state">No topics added yet.</div>';
+      container.innerHTML = `<div class="empty-state">${t(currentLocale, 'no_topics')}</div>`;
       return;
     }
     container.innerHTML = '';
-    topics.forEach(t => {
-      const isOwner = t.ownerId === me?.id || (isShared && currentRoom?.isAdmin);
+    topics.forEach(tItem => {
+      const isOwner = tItem.ownerId === me?.id || (isShared && currentRoom?.isAdmin);
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
         <div class="card-header">
-          <span class="badge ${t.status === 'answered' ? 'badge-answered' : (isShared ? 'badge-shared' : 'badge-personal')}">
-            ${t.status === 'answered' ? 'Answered' : (isShared ? 'Shared' : 'Personal')}
+          <span class="badge ${tItem.status === 'answered' ? 'badge-answered' : (isShared ? 'badge-shared' : 'badge-personal')}">
+            ${tItem.status === 'answered' ? t(currentLocale, 'answered_ok') : (isShared ? t(currentLocale, 'ui_shared_badge') : t(currentLocale, 'ui_personal_badge'))}
           </span>
-          ${!isShared ? `<span class="card-meta">By: ${escapeHtml(t.authorName || 'Member')}</span>` : ''}
+          ${!isShared ? `<span class="card-meta">By: ${escapeHtml(tItem.authorName || 'Member')}</span>` : ''}
         </div>
-        <div class="card-title">${escapeHtml(t.text)}</div>
-        ${t.updates && t.updates.length ? `
+        <div class="card-title">${escapeHtml(tItem.text)}</div>
+        ${tItem.updates && tItem.updates.length ? `
           <div class="topic-updates">
             <strong>Updates:</strong>
-            ${t.updates.map(u => `<div class="update-item">• ${escapeHtml(u.text)}</div>`).join('')}
+            ${tItem.updates.map(u => `<div class="update-item">• ${escapeHtml(u.text)}</div>`).join('')}
           </div>
         ` : ''}
-        ${t.answeredNote ? `
+        ${tItem.answeredNote ? `
           <div class="topic-updates" style="background: rgba(52, 199, 89, 0.1);">
-            <strong>Answered Praise:</strong> ${escapeHtml(t.answeredNote)}
+            <strong>Answered Praise:</strong> ${escapeHtml(tItem.answeredNote)}
           </div>
         ` : ''}
-        ${isOwner && t.status !== 'answered' ? `
+        ${isOwner && tItem.status !== 'answered' ? `
           <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <button class="btn btn-sm btn-outline btn-post-update" data-topic-id="${t.id}">+ Update</button>
-            <button class="btn btn-sm btn-secondary btn-mark-answered" data-topic-id="${t.id}">Mark Answered</button>
+            <button class="btn btn-sm btn-outline btn-post-update" data-topic-id="${tItem.id}">${t(currentLocale, 'btn_update')}</button>
+            <button class="btn btn-sm btn-secondary btn-mark-answered" data-topic-id="${tItem.id}">${t(currentLocale, 'btn_answer')}</button>
           </div>
         ` : ''}
       `;
@@ -351,7 +389,7 @@
 
     container.querySelectorAll('.btn-post-update').forEach(btn => {
       btn.addEventListener('click', () => {
-        showPromptModal('Add Update', 'Enter update text:', async (text) => {
+        showPromptModal(t(currentLocale, 'btn_update'), t(currentLocale, 'update_prompt'), async (text) => {
           await apiRequest(`/api/topics/${btn.getAttribute('data-topic-id')}/update`, {
             method: 'POST',
             body: JSON.stringify({ text })
@@ -363,7 +401,7 @@
 
     container.querySelectorAll('.btn-mark-answered').forEach(btn => {
       btn.addEventListener('click', () => {
-        showPromptModal('Mark Answered', 'Optional praise / answer note:', async (text) => {
+        showPromptModal(t(currentLocale, 'btn_answer'), t(currentLocale, 'answer_prompt'), async (text) => {
           await apiRequest(`/api/topics/${btn.getAttribute('data-topic-id')}/answer`, {
             method: 'POST',
             body: JSON.stringify({ text })
@@ -381,7 +419,7 @@
 
   // Modal Triggers
   document.getElementById('btn-create-room-modal').addEventListener('click', () => {
-    showPromptModal('Create Prayer Room', 'Enter room name:', async (name) => {
+    showPromptModal(t(currentLocale, 'btn_create_room'), t(currentLocale, 'create_prompt_name'), async (name) => {
       await apiRequest('/api/rooms', {
         method: 'POST',
         body: JSON.stringify({ name })
@@ -391,7 +429,7 @@
   });
 
   document.getElementById('btn-join-room-modal').addEventListener('click', () => {
-    showPromptModal('Join Prayer Room', 'Enter 8-character invite code:', async (code) => {
+    showPromptModal(t(currentLocale, 'btn_join_room'), t(currentLocale, 'join_prompt_code'), async (code) => {
       await apiRequest('/api/rooms/join', {
         method: 'POST',
         body: JSON.stringify({ code })
@@ -401,7 +439,7 @@
   });
 
   btnAddSharedTopic.addEventListener('click', () => {
-    showPromptModal('Add Shared Topic', 'Enter shared prayer topic for room:', async (text) => {
+    showPromptModal(t(currentLocale, 'btn_add_shared'), t(currentLocale, 'shared_prompt'), async (text) => {
       await apiRequest(`/api/rooms/${currentRoom.id}/topics`, {
         method: 'POST',
         body: JSON.stringify({ kind: 'shared', text })
@@ -411,7 +449,7 @@
   });
 
   btnAddPersonalTopic.addEventListener('click', () => {
-    showTopicModal('Add Personal Topic', async (text, isAnonymous) => {
+    showTopicModal(t(currentLocale, 'btn_add_personal'), async (text, isAnonymous) => {
       await apiRequest(`/api/rooms/${currentRoom.id}/topics`, {
         method: 'POST',
         body: JSON.stringify({ kind: 'personal', text, isAnonymous })
@@ -421,7 +459,7 @@
   });
 
   btnLeaveRoom.addEventListener('click', async () => {
-    if (confirm('Are you sure you want to leave this room?')) {
+    if (confirm(t(currentLocale, 'ui_confirm_leave'))) {
       await apiRequest(`/api/rooms/${currentRoom.id}/leave`, { method: 'POST' });
       roomOverlay.classList.add('hidden');
       loadRooms();
@@ -429,7 +467,7 @@
   });
 
   btnCloseRoom.addEventListener('click', async () => {
-    if (confirm('Are you sure you want to close this room for all members?')) {
+    if (confirm(t(currentLocale, 'ui_confirm_close'))) {
       await apiRequest(`/api/rooms/${currentRoom.id}/close`, { method: 'POST' });
       roomOverlay.classList.add('hidden');
       loadRooms();
@@ -441,9 +479,14 @@
     try {
       const data = await apiRequest('/api/me');
       me = data.user;
+      if (data.locales) locales = data.locales;
       reminderToggleEl.checked = !!me.reminderEnabled;
       if (me.reminderTime) reminderTimeEl.value = me.reminderTime;
       reminderTimeEl.disabled = !reminderToggleEl.checked;
+      if (me.locale) {
+        currentLocale = me.locale;
+      }
+      applyLanguage(currentLocale);
     } catch (e) {}
   }
 
@@ -451,16 +494,33 @@
     reminderTimeEl.disabled = !reminderToggleEl.checked;
   });
 
+  if (languageSelectEl) {
+    languageSelectEl.addEventListener('change', async (e) => {
+      const newLang = e.target.value;
+      applyLanguage(newLang);
+      try {
+        await apiRequest('/api/me/settings', {
+          method: 'PUT',
+          body: JSON.stringify({ locale: newLang })
+        });
+      } catch (err) {}
+    });
+  }
+
   document.getElementById('btn-save-settings').addEventListener('click', async () => {
-    await apiRequest('/api/me/reminder', {
+    const selectedLocale = languageSelectEl ? languageSelectEl.value : currentLocale;
+    await apiRequest('/api/me/settings', {
       method: 'PUT',
       body: JSON.stringify({
         enabled: reminderToggleEl.checked,
-        time: reminderTimeEl.value
+        time: reminderTimeEl.value,
+        locale: selectedLocale
       })
     });
-    if (tg?.showAlert) tg.showAlert('Settings saved!');
-    else alert('Settings saved!');
+    applyLanguage(selectedLocale);
+    const msg = t(currentLocale, 'ui_settings_saved');
+    if (tg?.showAlert) tg.showAlert(msg);
+    else alert(msg);
   });
 
   // Modal Helpers

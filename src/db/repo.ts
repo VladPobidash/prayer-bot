@@ -188,13 +188,16 @@ export function listTopicUpdates(topicId: number): TopicUpdate[] {
 
 // ─────────────────────────── Stage 2: prefs / assignments / prayer log ──────
 
-export interface UserPrefs { telegramId: number; timezone: string | null; reminderTime: string | null; reminderEnabled: boolean; }
+export interface UserPrefs { telegramId: number; timezone: string | null; reminderTime: string | null; reminderEnabled: boolean; locale: string | null; }
 
 export function getUserPrefs(telegramId: number): UserPrefs | null {
   const r = getDb().prepare(
-    `SELECT telegram_id, timezone, reminder_time, reminder_enabled FROM users WHERE telegram_id = ?`,
-  ).get(telegramId) as { telegram_id: number; timezone: string | null; reminder_time: string | null; reminder_enabled: number } | undefined;
-  return r ? { telegramId: r.telegram_id, timezone: r.timezone, reminderTime: r.reminder_time, reminderEnabled: !!r.reminder_enabled } : null;
+    `SELECT telegram_id, timezone, reminder_time, reminder_enabled, locale FROM users WHERE telegram_id = ?`,
+  ).get(telegramId) as { telegram_id: number; timezone: string | null; reminder_time: string | null; reminder_enabled: number; locale: string | null } | undefined;
+  return r ? { telegramId: r.telegram_id, timezone: r.timezone, reminderTime: r.reminder_time, reminderEnabled: !!r.reminder_enabled, locale: r.locale } : null;
+}
+export function setUserLocale(telegramId: number, locale: string): void {
+  getDb().prepare(`UPDATE users SET locale = ? WHERE telegram_id = ?`).run(locale, telegramId);
 }
 export function setReminderTime(telegramId: number, time: string | null): void {
   getDb().prepare(`UPDATE users SET reminder_time = ? WHERE telegram_id = ?`).run(time, telegramId);

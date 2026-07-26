@@ -34,9 +34,29 @@ test('GET /health, static assets, and authenticated API endpoints', async () => 
     headers: { Authorization: `Bearer ${initData}` }
   });
   assert.equal(meRes.status, 200);
-  const meData = (await meRes.json()) as { user: { id: number; firstName: string } };
+  const meData = (await meRes.json()) as { user: { id: number; firstName: string; locale?: string }; locales?: Record<string, unknown> };
   assert.equal(meData.user.id, 1001);
   assert.equal(meData.user.firstName, 'Alice');
+  assert.ok(meData.locales);
+  assert.ok(meData.locales['en']);
+
+  // Update settings (locale) via PUT /api/me/settings
+  const updateSettingsRes = await fetch(`${baseUrl}/api/me/settings`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${initData}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ locale: 'en' })
+  });
+  assert.equal(updateSettingsRes.status, 200);
+
+  // Verify updated locale in GET /api/me
+  const updatedMeRes = await fetch(`${baseUrl}/api/me`, {
+    headers: { Authorization: `Bearer ${initData}` }
+  });
+  const updatedMeData = (await updatedMeRes.json()) as { user: { locale: string } };
+  assert.equal(updatedMeData.user.locale, 'en');
 
   // 5. Create room via POST /api/rooms
   const createRoomRes = await fetch(`${baseUrl}/api/rooms`, {
