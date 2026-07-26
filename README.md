@@ -94,6 +94,8 @@ npm start
 npm test
 ```
 
+For step-by-step instructions on setting up a Dev Bot and testing Telegram Mini App locally with Cloudflare tunnels, see **[docs/LOCAL_TESTING_RUNBOOK.md](docs/LOCAL_TESTING_RUNBOOK.md)**.
+
 </details>
 
 ---
