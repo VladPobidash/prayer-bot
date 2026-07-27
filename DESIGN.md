@@ -145,6 +145,8 @@ Four candidates live in `brand/logo/`. Unlike the interface, a mark **shows a
 real thing** — an abstract composition of rectangles is unreadable as an avatar
 and says nothing about the product. Curves are allowed here, and only here.
 
+Two families. The first shows **the act** — what a member does:
+
 | File | Object |
 |------|--------|
 | `mark-a-hands.svg` | Praying hands, ink on a red field |
@@ -152,6 +154,15 @@ and says nothing about the product. Curves are allowed here, and only here.
 | `mark-c-book.svg` | An open book with a red ribbon |
 | `mark-d-open-palm.svg` | An open palm carrying a flame, white on black |
 | `mark-d2-open-palm-flat.svg` | The same palm, flame in two flat tones instead of a gradient |
+
+The second shows **the room** — the thing the product actually is, and the only
+family that carries the plural in the name:
+
+| File | Object |
+|------|--------|
+| `mark-e-room-people.svg` | A room with three people in it, one of them red |
+| `mark-f-lit-window.svg` | A building at night with one window lit: many rooms, yours is on |
+| `mark-h-room-candle.svg` | A room with a single candle burning in it |
 
 **Fire has a second palette.** A flame drawn in a single red is a drop of blood,
 not fire, so a mark that shows one may use warm secondaries — amber `#FFB100`,

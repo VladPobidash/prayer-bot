@@ -88,6 +88,9 @@ flat, no gradient — per [DESIGN.md](../DESIGN.md).
 | **C — Open book** | Black open book, red ribbon, white ground | "We pray through Scripture" without a word of it. The calmest option. |
 | **D — Open palm** | White palm carrying a flame, on black | The product in one picture: someone else is holding your request today. The only dark option — stands out in a light chat list. |
 | **D2 — Open palm, flat** | The same, flame in two flat tones | Identical silhouette without the gradient. Pick this if the brand should stay strictly flat. |
+| **E — Room with people** | Black room frame, three figures, the middle one red | The name made literal: a room that holds a group. Clearest at a glance of all eight. |
+| **F — Lit window** | Black building, one red window, a doorway | Rooms in the plural, and yours is the lit one. The most distinctive silhouette in a chat list. |
+| **H — Room with a candle** | Room frame with one candle burning inside | Both halves of the idea: the room says where, the candle says what for. |
 
 ---
 

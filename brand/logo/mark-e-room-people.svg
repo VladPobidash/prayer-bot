@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- E — A room with people in it. The frame is the room, the three figures
+       are the group, and the red one is you. -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+
+  <!-- room -->
+  <path d="M124 128 H 388 V 392 H 124 Z M 142 146 V 374 H 370 V 146 Z" fill="#101010" fill-rule="evenodd"/>
+
+  <!-- people, shoulders running off the bottom edge of the room -->
+  <g fill="#101010">
+    <circle cx="188" cy="228" r="26"/>
+    <path d="M148 374 C 148 320 165 292 188 292 C 211 292 228 320 228 374 Z"/>
+    <circle cx="324" cy="228" r="26"/>
+    <path d="M284 374 C 284 320 301 292 324 292 C 347 292 364 320 364 374 Z"/>
+  </g>
+  <g fill="#D0021B">
+    <circle cx="256" cy="212" r="30"/>
+    <path d="M212 374 C 212 314 231 284 256 284 C 281 284 300 314 300 374 Z"/>
+  </g>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- H — A room with one candle burning in it. The room says where, the
+       candle says what for. -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+
+  <path d="M124 128 H 388 V 392 H 124 Z M 142 146 V 374 H 370 V 146 Z" fill="#101010" fill-rule="evenodd"/>
+
+  <!-- flame -->
+  <path d="M258 170
+           C 274 202 285 222 287 244
+           C 289 267 277 289 257 292
+           C 249 293 243 293 238 291
+           C 220 283 214 259 219 240
+           C 223 226 232 218 239 205
+           C 247 191 253 182 258 170 Z" fill="#D0021B"/>
+  <path d="M258 224
+           C 269 243 274 254 274 267
+           C 274 283 266 292 255 292
+           C 244 292 239 283 240 268
+           C 241 253 251 240 258 224 Z" fill="#FFB100"/>
+
+  <g fill="#101010">
+    <rect x="252" y="290" width="8" height="20"/>
+    <!-- candle body, standing on the floor of the room -->
+    <path d="M234 308 C 242 300 250 300 256 303 C 262 306 274 301 280 308 L 280 364 L 234 364 Z"/>
+    <rect x="216" y="364" width="82" height="10"/>
+  </g>
+</svg>
