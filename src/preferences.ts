@@ -2,6 +2,12 @@
 export const TELEGRAM_MAX_LENGTH = 4096;
 export const PAGE_SIZE = 10;
 
+// Used only for a user whose timezone is still unknown — someone who has never
+// opened the Mini App. Everyone else gets their own zone (see src/timezone.ts).
+// UTC is deliberate: it is the one choice that is wrong by the same amount for
+// everybody rather than silently correct for one group.
+export const FALLBACK_TIMEZONE = 'UTC';
+
 export const LOG_PREFIX = {
   bot: '[bot]',
   db: '[db]',

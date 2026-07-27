@@ -6,7 +6,7 @@ import { LOG_PREFIX } from './preferences.ts';
 import { validateInitData, type TelegramUser } from './auth.ts';
 import * as repo from './db/repo.ts';
 import * as rooms from './rooms.ts';
-import { localDate } from './assignments.ts';
+import { userToday, userTimezone, isValidTimezone } from './timezone.ts';
 import { getStreakSummary } from './streak.ts';
 import { LOCALES } from './i18n.ts';
 
@@ -116,7 +116,8 @@ export function startHealthServer(port: number = config.port): Server {
       const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ') || null;
       const username = user.username || null;
       repo.upsertUser(userId, displayName, username);
-      const today = localDate(new Date(), config.tz);
+      // Every date in the API is the caller's own local day.
+      const today = userToday(userId);
 
       try {
         // GET /api/me
@@ -157,6 +158,7 @@ export function startHealthServer(port: number = config.port): Server {
               reminderEnabled: userPrefs?.reminderEnabled ?? true,
               locale: userPrefs?.locale ?? config.defaultLocale,
               theme: userPrefs?.theme ?? 'auto',
+              timezone: userTimezone(userId),
             },
             locales: LOCALES,
             todayAssignments,
@@ -204,7 +206,12 @@ export function startHealthServer(port: number = config.port): Server {
 
         // PUT /api/me/reminder or PUT /api/me/settings
         if (method === 'PUT' && (path === '/api/me/reminder' || path === '/api/me/settings')) {
-          const body = await parseJsonBody<{ enabled?: boolean; time?: string; locale?: string; theme?: string }>(req);
+          const body = await parseJsonBody<{ enabled?: boolean; time?: string; locale?: string; theme?: string; timezone?: string }>(req);
+          // The Mini App reports the device's IANA zone; it is the only source
+          // of a user's timezone, so it is accepted on every settings write.
+          if (typeof body.timezone === 'string' && isValidTimezone(body.timezone)) {
+            repo.setUserTimezone(userId, body.timezone);
+          }
           if (typeof body.enabled === 'boolean') {
             repo.setReminderEnabled(userId, body.enabled);
           }

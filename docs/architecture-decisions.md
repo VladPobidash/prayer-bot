@@ -197,7 +197,7 @@ uses only simple type annotations, interfaces, and `as const` assertions.
 
 **Context:** Reminders must fire at each member's chosen time. Missed ticks (process restart, redeploy, a skipped cron minute) must not silently drop messages for that day.
 
-**Decision:** The scheduler fires a node-cron job every minute. Each tick calls `dispatchDueReminders(now, tz, send)`. A user is "due" when their local `HH:MM` (derived from `now` in `config.tz`) is greater than or equal to their `reminder_time` AND the `sent_assignment` table has no row for `(chat_id, sent_date)`. Because the check is `>=` rather than `==`, any tick after the due minute — even hours later after a restart — will still deliver the reminder for that day.
+**Decision:** The scheduler fires a node-cron job every minute. Each tick calls `dispatchDueReminders(now, send)`. A user is "due" when their local `HH:MM` (derived from `now` in **their own** timezone — see ADR 18) is greater than or equal to their `reminder_time` AND the `sent_assignment` table has no row for `(chat_id, sent_date)`. Because the check is `>=` rather than `==`, any tick after the due minute — even hours later after a restart — will still deliver the reminder for that day.
 
 **Consequences:** Each user receives at most one batch of reminder messages per calendar day (idempotency enforced by the `sent_assignment` table). The per-minute polling adds negligible load for small user counts. A timezone-aware `localDate` / `localTime` helper using `Intl.DateTimeFormat` avoids manual UTC-offset arithmetic.
 
@@ -226,3 +226,15 @@ uses only simple type annotations, interfaces, and `as const` assertions.
 **Decision:** Embed a Single Page Application (SPA) served by Node `http.createServer` in `src/server.ts` (`public/index.html`, `public/style.css`, `public/app.js`). Authenticate API requests via `Authorization: Bearer <initData>` header using HMAC-SHA256 signature validation (`validateInitData` in `src/auth.ts`) against `TELEGRAM_BOT_TOKEN`. Configure the bot menu button (`setChatMenuButton`) to open the Mini App directly.
 
 **Consequences:** Bot commands and inline text wizards are minimized while retaining core Telegram notifications (daily reminders, accountability warnings) and media-reply forwarding. The server operates statelessly for web requests by verifying Telegram `initData` per request without requiring separate session tokens or cookies.
+
+---
+
+## ADR 18 — Day boundaries follow the user, not the server
+
+**Status:** Accepted
+
+**Context:** Every date in the product — which topics are today's, whether a prayer counts for today, when a streak breaks, when a missed day is complete — was derived from one server-wide `TZ` env var. With members in more than one zone that is wrong for everybody but one group: someone in Kyiv had their day cut short, someone in Los Angeles saw "today" before their morning. Telegram does not send a user's timezone in `initData`, so it cannot simply be read off an update.
+
+**Decision:** Remove `TZ` from the project. Each user's IANA zone lives on `users.timezone` and is reported by the Mini App, which reads `Intl.DateTimeFormat().resolvedOptions().timeZone` and PUTs it to `/api/me/settings` on every start — so it also follows the user when they travel. `src/timezone.ts` owns resolution (`userTimezone`, `userToday`, `userNowHHMM`) with a validated fallback of `FALLBACK_TIMEZONE` = UTC for a user who has never opened the app. Reminder dispatch resolves the date and the clock per recipient; the accountability sweep resolves "today" per member and now runs hourly instead of once a day, because "yesterday" ends at a different moment for each of them.
+
+**Consequences:** Members of one room can live in different zones and each sees a correct day. The cron schedules themselves are plain UTC ticks and carry no timezone of their own. The cost is that a bot-only user — someone who never opens the Mini App — is treated as UTC until they do; this is stated in `docs/USAGE.md`. An invalid or stale zone string degrades to the fallback rather than throwing.

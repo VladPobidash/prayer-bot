@@ -28,6 +28,7 @@ members' prayer requests. You host it on your own account; your data stays yours
 - Built-in **Telegram Mini-App (Web App)**: seamless room overview, topic management, prayer focus, and settings directly inside Telegram UI
 - Private prayer rooms with invite links/codes, shared topics, and private personal topics
 - Daily per-topic reminders, a one-tap **Prayed today** confirmation, and optional voice/video encouragement forwarded to the topic owner
+- **Per-user timezones**: reminders, day boundaries and streaks follow each member's own clock — nothing to configure, the Mini App reports the device's zone
 - **Daily streak** in the Mini App: consecutive prayer days, personal best, and a last-7-days strip on the Today screen
 - Gentle accountability: members are warned after two missed days and removed
   after five consecutive missed days, with a prior warning
@@ -37,7 +38,6 @@ members' prayer requests. You host it on your own account; your data stays yours
 
 **On the roadmap**
 
-- Per-user language and timezone preferences
 - Weekly or custom reminder schedules
 - Leaderboards and room-wide streak stats to keep the group encouraged
 

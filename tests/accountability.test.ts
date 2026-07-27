@@ -54,11 +54,11 @@ const NOW = new Date('2026-07-15T12:00:00Z'); // today = 2026-07-15 in UTC
 test('warns once at 2 missed days; admin exempt; second run same day is silent', async () => {
   const roomId = setupRoom('2026-07-01');
   const { sent, notify } = collector();
-  await evaluateAccountability(NOW, 'UTC', notify);
+  await evaluateAccountability(NOW, notify);
   assert.equal(sent.length, 1);                       // only member 2, never admin 1
   assert.equal(sent[0].chatId, 2);
   assert.equal(getMembershipState(roomId, 2)?.warnedAt, '2026-07-15');
-  await evaluateAccountability(NOW, 'UTC', notify);   // idempotent
+  await evaluateAccountability(NOW, notify);   // idempotent
   assert.equal(sent.length, 1);
   closeDb();
 });
@@ -70,7 +70,7 @@ test('removes at 5 missed days when warned 3+ days ago: leave semantics + both D
   getDb().prepare(`UPDATE topics SET status = 'answered' WHERE id = ?`).run(answered);
   upsertMembershipState(roomId, 2, null, 2, '2026-07-12'); // warned 3 days before NOW
   const { sent, notify } = collector();
-  await evaluateAccountability(NOW, 'UTC', notify);
+  await evaluateAccountability(NOW, notify);
   assert.equal(getMember(roomId, 2), null);                          // membership gone
   const kinds = listTopics(roomId).filter((t) => t.ownerId === 2).map((t) => t.status);
   assert.deepEqual(kinds, ['answered']);                             // active personal deleted, answered kept
@@ -85,7 +85,7 @@ test('a prayer resets the streak and clears a stale warning', async () => {
   upsertMembershipState(roomId, 2, null, 3, '2026-07-11');
   recordPrayer(2, roomId, topicId, '2026-07-14');       // prayed yesterday, after the warning
   const { sent, notify } = collector();
-  await evaluateAccountability(NOW, 'UTC', notify);
+  await evaluateAccountability(NOW, notify);
   assert.equal(sent.length, 0);
   const st = getMembershipState(roomId, 2);
   assert.equal(st?.missStreak, 0);
@@ -96,7 +96,7 @@ test('a prayer resets the streak and clears a stale warning', async () => {
 test('new-member grace: joined yesterday, never prayed - no warning', async () => {
   setupRoom('2026-07-14');
   const { sent, notify } = collector();
-  await evaluateAccountability(NOW, 'UTC', notify);
+  await evaluateAccountability(NOW, notify);
   assert.equal(sent.length, 0);
   closeDb();
 });
@@ -104,7 +104,7 @@ test('new-member grace: joined yesterday, never prayed - no warning', async () =
 test('catch-up after downtime: streak 7 with no prior warning warns instead of removing', async () => {
   const roomId = setupRoom('2026-07-07');
   const { sent, notify } = collector();
-  await evaluateAccountability(NOW, 'UTC', notify);
+  await evaluateAccountability(NOW, notify);
   assert.equal(sent.length, 1);                        // warn, never silent-remove
   assert.equal(sent[0].chatId, 2);
   assert.equal(getMembershipState(roomId, 2)?.warnedAt, '2026-07-15');
@@ -122,7 +122,7 @@ test('a failing DM does not block the rest of the sweep', async () => {
     if (chatId === 2) throw new Error('blocked bot');
     sent.push(chatId);
   };
-  await evaluateAccountability(NOW, 'UTC', notify);
+  await evaluateAccountability(NOW, notify);
   assert.deepEqual(sent, [3]);                         // member 3 still warned
   closeDb();
 });
@@ -135,7 +135,7 @@ test('does not warn or remove a member who has no topic they can receive', async
   upsertMembershipState(roomId, 2, null, 5, '2026-07-12');
   const { sent, notify } = collector();
 
-  await evaluateAccountability(NOW, 'UTC', notify);
+  await evaluateAccountability(NOW, notify);
 
   assert.equal(getMember(roomId, 2)?.telegramId, 2);
   assert.equal(getMembershipState(roomId, 2), null);

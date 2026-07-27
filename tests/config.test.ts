@@ -12,7 +12,6 @@ test('applies sensible defaults', () => {
   const c = loadConfig({ ...base });
   assert.equal(c.dbPath, './data/prayer-bot.db');
   assert.equal(c.port, 3000);
-  assert.equal(c.tz, 'UTC');
   assert.equal(c.defaultLocale, 'uk');
   assert.equal(c.adminChatId, null);
 });
@@ -35,11 +34,10 @@ test('invalid DEFAULT_LOCALE falls back to uk', () => {
 test('treats empty-string env vars as unset and uses defaults', () => {
   const c = loadConfig({
     TELEGRAM_BOT_TOKEN: 'x',
-    DB_PATH: '', PORT: '', TZ: '', DEFAULT_LOCALE: '', ADMIN_CHAT_ID: '',
+    DB_PATH: '', PORT: '', DEFAULT_LOCALE: '', ADMIN_CHAT_ID: '',
   } as NodeJS.ProcessEnv);
   assert.equal(c.dbPath, './data/prayer-bot.db');
   assert.equal(c.port, 3000);
-  assert.equal(c.tz, 'UTC');
   assert.equal(c.defaultLocale, 'uk');
   assert.equal(c.adminChatId, null);
 });
