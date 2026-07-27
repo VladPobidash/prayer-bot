@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- The mark on a dark ground: the building becomes the light, the windows
+       the gaps. Same geometry as mark.svg. -->
+  <rect width="512" height="512" fill="#101010"/>
+  <rect x="132" y="124" width="248" height="264" fill="#FFFFFF"/>
+
+  <g fill="#101010">
+    <rect x="160" y="152" width="56" height="56"/>
+    <rect x="228" y="152" width="56" height="56"/>
+    <rect x="296" y="152" width="56" height="56"/>
+
+    <rect x="160" y="224" width="56" height="56"/>
+    <rect x="296" y="224" width="56" height="56"/>
+
+    <rect x="160" y="296" width="56" height="56"/>
+    <rect x="296" y="296" width="56" height="56"/>
+    <rect x="234" y="296" width="44" height="92"/>
+  </g>
+
+  <rect x="228" y="224" width="56" height="56" fill="#FF2B3D"/>
+</svg>

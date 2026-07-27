@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <g transform="translate(62,50) scale(1.5)">
+    <path fill="#101010" fill-rule="evenodd" d="M3 2h18v20H3z M5 5h4v4H5z M10 5h4v4h-4z M15 5h4v4h-4z M5 11h4v4H5z M10 11h4v4h-4z M15 11h4v4h-4z M5 17h4v5H5z M10 17h4v5h-4z M15 17h4v5h-4z"/>
+    <rect x="10" y="11" width="4" height="4" fill="#D0021B"/>
+  </g>
+  <text x="112" y="74" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#101010" letter-spacing="4.2">PRAYER ROOM</text>
+
+  <text x="64" y="192" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="800" fill="#101010" letter-spacing="-1">Один день у кімнаті</text>
+  <text x="64" y="232" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#4A4A4A">Не ще один чат. Одне ім'я на день — і людина знає, що її не забули</text>
+
+  <!-- timeline: one straight rule, four square nodes -->
+  <rect x="64" y="300" width="1152" height="2" fill="#101010"/>
+  <g fill="#D0021B">
+    <rect x="64" y="290" width="22" height="22"/>
+    <rect x="440" y="290" width="22" height="22"/>
+    <rect x="816" y="290" width="22" height="22"/>
+    <rect x="1194" y="290" width="22" height="22"/>
+  </g>
+
+  <g>
+    <text x="64" y="372" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#8A8A8A" letter-spacing="2.4">КРОК 01</text>
+    <text x="64" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#101010">08:00, твій час</text>
+    <text x="64" y="458" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">Приходить одне</text>
+    <text x="64" y="486" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">повідомлення: «Сьогодні</text>
+    <text x="64" y="514" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">молись за Олю».</text>
+  </g>
+
+  <g>
+    <text x="440" y="372" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#8A8A8A" letter-spacing="2.4">КРОК 02</text>
+    <text x="440" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#101010">Одна хвилина</text>
+    <text x="440" y="458" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">Молишся своїми словами.</text>
+    <text x="440" y="486" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">Без списку на двадцять</text>
+    <text x="440" y="514" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">пунктів.</text>
+  </g>
+
+  <g>
+    <text x="816" y="372" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#8A8A8A" letter-spacing="2.4">КРОК 03</text>
+    <text x="816" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#101010">Один тап</text>
+    <text x="816" y="458" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">Тиснеш кнопку</text>
+    <text x="816" y="486" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">«Помолився сьогодні».</text>
+  </g>
+
+  <!-- the outcome, the only red headline on the sheet -->
+  <g>
+    <text x="1024" y="372" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#D0021B" letter-spacing="2.4">РЕЗУЛЬТАТ</text>
+    <text x="1024" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#D0021B">Оля бачить</text>
+    <text x="1024" y="458" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">«Влад помолився за</text>
+    <text x="1024" y="486" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">твою тему» — і вона</text>
+    <text x="1024" y="514" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">знає, що не сама.</text>
+  </g>
+
+  <rect x="64" y="592" width="1152" height="1" fill="#DADADA"/>
+  <text x="64" y="656" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800" fill="#101010">Хвилина на день. Ніхто не забутий<tspan fill="#D0021B">.</tspan></text>
+</svg>

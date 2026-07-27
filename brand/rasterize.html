@@ -7,12 +7,12 @@
 // Renders every brand SVG to a pixel-exact PNG and POSTs it back to the dev
 // server, which writes it into brand/render/. Run with: node serve.mjs <brand dir>
 const JOBS = [
-  ['logo/option-a-flame-circle.svg', 'botpic-option-a.png', 512, 512],
-  ['logo/option-b-hands-arch.svg',   'botpic-option-b.png', 512, 512],
-  ['logo/option-c-bubble-flame.svg', 'botpic-option-c.png', 512, 512],
-  ['logo/option-d-streak-ring.svg',  'botpic-option-d.png', 512, 512],
+  ['logo/mark.svg',          'botpic.png',          512, 512],
+  ['logo/mark-inverted.svg', 'botpic-inverted.png', 512, 512],
   ['description-picture-uk.svg', 'description-picture-uk.png', 640, 360],
   ['description-picture-en.svg', 'description-picture-en.png', 640, 360],
+  ['invite/how-it-works-uk.svg', 'invite-how-it-works-uk.png', 1280, 720],
+  ['invite/one-day-uk.svg',      'invite-one-day-uk.png',      1280, 720],
 ];
 
 const log = (m) => { document.getElementById('log').textContent += '\n' + m; };

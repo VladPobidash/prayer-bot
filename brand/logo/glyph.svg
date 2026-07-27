@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- The mark reduced for UI use at 20–32px. The building takes currentColor
+       and the windows are cut out of it, so whatever surface is behind shows
+       through and the glyph works in both themes. Only the lit window is
+       painted, and it is the one red thing in the header. -->
+  <path fill="currentColor" fill-rule="evenodd"
+        d="M3 2h18v20H3z
+           M5 5h4v4H5z M10 5h4v4h-4z M15 5h4v4h-4z
+           M5 11h4v4H5z M10 11h4v4h-4z M15 11h4v4h-4z
+           M5 17h4v5H5z M10 17h4v5h-4z M15 17h4v5h-4z"/>
+  <rect x="10" y="11" width="4" height="4" fill="var(--red, #D0021B)"/>
+</svg>
