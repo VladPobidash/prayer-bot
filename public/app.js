@@ -30,7 +30,7 @@
   // 'auto' follows the Telegram client (then the OS); 'light'/'dark' are the
   // user's explicit choice in Settings. Stored server-side next to the locale,
   // mirrored to localStorage so the pre-paint script in index.html can use it.
-  const THEME_BG = { dark: '#0f1229', light: '#f5f4fb' };
+  const THEME_BG = { dark: '#101010', light: '#ffffff' };
   let themeMode = 'auto';
 
   function resolveTheme(mode) {

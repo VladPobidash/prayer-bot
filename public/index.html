@@ -26,15 +26,15 @@
 <body>
   <div id="app">
     <header class="app-topbar">
-      <svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true">
-        <defs>
-          <linearGradient id="brandFlame" x1="0.5" y1="0" x2="0.5" y2="1">
-            <stop offset="0" stop-color="#FFE9A8"/>
-            <stop offset="0.45" stop-color="#FFC24A"/>
-            <stop offset="1" stop-color="#FF8A3D"/>
-          </linearGradient>
-        </defs>
-        <path d="M256 96C268 152 312 178 330 216c18 40 12 86-14 114-24 26-52 36-60 36s-36-10-60-36c-26-28-32-74-14-114 18-38 62-64 74-120Z" fill="url(#brandFlame)"/>
+      <!-- brand/logo/glyph.svg: the building takes currentColor and the windows
+           are cut out of it, so the mark works in either theme. -->
+      <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" fill-rule="evenodd"
+              d="M3 2h18v20H3z
+                 M5 5h4v4H5z M10 5h4v4h-4z M15 5h4v4h-4z
+                 M5 11h4v4H5z M10 11h4v4h-4z M15 11h4v4h-4z
+                 M5 17h4v5H5z M10 17h4v5h-4z M15 17h4v5h-4z"/>
+        <rect x="10" y="11" width="4" height="4" fill="var(--red)"/>
       </svg>
       <span class="brand-name">Prayer Room</span>
     </header>

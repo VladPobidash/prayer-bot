@@ -1,69 +1,44 @@
-/* Prayer Room — Mini App theme.
-   Brand tokens mirror brand/README.md so the app and the marketing art match.
-   Colours are ours, not Telegram's; only the light/dark *mode* follows the
-   client (or the user's explicit choice in Settings, via [data-theme]). */
+/* Prayer Room — Mini App.
+   Implements DESIGN.md: paper, ink, one red; straight lines only; flat.
+   border-radius is 0 everywhere. Telegram's --tg-theme-* variables are not
+   used — only the light/dark mode is inherited, never the colours. */
 
 :root {
-  --radius: 16px;
-  --radius-sm: 10px;
-  --radius-pill: 999px;
-  --speed: 0.18s;
-
-  --gold: #ffc24a;
-  --gold-strong: #ff8a3d;
-  --violet: #7c5cff;
-  --grad-cta: linear-gradient(100deg, #ffd469 0%, #ff8a3d 100%);
-  --ink: #20130a;
+  --speed: 0.15s;
 }
 
-/* Dark is the brand's home ground. */
 :root,
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --bg: #0f1229;
-  --bg-tint: radial-gradient(120% 80% at 85% -10%, rgba(124, 92, 255, 0.22) 0%, rgba(124, 92, 255, 0) 60%),
-             radial-gradient(90% 60% at 0% 110%, rgba(255, 154, 60, 0.14) 0%, rgba(255, 154, 60, 0) 60%);
-  --surface: #191c3d;
-  --surface-2: #232750;
-  --text: #edebff;
-  --muted: #8e8cbe;
-  --line: rgba(255, 255, 255, 0.09);
-  --accent: #9b7bff;
-  --accent-soft: rgba(155, 123, 255, 0.16);
-  --gold-text: #ffc24a;
-  --gold-soft: rgba(255, 194, 74, 0.16);
-  --success: #48d18b;
-  --success-soft: rgba(72, 209, 139, 0.16);
-  --danger: #ff6b61;
-  --danger-soft: rgba(255, 107, 97, 0.14);
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-}
-
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg: #f5f4fb;
-  --bg-tint: radial-gradient(120% 80% at 85% -10%, rgba(124, 92, 255, 0.12) 0%, rgba(124, 92, 255, 0) 60%),
-             radial-gradient(90% 60% at 0% 110%, rgba(255, 154, 60, 0.12) 0%, rgba(255, 154, 60, 0) 60%);
-  --surface: #ffffff;
-  --surface-2: #f1effb;
-  --text: #171a38;
-  --muted: #6b6a90;
-  --line: rgba(23, 26, 56, 0.1);
-  --accent: #6244e8;
-  --accent-soft: rgba(98, 68, 232, 0.1);
-  --gold-text: #b4700a;
-  --gold-soft: rgba(255, 176, 32, 0.18);
-  --success: #12875a;
-  --success-soft: rgba(18, 135, 90, 0.12);
-  --danger: #c62f27;
-  --danger-soft: rgba(198, 47, 39, 0.1);
-  --shadow: 0 8px 24px rgba(23, 26, 56, 0.08);
+  --paper: #ffffff;
+  --paper-2: #f4f2ef;
+  --ink: #101010;
+  --ink-2: #4a4a4a;
+  --muted: #6b6b6b;
+  --rule: #dadada;
+  --red: #d0021b;
+  --on-red: #ffffff;
+  --scrim: rgba(16, 16, 16, 0.6);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #101010;
+  --paper-2: #1a1a1a;
+  --ink: #ffffff;
+  --ink-2: #c9c9c9;
+  --muted: #a3a3a3;
+  --rule: #2e2e2e;
+  --red: #ff2b3d;
+  --on-red: #101010;
+  --scrim: rgba(0, 0, 0, 0.7);
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  border-radius: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -75,188 +50,159 @@ body, #app, .card, .overlay-screen, .topic-updates, .card-title, code, span, p, 
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg);
-  background-image: var(--bg-tint);
-  background-attachment: fixed;
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   line-height: 1.45;
   overflow-x: hidden;
-  transition: background-color var(--speed) ease, color var(--speed) ease;
 }
 
 #app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-bottom: calc(84px + env(safe-area-inset-bottom, 16px));
-}
-
-/* ── Brand top bar ─────────────────────────────────────────────────────── */
-.app-topbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 16px 2px;
-}
-
-.brand-mark {
-  width: 26px;
-  height: 26px;
-  flex: none;
-}
-
-.brand-name {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-}
-
-/* ── Content & tabs ────────────────────────────────────────────────────── */
-.app-content {
-  padding: 12px 16px calc(84px + env(safe-area-inset-bottom, 16px));
-  flex: 1;
-}
-
-.tab-page { display: none; }
-
-.tab-page.active {
-  display: block;
-  animation: fadeIn var(--speed) ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 16px));
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
+/* ── Brand bar ─────────────────────────────────────────────────────────── */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand-mark {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  color: var(--ink);
+}
+
+.brand-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3.4px;
+  text-transform: uppercase;
+}
+
+/* ── Content & tabs ────────────────────────────────────────────────────── */
+.app-content {
+  padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 16px));
+  flex: 1;
+}
+
+.tab-page { display: none; }
+.tab-page.active { display: block; }
+
 .section-title, .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .section-title h2, .section-header h2 {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
 }
 
 .header-actions { display: flex; gap: 8px; }
 
 /* ── Today banner ──────────────────────────────────────────────────────── */
 .today-banner-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  background: var(--paper);
+  border: 1px solid var(--rule);
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-.today-banner-card::after {
-  /* the warm glow from the marketing art */
-  content: '';
-  position: absolute;
-  inset: -40% -30% auto auto;
-  width: 190px;
-  height: 190px;
-  background: radial-gradient(circle, rgba(255, 194, 74, 0.25) 0%, rgba(255, 194, 74, 0) 70%);
-  pointer-events: none;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .banner-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 .banner-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
 }
 
 .banner-subtitle {
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
   color: var(--muted);
   display: inline-block;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .progress-pill {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 5px 11px;
-  border-radius: var(--radius-pill);
-  background: var(--gold-soft);
-  color: var(--gold-text);
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border: 1px solid var(--rule);
+  color: var(--muted);
   white-space: nowrap;
 }
 
 .progress-bar-container {
   width: 100%;
   height: 8px;
-  background: var(--surface-2);
-  border-radius: var(--radius-pill);
-  overflow: hidden;
+  background: var(--paper-2);
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: var(--grad-cta);
-  border-radius: var(--radius-pill);
-  transition: width 0.4s ease;
+  background: var(--red);
+  transition: width 0.3s ease-out;
 }
 
-/* ── Daily streak line ─────────────────────────────────────────────────── */
-/* Lit days are the brand gold, exactly like the streak strip in the
-   marketing art; the pending day is a hollow outline. */
+/* ── Daily streak ──────────────────────────────────────────────────────── */
 .streak-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
 }
 
 .streak-headline {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
 }
 
-.streak-flame {
-  font-size: 17px;
-  line-height: 1;
-}
-
-.streak-flame.cold {
-  filter: grayscale(1);
-  opacity: 0.45;
-}
+/* The emoji is decorative; the number and the label carry the meaning. */
+.streak-flame { display: none; }
 
 .streak-count {
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 800;
-  color: var(--gold-text);
+  color: var(--ink);
 }
 
 .streak-label {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -271,14 +217,13 @@ body {
 
 .streak-week {
   display: flex;
-  gap: 5px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
 .streak-dot {
   width: 22px;
   height: 22px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,47 +231,48 @@ body {
   font-weight: 700;
   color: var(--muted);
   background: transparent;
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--rule);
 }
 
 .streak-dot.on {
-  background: var(--grad-cta);
-  border-color: transparent;
-  color: var(--ink);
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--on-red);
 }
 
 .streak-dot.today {
-  box-shadow: 0 0 0 2px var(--accent);
+  outline: 2px solid var(--ink);
+  outline-offset: -1px;
 }
 
 /* ── Today cards ───────────────────────────────────────────────────────── */
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The 4px rail is the primary signal of a card's kind; the badge repeats it
+   in words so nothing depends on colour alone. */
 .today-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 16px 16px 16px 20px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--ink);
 }
 
-/* Accent rail: gold = shared focus, violet = personal request. Same language
-   as the badges, so the card type is readable without reading the badge. */
-.today-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--accent);
-}
+.today-card:has(.badge-personal) { border-left-color: var(--red); }
 
-.today-card:has(.badge-shared)::before { background: linear-gradient(180deg, #ffd469, #ff8a3d); }
-.today-card:has(.badge-personal)::before { background: var(--accent); }
+/* Red is a budget: only the first pending action on the screen is filled;
+   the ones below it are outlined so the eye still has one place to land. */
+.today-card ~ .today-card .btn-pray {
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--ink);
+}
 
 .today-card-header {
   display: flex;
@@ -338,9 +284,11 @@ body {
 .room-tag {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  font-weight: 600;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
   color: var(--muted);
   min-width: 0;
 }
@@ -351,46 +299,38 @@ body {
   font-size: 17px;
   font-weight: 600;
   line-height: 1.4;
-  margin: 2px 0;
   overflow-wrap: anywhere;
 }
 
 .latest-update-box {
-  background: var(--surface-2);
-  border-left: 3px solid var(--accent);
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  border-left: 3px solid var(--rule);
+  padding: 10px 12px;
   font-size: 13px;
 }
 
 .prayed-done-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--success-soft);
-  color: var(--success);
-  font-size: 13px;
+  gap: 8px;
+  padding: 10px 0;
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-top: 1px solid var(--rule);
+  width: 100%;
 }
 
 /* ── Cards & lists ─────────────────────────────────────────────────────── */
-.cards-list {
+.card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .card-header {
@@ -413,37 +353,41 @@ body {
 
 .badge {
   display: inline-block;
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid var(--rule);
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 1.4px;
   text-transform: uppercase;
+  color: var(--muted);
   white-space: nowrap;
 }
 
-.badge-admin { background: var(--gold-soft); color: var(--gold-text); }
-.badge-member { background: var(--accent-soft); color: var(--accent); }
-.badge-shared { background: var(--gold-soft); color: var(--gold-text); }
-.badge-personal { background: var(--accent-soft); color: var(--accent); }
-.badge-answered { background: var(--success-soft); color: var(--success); }
+.badge-personal, .badge-admin {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.badge-answered {
+  border-color: var(--ink);
+  color: var(--ink);
+}
 
 /* ── Updates / answered notes ──────────────────────────────────────────── */
 .topic-updates {
-  background: var(--surface-2);
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  padding: 12px;
   font-size: 13px;
-  margin-top: 6px;
 }
 
 .topic-updates.answered {
-  background: var(--success-soft);
+  background: transparent;
+  border: 1px solid var(--ink);
 }
 
 .update-item {
-  border-bottom: 1px solid var(--line);
-  padding: 4px 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 6px 0;
 }
 
 .update-item:last-child { border-bottom: none; }
@@ -451,55 +395,58 @@ body {
 /* ── Buttons & inputs ──────────────────────────────────────────────────── */
 .btn {
   border: 1px solid transparent;
-  border-radius: var(--radius-pill);
-  padding: 11px 18px;
-  font-size: 14px;
+  padding: 12px 20px;
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 44px; /* touch target */
-  transition: transform var(--speed) ease, opacity var(--speed) ease;
+  gap: 8px;
+  min-height: 48px;
+  transition: opacity var(--speed) ease-out;
 }
 
-.btn:active { transform: scale(0.98); opacity: 0.85; }
+.btn:active { opacity: 0.75; }
 
 .btn:focus-visible,
 .nav-item:focus-visible,
 .btn-icon:focus-visible,
 .segmented button:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
 
 .btn-primary {
-  background: var(--grad-cta);
-  color: var(--ink);
-  box-shadow: 0 6px 16px rgba(255, 138, 61, 0.28);
+  background: var(--red);
+  color: var(--on-red);
 }
 
 .btn-secondary {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .btn-outline {
   background: transparent;
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--rule);
+  color: var(--ink);
 }
 
 .btn-danger {
-  background: var(--danger-soft);
-  color: var(--danger);
+  background: transparent;
+  border-color: var(--red);
+  color: var(--red);
 }
 
 .btn-sm {
-  padding: 7px 14px;
-  font-size: 13px;
-  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 11px;
+  min-height: 44px;
 }
 
 .btn-block { width: 100%; }
@@ -507,120 +454,135 @@ body {
 .btn-icon {
   background: none;
   border: none;
-  font-size: 15px;
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
   cursor: pointer;
-  color: var(--accent);
+  color: var(--ink);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   min-height: 44px;
   padding: 0 4px;
 }
 
 /* ── Settings ──────────────────────────────────────────────────────────── */
-.settings-card { gap: 18px; }
+.settings-card { gap: 24px; }
 
 .setting-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
 }
 
 .setting-item.stacked {
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
+  gap: 12px;
 }
 
 .setting-label {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
+  font-weight: 600;
 }
 
 .setting-desc {
   font-size: 12px;
+  font-weight: 400;
   color: var(--muted);
 }
 
 .toggle-switch {
-  width: 46px;
+  width: 48px;
   height: 28px;
   flex: none;
   appearance: none;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
   position: relative;
   outline: none;
   cursor: pointer;
-  transition: background var(--speed);
+  transition: background var(--speed) ease-out;
 }
 
-.toggle-switch:checked { background: var(--grad-cta); border-color: transparent; }
+.toggle-switch:checked {
+  background: var(--red);
+  border-color: var(--red);
+}
 
 .toggle-switch::after {
   content: '';
   width: 22px;
   height: 22px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  background: var(--ink);
   position: absolute;
   top: 2px;
   left: 2px;
-  transition: transform var(--speed);
+  transition: transform var(--speed) ease-out;
 }
 
-.toggle-switch:checked::after { transform: translateX(18px); }
+.toggle-switch:checked::after {
+  background: var(--on-red);
+  transform: translateX(20px);
+}
 
 .input-time, .input-text, .input-select {
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--line);
-  background: var(--surface-2);
-  color: var(--text);
-  font-size: 15px; /* >=16px-ish avoids iOS zoom-on-focus jitter */
+  padding: 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  color: var(--ink);
+  font-size: 15px;
   font-family: inherit;
-  min-height: 44px;
+  min-height: 48px;
 }
+
+/* The select keeps its native arrow — without it there is no affordance, and a
+   custom caret cannot follow the theme's ink colour from a background image. */
+.input-select { padding-right: 8px; }
 
 .input-text { width: 100%; }
 
-.input-time:disabled, .input-select:disabled { opacity: 0.5; }
+.input-time:focus, .input-text:focus, .input-select:focus {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
 
-/* Segmented control (theme picker) */
+.input-time:disabled, .input-select:disabled { opacity: 0.45; }
+
 .segmented {
   display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  border: 1px solid var(--rule);
 }
 
 .segmented button {
   flex: 1;
   border: none;
+  border-right: 1px solid var(--rule);
   background: transparent;
   color: var(--muted);
   font: inherit;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 9px 6px;
-  min-height: 40px;
-  border-radius: var(--radius-pill);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 12px 6px;
+  min-height: 48px;
   cursor: pointer;
-  transition: background var(--speed), color var(--speed);
+  transition: background var(--speed) ease-out;
 }
 
+.segmented button:last-child { border-right: none; }
+
 .segmented button[aria-pressed='true'] {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 /* ── Bottom navigation ─────────────────────────────────────────────────── */
@@ -631,30 +593,32 @@ body {
   right: 0;
   height: calc(64px + env(safe-area-inset-bottom, 8px));
   padding-bottom: env(safe-area-inset-bottom, 8px);
-  background: var(--surface);
-  border-top: 1px solid var(--line);
+  background: var(--paper);
+  border-top: 1px solid var(--rule);
   display: flex;
-  align-items: center;
-  justify-content: space-around;
+  align-items: stretch;
   z-index: 100;
 }
 
 .nav-item {
   background: none;
   border: none;
+  border-top: 3px solid transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  justify-content: center;
+  gap: 4px;
   color: var(--muted);
   cursor: pointer;
   flex: 1;
-  min-height: 56px;
-  justify-content: center;
   font-family: inherit;
 }
 
-.nav-item.active { color: var(--accent); }
+.nav-item.active {
+  color: var(--ink);
+  border-top-color: var(--red);
+}
 
 .nav-icon {
   display: flex;
@@ -664,39 +628,43 @@ body {
   height: 24px;
 }
 
-.nav-label { font-size: 11px; font-weight: 600; }
+.nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 
 /* ── Overlay & modals ──────────────────────────────────────────────────── */
 .overlay-screen {
   position: fixed;
   inset: 0;
-  background: var(--bg);
-  background-image: var(--bg-tint);
+  background: var(--paper);
   z-index: 200;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding-bottom: calc(90px + env(safe-area-inset-bottom, 16px));
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 16px));
 }
 
 .overlay-screen.hidden, .modal-backdrop.hidden, .hidden { display: none !important; }
 
 .overlay-header {
-  background: var(--surface);
+  background: var(--paper);
   padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  border-bottom: 1px solid var(--line);
+  gap: 12px;
+  border-bottom: 1px solid var(--rule);
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
 .overlay-header h2 {
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   text-align: center;
   flex: 1;
   min-width: 0;
@@ -709,7 +677,7 @@ body {
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
 .room-actions-bar {
@@ -721,7 +689,7 @@ body {
 .room-summary-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .summary-header {
@@ -735,39 +703,44 @@ body {
 .admin-profile {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 14px;
 }
 
 .admin-profile .label, .invite-code-box .label {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
 }
 
 .invite-strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
 }
 
-.invite-code-box { display: flex; align-items: center; gap: 6px; }
-.invite-buttons { display: flex; gap: 6px; }
+.invite-code-box { display: flex; align-items: center; gap: 8px; }
+.invite-buttons { display: flex; gap: 8px; }
 
 .topics-section h3 {
   font-size: 16px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--ink);
 }
 
 .section-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .section-title-row h3 { margin-bottom: 0; }
@@ -775,10 +748,9 @@ body {
 .members-grid {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
   max-height: 400px;
   overflow-y: auto;
-  padding-right: 4px;
 }
 
 .member-item {
@@ -786,17 +758,17 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 10px 12px;
-  background: var(--surface-2);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+  padding: 12px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
 }
+
+.member-item:last-child { border-bottom: none; }
 
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(9, 11, 28, 0.55);
-  backdrop-filter: blur(2px);
+  background: var(--scrim);
   z-index: 300;
   display: flex;
   align-items: center;
@@ -805,16 +777,14 @@ body {
 }
 
 .modal-card {
-  background: var(--surface);
+  background: var(--paper);
   width: 100%;
   max-width: 420px;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  padding: 18px;
+  border: 1px solid var(--rule);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  gap: 16px;
 }
 
 .modal-header {
@@ -822,51 +792,61 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--ink);
 }
 
-.modal-header h3 { font-size: 17px; font-weight: 700; }
+.modal-header h3 { font-size: 16px; font-weight: 800; }
 
 .modal-field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-.modal-label { font-size: 13px; color: var(--muted); }
+.modal-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 
 .modal-check {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 14px;
   cursor: pointer;
 }
 
-.modal-check input { width: 20px; height: 20px; accent-color: var(--accent); }
+.modal-check input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--red);
+}
 
 .copyable {
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  padding: 4px 8px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px;
+  font-size: 14px;
+  letter-spacing: 1px;
 }
 
 /* ── States ────────────────────────────────────────────────────────────── */
 .loading-state, .empty-state {
   text-align: center;
-  padding: 28px 20px;
+  padding: 32px 20px;
   color: var(--muted);
   font-size: 14px;
-  background: var(--surface);
-  border: 1px dashed var(--line);
-  border-radius: var(--radius);
+  border: 1px dashed var(--rule);
 }
 
 .empty-state strong {
   display: block;
-  color: var(--text);
+  color: var(--ink);
   font-size: 16px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }

@@ -96,12 +96,14 @@ not introduce an external cache (Redis, etc.) without an ADR.
 
 ### Mini App theming: brand tokens behind `[data-theme]`
 
-`public/style.css` defines the Prayer Room palette (`--gold`, `--violet`,
-`--grad-cta`, `--surface`, …) twice: once under `:root, :root[data-theme='dark']`
-and once under `:root[data-theme='light']`. The tokens mirror `brand/README.md`,
-so the app and the marketing artwork stay in step; Telegram's own
-`--tg-theme-*` variables are deliberately **not** used — only the light/dark
-*mode* follows the client.
+`public/style.css` implements [DESIGN.md](DESIGN.md): paper, ink and one red,
+straight lines only (`border-radius: 0` is the sole value), flat — no gradient,
+shadow or blur. The tokens (`--paper`, `--paper-2`, `--ink`, `--ink-2`,
+`--muted`, `--rule`, `--red`, `--on-red`) are declared twice: once under
+`:root, :root[data-theme='light']` and once under `:root[data-theme='dark']`.
+Telegram's own `--tg-theme-*` variables are deliberately **not** used — only the
+light/dark *mode* follows the client, never the colours. Read DESIGN.md before
+adding UI; it carries the component rules and the pre-ship checklist.
 
 The mode lives in `users.theme` (`'auto' | 'light' | 'dark'`, `'auto'` = follow
 the Telegram client, then the OS) and is exposed through `GET /api/me` and
