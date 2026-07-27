@@ -94,6 +94,24 @@ timestamps) goes in SQLite via `src/db/repo.ts`. Ephemeral state (in-flight
 variables, module-local caches) may be held in plain JavaScript variables. Do
 not introduce an external cache (Redis, etc.) without an ADR.
 
+### Mini App theming: brand tokens behind `[data-theme]`
+
+`public/style.css` implements [DESIGN.md](DESIGN.md): paper, ink and one red,
+straight lines only (`border-radius: 0` is the sole value), flat — no gradient,
+shadow or blur. The tokens (`--paper`, `--paper-2`, `--ink`, `--ink-2`,
+`--muted`, `--rule`, `--red`, `--on-red`) are declared twice: once under
+`:root, :root[data-theme='light']` and once under `:root[data-theme='dark']`.
+Telegram's own `--tg-theme-*` variables are deliberately **not** used — only the
+light/dark *mode* follows the client, never the colours. Read DESIGN.md before
+adding UI; it carries the component rules and the pre-ship checklist.
+
+The mode lives in `users.theme` (`'auto' | 'light' | 'dark'`, `'auto'` = follow
+the Telegram client, then the OS) and is exposed through `GET /api/me` and
+`PUT /api/me/settings`. An inline script in `public/index.html` resolves the
+theme from `localStorage` before first paint so the app never flashes the wrong
+one; `app.js` re-applies the server value once it loads. When adding UI, use the
+tokens — no raw hex, no `rgba(0,0,0,…)` overlays, since those break in light mode.
+
 ### Erasable-only TypeScript + `.ts` import extensions
 
 `tsconfig.json` sets `erasableSyntaxOnly: true` and

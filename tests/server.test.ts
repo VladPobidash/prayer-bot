@@ -22,7 +22,7 @@ test('GET /health, static assets, and authenticated API endpoints', async () => 
   const htmlRes = await fetch(`${baseUrl}/`);
   assert.equal(htmlRes.status, 200);
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('Prayer Bot App'));
+  assert.ok(htmlText.includes('Prayer Room'));
 
   // 3. API Unauthorized without token
   const unauthRes = await fetch(`${baseUrl}/api/me`);

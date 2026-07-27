@@ -156,6 +156,7 @@ export function startHealthServer(port: number = config.port): Server {
               reminderTime: userPrefs?.reminderTime ?? '09:00',
               reminderEnabled: userPrefs?.reminderEnabled ?? true,
               locale: userPrefs?.locale ?? config.defaultLocale,
+              theme: userPrefs?.theme ?? 'auto',
             },
             locales: LOCALES,
             todayAssignments,
@@ -203,7 +204,7 @@ export function startHealthServer(port: number = config.port): Server {
 
         // PUT /api/me/reminder or PUT /api/me/settings
         if (method === 'PUT' && (path === '/api/me/reminder' || path === '/api/me/settings')) {
-          const body = await parseJsonBody<{ enabled?: boolean; time?: string; locale?: string }>(req);
+          const body = await parseJsonBody<{ enabled?: boolean; time?: string; locale?: string; theme?: string }>(req);
           if (typeof body.enabled === 'boolean') {
             repo.setReminderEnabled(userId, body.enabled);
           }
@@ -212,6 +213,9 @@ export function startHealthServer(port: number = config.port): Server {
           }
           if (typeof body.locale === 'string' && ['uk', 'en', 'ru'].includes(body.locale)) {
             repo.setUserLocale(userId, body.locale);
+          }
+          if (typeof body.theme === 'string' && ['auto', 'light', 'dark'].includes(body.theme)) {
+            repo.setUserTheme(userId, body.theme);
           }
           return sendJson(res, 200, { ok: true });
         }

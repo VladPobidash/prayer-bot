@@ -23,6 +23,10 @@ A building at night with one window lit: many rooms, and yours is the one that
 is on. It carries the plural in the product's name without drawing a single
 person, and it survives Telegram's circular avatar crop and a 20px chat list.
 
+The Mini App carries the same tokens in `public/style.css` (`--paper`, `--ink`,
+`--red`, …) with a light and a dark set behind `[data-theme]`. Change a brand
+colour here and there.
+
 ## Regenerating the PNGs
 
 ```bash
