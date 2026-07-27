@@ -86,7 +86,8 @@ flat, no gradient — per [DESIGN.md](../DESIGN.md).
 | **A — Praying hands** | Black hands on a red square, white ground | The most literal statement of what the bot is for. The red field makes it the loudest of the four in a chat list. |
 | **B — Candle** | Black candle, red flame, white ground | Warm and unmistakable; the flame is the only red. Reads well at every size. |
 | **C — Open book** | Black open book, red ribbon, white ground | "We pray through Scripture" without a word of it. The calmest option. |
-| **D — Open palm** | White palm carrying a red flame, on black | The product in one picture: someone else is holding your request today. The only dark option — stands out in a light chat list. |
+| **D — Open palm** | White palm carrying a flame, on black | The product in one picture: someone else is holding your request today. The only dark option — stands out in a light chat list. |
+| **D2 — Open palm, flat** | The same, flame in two flat tones | Identical silhouette without the gradient. Pick this if the brand should stay strictly flat. |
 
 ---
 

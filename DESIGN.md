@@ -151,11 +151,19 @@ and says nothing about the product. Curves are allowed here, and only here.
 | `mark-b-candle.svg` | A lit candle: black body, red flame, white ground |
 | `mark-c-book.svg` | An open book with a red ribbon |
 | `mark-d-open-palm.svg` | An open palm carrying a flame, white on black |
+| `mark-d2-open-palm-flat.svg` | The same palm, flame in two flat tones instead of a gradient |
+
+**Fire has a second palette.** A flame drawn in a single red is a drop of blood,
+not fire, so a mark that shows one may use warm secondaries — amber `#FFB100`,
+ember `#FF7A00`, highlight `#FFE071` — as a core inside the red, or as a vertical
+gradient. This applies to the mark only. **The interface stays three flat
+colours**; none of these values may appear in `public/style.css`.
 
 Rules for any future mark:
 
 - one recognisable object, no compositions of two ideas;
-- ink + one red + the ground colour, flat fills, no gradient or stroke effects;
+- ink + red + the ground colour, plus the warm secondaries above when the object
+  is a flame; no strokes, no shadows, no texture;
 - silhouette-first: it must survive as a 20px single-colour shape, so no detail
   thinner than ~8px at 512;
 - everything inside a 400px circle of the 512px canvas — Telegram crops avatars

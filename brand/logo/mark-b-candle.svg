@@ -1,16 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <!-- B — Candle. A real object: black candle, red flame, nothing else.
-       The one lit thing on the page. -->
+  <!-- B — Candle. Black candle, real flame: asymmetric outline, curled tip,
+       amber core. White ground. -->
   <rect width="512" height="512" fill="#FFFFFF"/>
 
-  <!-- flame -->
-  <path d="M256 112 C 270 148 292 166 292 198 C 292 228 276 248 256 248 C 236 248 220 228 220 198 C 220 166 242 148 256 112 Z" fill="#D0021B"/>
+  <path d="M259 104
+           C 278 142 292 166 294 192
+           C 297 220 283 250 258 254
+           C 249 255 241 255 235 252
+           C 214 243 207 215 213 190
+           C 217 173 228 164 236 149
+           C 245 133 252 119 259 104 Z" fill="#D0021B"/>
+  <path d="M259 168
+           C 272 190 279 203 279 218
+           C 279 237 270 248 257 248
+           C 244 248 237 237 238 220
+           C 239 203 250 187 259 168 Z" fill="#FFB100"/>
 
   <g fill="#101010">
     <!-- wick -->
-    <rect x="251" y="246" width="10" height="30"/>
+    <rect x="251" y="250" width="10" height="30"/>
     <!-- body, with a slightly melted top edge -->
-    <path d="M220 286 C 232 274 248 274 256 278 C 264 282 282 276 292 286 L 292 386 L 220 386 Z"/>
+    <path d="M220 290 C 232 278 248 278 256 282 C 264 286 282 280 292 290 L 292 386 L 220 386 Z"/>
     <!-- base -->
     <rect x="188" y="386" width="136" height="24"/>
   </g>
