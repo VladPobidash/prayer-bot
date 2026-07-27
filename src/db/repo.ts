@@ -199,6 +199,10 @@ export function getUserPrefs(telegramId: number): UserPrefs | null {
 export function setUserLocale(telegramId: number, locale: string): void {
   getDb().prepare(`UPDATE users SET locale = ? WHERE telegram_id = ?`).run(locale, telegramId);
 }
+/** An IANA zone reported by the Mini App; validated before it gets here. */
+export function setUserTimezone(telegramId: number, timezone: string): void {
+  getDb().prepare(`UPDATE users SET timezone = ? WHERE telegram_id = ?`).run(timezone, telegramId);
+}
 /** theme is 'auto' | 'light' | 'dark'; 'auto' follows the Telegram client. */
 export function setUserTheme(telegramId: number, theme: string): void {
   getDb().prepare(`UPDATE users SET theme = ? WHERE telegram_id = ?`).run(theme, telegramId);
@@ -210,10 +214,11 @@ export function setReminderEnabled(telegramId: number, enabled: boolean): void {
   getDb().prepare(`UPDATE users SET reminder_enabled = ? WHERE telegram_id = ?`).run(enabled ? 1 : 0, telegramId);
 }
 // Users who should get a reminder today: a time set and reminders enabled.
-export function listReminderRecipients(): { telegramId: number; reminderTime: string }[] {
+export function listReminderRecipients(): { telegramId: number; reminderTime: string; timezone: string | null }[] {
   return (getDb().prepare(
-    `SELECT telegram_id, reminder_time FROM users WHERE reminder_time IS NOT NULL AND reminder_enabled = 1`,
-  ).all() as { telegram_id: number; reminder_time: string }[]).map((r) => ({ telegramId: r.telegram_id, reminderTime: r.reminder_time }));
+    `SELECT telegram_id, reminder_time, timezone FROM users WHERE reminder_time IS NOT NULL AND reminder_enabled = 1`,
+  ).all() as { telegram_id: number; reminder_time: string; timezone: string | null }[])
+    .map((r) => ({ telegramId: r.telegram_id, reminderTime: r.reminder_time, timezone: r.timezone }));
 }
 
 export interface Assignment { date: string; roomId: number; telegramId: number; sharedTopicId: number | null; personalTopicId: number | null; }

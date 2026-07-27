@@ -5,7 +5,7 @@ import { t, resolveLocale } from './i18n.ts';
 import * as rooms from './rooms.ts';
 import * as repo from './db/repo.ts';
 import { mainMenu, roomsList, renderRoomView, confirmKb, ownTopicsKb, errorText } from './ui.ts';
-import { localDate } from './assignments.ts';
+import { userToday } from './timezone.ts';
 import { getStreakSummary } from './streak.ts';
 
 // Pending multi-step input, keyed by user id (chat.id === user.id in DMs).
@@ -32,7 +32,8 @@ export function createBot(token: string = config.telegramBotToken): Telegraf {
 
   const loc = (ctx: Context) => resolveLocale(ctx);
   const uid = (ctx: Context): number => ctx.from?.id ?? 0;
-  const todayLocal = () => localDate(new Date(), config.tz);
+  // Day boundaries follow the user, not the server (see src/timezone.ts).
+  const todayLocal = (ctx: Context) => userToday(uid(ctx));
 
   async function showMenu(ctx: Context) {
     repo.upsertUser(uid(ctx), ctx.from?.first_name ?? null);
@@ -104,10 +105,10 @@ export function createBot(token: string = config.telegramBotToken): Telegraf {
       if (ns === 'pray' && action === 'done') {
         const topic = repo.getTopic(id);
         if (!topic) return void (await ctx.reply(t(loc(ctx), 'stale_button')));
-        if (repo.hasPrayed(uid(ctx), topic.id, todayLocal())) return void (await ctx.reply(t(loc(ctx), 'prayed_already')));
-        repo.recordPrayer(uid(ctx), topic.roomId, topic.id, todayLocal());
+        if (repo.hasPrayed(uid(ctx), topic.id, todayLocal(ctx))) return void (await ctx.reply(t(loc(ctx), 'prayed_already')));
+        repo.recordPrayer(uid(ctx), topic.roomId, topic.id, todayLocal(ctx));
         // Read the streak after recording: today now counts towards it.
-        const streak = getStreakSummary(uid(ctx), todayLocal());
+        const streak = getStreakSummary(uid(ctx), todayLocal(ctx));
         const ack = `${t(loc(ctx), 'prayed_ack')}\n${t(loc(ctx), 'streak_kept', { n: streak.current })}`;
         return void (await ctx.reply(ack));
       }

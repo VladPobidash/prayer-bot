@@ -1,6 +1,7 @@
 import * as repo from './db/repo.ts';
 import * as rooms from './rooms.ts';
-import { localDate, dayNumber } from './assignments.ts';
+import { dayNumber } from './assignments.ts';
+import { userToday } from './timezone.ts';
 import { t } from './i18n.ts';
 import config from './config.ts';
 import { LOG_PREFIX } from './preferences.ts';
@@ -27,10 +28,12 @@ export type NotifyFn = (chatId: number, text: string) => Promise<void>;
 
 // Daily sweep: recompute each plain member's miss-streak from prayer_log
 // (wall-clock derived — idempotent + catch-up safe), warn at 2, remove at 5.
-export async function evaluateAccountability(now: Date, tz: string, notify: NotifyFn): Promise<void> {
-  const today = localDate(now, tz);
+export async function evaluateAccountability(now: Date, notify: NotifyFn): Promise<void> {
   const locale = config.defaultLocale;
   for (const m of repo.listEvaluableMemberships()) {
+    // "Today" is the member's own local day: a sweep at a fixed server hour
+    // must not cut someone's day short because they live further east.
+    const today = userToday(m.telegramId, now);
     const room = repo.getRoom(m.roomId);
     if (!room) continue;
     if (!repo.hasPrayableTopicForMember(m.roomId, m.telegramId)) {

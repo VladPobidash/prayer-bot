@@ -110,8 +110,22 @@ From the main menu, tap **⏰ Reminder time**. The bot will ask you to send a
 time in `HH:MM` format (24-hour clock, e.g. `08:00`). Send `off` to disable
 reminders.
 
-The reminder uses the single server timezone configured with `TZ` (UTC by
-default). All members' reminder times are interpreted in that timezone.
+### Timezones
+
+Your reminder time — and every day boundary that follows from it: "today's"
+topics, the **Prayed today** confirmation, and your streak — is resolved in
+**your own timezone**. There is no server-wide setting, and nothing needs to be
+configured by the operator.
+
+The zone comes from the device: the Mini App reads it
+(`Intl.DateTimeFormat().resolvedOptions().timeZone`) and reports it to the bot
+every time you open the app, so it also follows you when you travel or move.
+
+**Open the Mini App once** — via the menu button next to the input field, or the
+**Prayer App** button under `/start`. Until you do, the bot has no way to learn
+your zone and falls back to UTC; Telegram itself never sends it. Members of the
+same room may live in different zones, and each one's day starts and ends on
+their own clock.
 
 ### Receiving reminder messages
 
@@ -136,8 +150,8 @@ automatically — you will still receive your reminders.
 
 ### Gentle accountability
 
-The bot evaluates active non-admin members once each day in the configured
-server timezone. It counts completed local calendar days without a recorded
+The bot sweeps active non-admin members every hour, and for each one it counts
+completed calendar days **in that member's own timezone** without a recorded
 **Prayed today** confirmation for that room:
 
 - After **two** consecutive missed days, the member receives a private warning.

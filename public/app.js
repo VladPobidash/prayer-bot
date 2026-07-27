@@ -239,6 +239,20 @@
     await loadToday();
   }
 
+  // The device's IANA zone is the only place a user's timezone can come from —
+  // Telegram never sends one. Reported on every start; the server ignores it
+  // when it hasn't changed in effect, and every day boundary is derived from it.
+  function reportTimezone(known) {
+    let tz = null;
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
+    if (!tz || tz === known) return;
+    apiRequest('/api/me/settings', {
+      method: 'PUT',
+      body: JSON.stringify({ timezone: tz }),
+      silent: true,
+    }).catch(() => {});
+  }
+
   async function loadUser() {
     try {
       const data = await apiRequest('/api/me');
@@ -248,6 +262,7 @@
         currentLocale = me.locale;
       }
       if (me?.theme) applyTheme(me.theme, false);
+      reportTimezone(me?.timezone);
       applyLanguage(currentLocale);
     } catch (e) {}
   }

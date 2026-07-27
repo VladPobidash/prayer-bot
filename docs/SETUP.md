@@ -69,7 +69,6 @@ wiped every time the bot restarts or redeploys.
 | `DB_PATH` | `/data/prayer-bot.db` | Yes |
 | `WEBAPP_URL` | Public HTTPS domain URL of your deployment (e.g. `https://your-service.railway.app`) | Recommended |
 | `DEFAULT_LOCALE` | `uk`, `en`, or `ru` (defaults to `uk`) | No |
-| `TZ` | Your timezone, e.g. `Europe/Kyiv` (defaults to `UTC`) | No |
 | `ADMIN_USER_IDS` | Reserved legacy setting; it is not needed for prayer-room administration | No |
 
 3. After saving, Railway will restart the service with the new variables.
@@ -104,5 +103,5 @@ available commands.
 |---|---|
 | Bot does not respond to messages | Double-check `TELEGRAM_BOT_TOKEN` — make sure you copied the full token from BotFather with no extra spaces. |
 | Data disappears after every redeploy | The Volume is missing or `DB_PATH` is not set to `/data/prayer-bot.db`. Repeat Step 3 and Step 4. |
-| Reminders fire at the wrong time | Set the `TZ` variable to your group's IANA timezone, e.g. `Europe/Kyiv` or `America/New_York`, then restart the service. |
+| Reminders fire at the wrong time | Timezones are per person and there is no server setting. Open the Mini App once on the device you actually use — it reports that device's timezone and every later reminder, day boundary and streak follows it. Until then the bot assumes UTC. |
 | Health endpoint returns an error | Check the **Deployments** tab in Railway for build or startup errors. The most common cause is a missing required variable. |

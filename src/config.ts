@@ -8,7 +8,6 @@ export interface Config {
   botUsername: string;
   dbPath: string;
   port: number;
-  tz: string;
   defaultLocale: Locale;
   adminUserIds: Set<number>;
   adminChatId: number | null;
@@ -51,7 +50,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     botUsername,
     dbPath: read(env.DB_PATH) ?? './data/prayer-bot.db',
     port,
-    tz: read(env.TZ) ?? 'UTC',
     defaultLocale,
     adminUserIds,
     adminChatId: adminChatStr !== undefined ? Number(adminChatStr) : null,

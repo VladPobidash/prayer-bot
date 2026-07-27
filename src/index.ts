@@ -41,7 +41,7 @@ reconcileOnBoot();
 registerSchedules({ send, notify });
 // Catch-up: a redeploy may have crossed the daily 09:00 tick. The sweep is
 // wall-clock derived and warn-once guarded, so running it again is safe.
-evaluateAccountability(new Date(), config.tz, notify).catch((err) => {
+evaluateAccountability(new Date(), notify).catch((err) => {
   console.error(`${LOG_PREFIX.scheduler} boot accountability catch-up failed:`, err);
 });
 
