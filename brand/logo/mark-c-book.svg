@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- C — Open book with a red ribbon. Says "we pray through Scripture"
+       without a single word of it. -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+
+  <g fill="#101010">
+    <path d="M256 208 C 218 182 172 172 122 178 L 122 322 C 172 316 218 326 256 352 Z"/>
+    <path d="M256 208 C 294 182 340 172 390 178 L 390 322 C 340 316 294 326 256 352 Z"/>
+  </g>
+  <rect x="250" y="200" width="12" height="152" fill="#FFFFFF"/>
+
+  <!-- ribbon -->
+  <path d="M240 300 L 274 300 L 274 402 L 257 380 L 240 402 Z" fill="#D0021B"/>
+</svg>

@@ -8,7 +8,7 @@ imported by the runtime; this folder is design source + generated PNGs.
 | [botfather.md](botfather.md) | Ready-to-paste Name / About / Description / Commands / Privacy Policy |
 | [invite/invite-uk.md](invite/invite-uk.md) | Ukrainian invite message for a real group + the infographics that go with it |
 | [../DESIGN.md](../DESIGN.md) | The design system: principles, tokens, components, checklist |
-| `logo/*.svg` | Four botpic concepts, 512×512 source |
+| `logo/*.svg` | Four botpic concepts, 512×512 source — one real object each; curves are allowed in the mark, never in the interface |
 | `invite/*.svg` | 1280×720 how-it-works infographics |
 | `description-picture-{uk,en}.svg` | 640×360 "What can this bot do?" banner source |
 | `render/*.png` | Generated, pixel-exact uploads for BotFather |

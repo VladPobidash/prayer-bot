@@ -8,8 +8,11 @@ file, the file wins.
 
 ## 1. Principles
 
-1. **Straight lines only.** No border radius anywhere — buttons, cards, inputs,
-   avatars, badges, dots. `border-radius: 0` is the default and the only value.
+1. **Straight lines only — in the interface.** No border radius anywhere in the
+   app or the layout of an asset: buttons, cards, inputs, avatars, badges, dots.
+   `border-radius: 0` is the default and the only value. **The logo is the one
+   exception**: a mark has to depict a real object, and objects have curves. See
+   §7.
 2. **Three colours.** Paper, ink, and one red. No blue, no gold, no green
    "success" tint, no purple. Meaning comes from position, weight and rules —
    not from a fifth hue.
@@ -138,18 +141,26 @@ respect `prefers-reduced-motion: reduce` by dropping to no transition.
 
 ## 7. The marks
 
-Four candidates live in `brand/logo/`, all built from rectangles only:
+Four candidates live in `brand/logo/`. Unlike the interface, a mark **shows a
+real thing** — an abstract composition of rectangles is unreadable as an avatar
+and says nothing about the product. Curves are allowed here, and only here.
 
-| File | Idea |
-|------|------|
-| `mark-a-frame.svg` | An open square — the room — with a red block inside it: a person held by the group |
-| `mark-b-week.svg` | Seven bars, today in red: the habit, one day at a time |
-| `mark-c-window.svg` | A red field split by two white gaps: a window, at its most reduced |
-| `mark-d-candle.svg` | A red square over a straight stem, on black: the old flame with every curve removed |
+| File | Object |
+|------|--------|
+| `mark-a-hands.svg` | Praying hands, ink on a red field |
+| `mark-b-candle.svg` | A lit candle: black body, red flame, white ground |
+| `mark-c-book.svg` | An open book with a red ribbon |
+| `mark-d-open-palm.svg` | An open palm carrying a flame, white on black |
 
-Rules for any future mark: rectangles and straight strokes only, one red element,
-content inside a 400px circle of the 512px canvas so Telegram's round avatar crop
-never clips it, and it must stay legible as a 20px monochrome silhouette.
+Rules for any future mark:
+
+- one recognisable object, no compositions of two ideas;
+- ink + one red + the ground colour, flat fills, no gradient or stroke effects;
+- silhouette-first: it must survive as a 20px single-colour shape, so no detail
+  thinner than ~8px at 512;
+- everything inside a 400px circle of the 512px canvas — Telegram crops avatars
+  to a circle;
+- no religious or cultural insignia beyond what the product itself is about.
 
 ---
 

@@ -77,16 +77,16 @@ No ads. Only your people.
 
 ## Botpic — `/setuserpic`
 
-Pick one of `brand/render/botpic-{a-frame,b-week,c-window,d-candle}.png`
-(512×512, sources in `brand/logo/`). All four are rectangles only — no radius,
-no gradient — per [DESIGN.md](../DESIGN.md).
+Pick one of `brand/render/botpic-{a-hands,b-candle,c-book,d-open-palm}.png`
+(512×512, sources in `brand/logo/`). Each shows one real object in ink + one red,
+flat, no gradient — per [DESIGN.md](../DESIGN.md).
 
 | Option | Mark | Reads as |
 |--------|------|----------|
-| **A — Frame** | Open black square, red block inside, on white | The room, and a person held inside it. Most literal to the product name. |
-| **B — Week** | Seven bars on off-white, the seventh red | The habit itself — one day at a time. Ties the avatar to the streak. |
-| **C — Window** | Red field split by two white gaps | Strongest at 20px; pure shape, zero detail to lose. |
-| **D — Candle** | Red square over a straight white stem, on black | Keeps the old flame idea with every curve removed. The only dark option — a hard black circle in a light chat list. |
+| **A — Praying hands** | Black hands on a red square, white ground | The most literal statement of what the bot is for. The red field makes it the loudest of the four in a chat list. |
+| **B — Candle** | Black candle, red flame, white ground | Warm and unmistakable; the flame is the only red. Reads well at every size. |
+| **C — Open book** | Black open book, red ribbon, white ground | "We pray through Scripture" without a word of it. The calmest option. |
+| **D — Open palm** | White palm carrying a red flame, on black | The product in one picture: someone else is holding your request today. The only dark option — stands out in a light chat list. |
 
 ---
 

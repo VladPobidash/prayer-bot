@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <!-- D — Candle. One red square of flame over a straight black stem. Keeps the
-       old brand's idea and drops every curve. Inverted for dark surfaces. -->
-  <rect width="512" height="512" fill="#101010"/>
-
-  <rect x="224" y="132" width="64" height="64" fill="#D0021B"/>
-  <rect x="236" y="232" width="40" height="140" fill="#FFFFFF"/>
-  <rect x="196" y="372" width="120" height="16" fill="#FFFFFF"/>
-</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- D — An open palm carrying a flame: someone else is holding your request
+       today. Inverted, for a dark chat list. -->
+  <rect width="512" height="512" fill="#101010"/>
+
+  <path d="M266 104 C 280 148 306 168 316 198 C 328 232 316 268 288 280 C 278 285 256 285 246 280 C 218 268 206 232 218 198 C 228 168 254 148 266 104 Z" fill="#D0021B"/>
+
+  <g fill="#FFFFFF">
+    <!-- fingers: index, middle, ring, little -->
+    <path d="M176 322 V 268 C 176 254 186 246 198 246 C 210 246 220 254 220 268 V 322 Z"/>
+    <path d="M224 322 V 252 C 224 238 234 230 246 230 C 258 230 268 238 268 252 V 322 Z"/>
+    <path d="M272 322 V 262 C 272 248 282 240 294 240 C 306 240 316 248 316 262 V 322 Z"/>
+    <path d="M320 322 V 284 C 320 272 328 264 338 264 C 348 264 356 272 356 284 V 322 Z"/>
+    <!-- thumb -->
+    <path d="M176 344 L 138 308 C 129 299 129 286 138 277 C 147 268 160 268 169 277 L 204 312 Z"/>
+    <!-- palm -->
+    <path d="M176 312 H 356 V 342 C 356 388 316 418 266 418 C 216 418 176 388 176 342 Z"/>
+  </g>
+</svg>

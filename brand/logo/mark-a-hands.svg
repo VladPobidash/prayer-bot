@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- A — Praying hands. Ink silhouette on a red field. Blunt fingertips and a
+       wide base: sharp tips read as an arrow at avatar size, not as hands. -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  <rect x="96" y="96" width="320" height="320" fill="#D0021B"/>
+
+  <g fill="#101010">
+    <!-- left hand -->
+    <path d="M232 170
+             C 220 176 212 196 208 220
+             C 195 272 180 316 172 348
+             C 168 366 170 382 178 394
+             L 250 394
+             L 250 212
+             C 250 188 244 166 232 170 Z"/>
+    <!-- right hand, fingertip a little higher -->
+    <path d="M280 160
+             C 292 166 300 186 304 210
+             C 317 264 332 310 340 342
+             C 344 360 342 380 334 394
+             L 262 394
+             L 262 202
+             C 262 178 268 156 280 160 Z"/>
+    <!-- wrists / cuff -->
+    <path d="M174 394 H 338 V 418 H 174 Z"/>
+  </g>
+</svg>
