@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- F — Many rooms, one of them lit. A building at night: your room is the
+       red window. Says "prayer rooms", plural, with no figure at all. -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  <rect x="132" y="124" width="248" height="264" fill="#101010"/>
+
+  <g fill="#FFFFFF">
+    <rect x="160" y="152" width="56" height="56"/>
+    <rect x="228" y="152" width="56" height="56"/>
+    <rect x="296" y="152" width="56" height="56"/>
+
+    <rect x="160" y="224" width="56" height="56"/>
+    <rect x="296" y="224" width="56" height="56"/>
+
+    <rect x="160" y="296" width="56" height="56"/>
+    <rect x="296" y="296" width="56" height="56"/>
+    <!-- the way in -->
+    <rect x="234" y="296" width="44" height="92"/>
+  </g>
+
+  <!-- the lit room -->
+  <rect x="228" y="224" width="56" height="56" fill="#D0021B"/>
+</svg>

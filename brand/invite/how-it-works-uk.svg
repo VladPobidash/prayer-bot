@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <!-- Editorial layout: hairline rules instead of boxes, red only on the
+       numerals and the one action. No radius anywhere. -->
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <g transform="translate(62,50) scale(1.5)">
+    <path fill="#101010" fill-rule="evenodd" d="M3 2h18v20H3z M5 5h4v4H5z M10 5h4v4h-4z M15 5h4v4h-4z M5 11h4v4H5z M10 11h4v4h-4z M15 11h4v4h-4z M5 17h4v5H5z M10 17h4v5h-4z M15 17h4v5h-4z"/>
+    <rect x="10" y="11" width="4" height="4" fill="#D0021B"/>
+  </g>
+  <text x="112" y="74" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#101010" letter-spacing="4.2">PRAYER ROOM</text>
+
+  <text x="64" y="192" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="800" fill="#101010" letter-spacing="-1">Як це працює</text>
+  <text x="64" y="232" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#4A4A4A">Молитовна кімната нашої групи — три кроки, далі бот сам</text>
+
+  <rect x="64" y="272" width="1152" height="3" fill="#101010"/>
+
+  <g>
+    <text x="64" y="352" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800" fill="#D0021B">01</text>
+    <text x="64" y="404" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#101010">Приєднуєшся</text>
+    <text x="64" y="446" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">Тиснеш посилання</text>
+    <text x="64" y="474" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">і «Запустити».</text>
+    <text x="64" y="516" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#8A8A8A">Кімната закрита —</text>
+    <text x="64" y="544" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#8A8A8A">тільки свої.</text>
+  </g>
+
+  <rect x="440" y="320" width="1" height="240" fill="#DADADA"/>
+
+  <g>
+    <text x="504" y="352" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800" fill="#D0021B">02</text>
+    <text x="504" y="404" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#101010">Пишеш прохання</text>
+    <text x="504" y="446" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">До 3 своїх тем —</text>
+    <text x="504" y="474" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">можна почати з однієї.</text>
+    <text x="504" y="516" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#8A8A8A">Обираєш час</text>
+    <text x="504" y="544" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#8A8A8A">нагадування.</text>
+  </g>
+
+  <rect x="840" y="320" width="1" height="240" fill="#DADADA"/>
+
+  <g>
+    <text x="904" y="352" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="800" fill="#D0021B">03</text>
+    <text x="904" y="404" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#101010">Молишся щодня</text>
+    <text x="904" y="446" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">Бот пише, за кого</text>
+    <text x="904" y="474" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#4A4A4A">молитись сьогодні.</text>
+    <text x="904" y="516" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#8A8A8A">Помолився — тиснеш</text>
+    <text x="904" y="544" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#8A8A8A">кнопку.</text>
+  </g>
+
+  <rect x="64" y="608" width="1152" height="64" fill="#101010"/>
+  <rect x="96" y="632" width="16" height="16" fill="#D0021B"/>
+  <text x="128" y="646" font-family="Segoe UI, Arial, sans-serif" font-size="19" fill="#FFFFFF">Бог відповів — позначаєш тему, і група бачить не лише прохання, а й відповіді</text>
+</svg>

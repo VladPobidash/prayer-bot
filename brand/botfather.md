@@ -77,15 +77,11 @@ No ads. Only your people.
 
 ## Botpic — `/setuserpic`
 
-Pick one of `brand/render/botpic-option-{a,b,c,d}.png` (512×512, sources in
-`brand/logo/`).
+`brand/render/botpic.png` (512×512, source `brand/logo/mark.svg`) — a building at
+night with one window lit: many rooms, and yours is the one that is on.
 
-| Option | Mark | Reads as |
-|--------|------|----------|
-| **A — Flame & circle** | Gold flame inside a dotted ring of eight dots | A group gathered around one prayer. Strongest at small sizes. |
-| **B — Cupped hands** | Indigo hands holding a flame on warm cream | Warm, human, unmistakably prayer. The only light-background option — stands out in a dark chat list. |
-| **C — Bubble & flame** | Telegram-style speech bubble with a flame | "Prayer, in a messenger." Note: Telegram crops avatars to a circle, so the bubble tail is partly clipped. |
-| **D — Sunrise ring** | Sunrise inside a 7-segment ring, one segment unlit | The daily streak — habit and morning rhythm. Most abstract. |
+`botpic-inverted.png` is the same mark on `#101010`; use it only where the
+surface is already dark. Don't recolour the mark beyond these two variants.
 
 ---
 
